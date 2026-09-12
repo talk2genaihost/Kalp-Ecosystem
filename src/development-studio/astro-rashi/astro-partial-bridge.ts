@@ -44,8 +44,8 @@ function renderPartialNotice(answer: HTMLElement): void {
   const notice = document.createElement("section");
   notice.className = "kalp-partial-notice";
   notice.style.cssText = "margin-top:14px;padding:12px;border:1px solid #f59e0b;border-radius:12px;background:#fffbeb";
-  const status = payload.__providerStatus ?? "अनुपलब्ध";
-  const stage = payload.__providerStage ?? "PROVIDER";
+  const status = payload.providerStatus ?? data.__providerStatus ?? "अनुपलब्ध";
+  const stage = payload.providerStage ?? data.__providerStage ?? "PROVIDER";
   notice.innerHTML = `<strong>स्रोत स्थिति: आंशिक</strong><p style="margin:6px 0">लग्न KALP ने स्वतंत्र रूप से गणना किया है; अन्य प्रदाता तथ्य अभी उपलब्ध नहीं हैं।</p><div><b>KALP Lagna:</b> ${escapeHtml(String(lagna.value ?? "उपलब्ध नहीं"))}${lagna.degreeText ? ` · ${escapeHtml(String(lagna.degreeText))}` : ""}</div><div style="margin-top:4px;font-size:.85rem;color:#92400e">Provider stage: ${escapeHtml(String(stage))} · Status: ${escapeHtml(String(status))}</div>`;
   const details = answer.querySelector("details");
   if (details) answer.insertBefore(notice, details); else answer.appendChild(notice);
