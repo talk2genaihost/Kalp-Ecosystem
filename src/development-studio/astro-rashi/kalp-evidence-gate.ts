@@ -77,7 +77,6 @@ export function buildEvidenceContext(payload: unknown): EvidenceContext {
 
   const planets = Array.isArray(data.planets) ? data.planets.map((planet) => {
     const p = obj(planet);
-    // Only expose chart facts that are safe to interpret without house/aspect calculation.
     return clean({
       name: p.name ?? p.planet,
       sign: p.sign ?? p.rashi ?? p.zodiac,
@@ -127,6 +126,20 @@ function normalized(text: string): string {
   return text.toLowerCase().replace(/[\s.,:;!?()\[\]{}'"“”‘’–—-]/g, "");
 }
 
+const COMMON_YOGA_NAMES = [
+  ["परिवर्तन योग", "parivartana yoga"],
+  ["दैन्य परिवर्तन योग", "dainya parivartana yoga"],
+  ["विपरीत राजयोग", "vipareeta rajayoga", "viparita rajayoga"],
+  ["राजयोग", "राज योग", "raja yoga"],
+  ["वेशि योग", "veshi yoga"],
+  ["वोशी योग", "vasi yoga"],
+  ["उभयचरी योग", "ubhayachari yoga"],
+  ["केमद्रुम", "kemadruma"],
+  ["गजकेसरी योग", "gajakesari yoga"],
+  ["बुधादित्य योग", "budhaditya yoga"],
+  ["नीचभंग राजयोग", "neechabhanga rajayoga", "neecha bhanga raja yoga"],
+];
+
 export function validateInterpretation(value: unknown, evidence: EvidenceContext): { ok: boolean; violations: string[] } {
   const parsed = obj(value);
   const text = Object.values(parsed).flatMap((item) => Array.isArray(item) ? item : [item]).filter((item): item is string => typeof item === "string").join(" ");
@@ -139,13 +152,22 @@ export function validateInterpretation(value: unknown, evidence: EvidenceContext
   unsupported("tithi", ["तिथि", "tithi"]);
   unsupported("karana", ["करण", "karana"]);
   unsupported("mangalDosha", ["मंगलदोष", "मांगलिक", "mangaldosha", "manglik"]);
-  unsupported("yogaDetails", ["योग", "yoga"]);
 
   const dashaLevels = evidence.facts.dashaLevels;
   if (dashaLevels.length < 2 && ["अंतरदशा", "antardasha", "subperiod"].some((pattern) => n.includes(normalized(pattern)))) violations.push("dasha: Antardasha not evidenced");
   if (dashaLevels.length < 3 && ["प्रत्यंतरदशा", "pratyantardasha", "sub-sub-period"].some((pattern) => n.includes(normalized(pattern)))) violations.push("dasha: Pratyantardasha not evidenced");
 
-  if (!evidence.facts.yogaDetails.length && ["परिवर्तनयोग", "परिवर्तन योग", "राजयोग", "विपरीत राजयोग", "वेशि योग", "केमद्रुम", "parivartana yoga", "raja yoga", "veshi yoga", "kemadruma"].some((pattern) => n.includes(normalized(pattern)))) violations.push("yogaDetails: no supplied yoga evidence");
+  const suppliedYogaText = normalized(evidence.facts.yogaDetails.map(textOf).join(" "));
+  for (const names of COMMON_YOGA_NAMES) {
+    const mentioned = names.some((name) => n.includes(normalized(name)));
+    const evidenced = names.some((name) => suppliedYogaText.includes(normalized(name)));
+    if (mentioned && !evidenced) violations.push(`yogaDetails: unsupported yoga claim (${names[0]})`);
+  }
+  if (!evidence.facts.yogaDetails.length && ["योग", "yoga"].some((pattern) => n.includes(normalized(pattern)))) violations.push("yogaDetails: no supplied yoga evidence");
 
   return { ok: violations.length === 0, violations };
+}
+
+function textOf(value: unknown): string {
+  return typeof value === "string" ? value : JSON.stringify(value ?? "");
 }
