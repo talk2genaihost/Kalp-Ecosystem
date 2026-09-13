@@ -23,17 +23,17 @@ function nakshatraFromMoon(moon:R): {name:string|null;pada:number|null;lord:stri
   const degree=Number(moon.degree); const sign=String(moon.sign??"");
   const signIndex=["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"].indexOf(sign);
   if(!Number.isFinite(degree)||signIndex<0) return {name:null,pada:null,lord:null,source:"UNAVAILABLE"};
-  const longitude=signIndex*30+degree; const index=Math.floor(longitude/(13+20/60));
+  const longitude=signIndex*30+degree; const span=13+20/60; const index=Math.floor(longitude/span);
   const names=["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishtha","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
   const lords=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"];
-  const name=names[index]??null; const pada=name?Math.floor((longitude-index*(13+20/60))/(13+20/60)/4*4)+1:null;
-  return {name,pada:Math.min(4,Math.max(1,pada??1)),lord:name?lords[index%9]:null,source:name?"KALP_CALCULATED":"UNAVAILABLE"};
+  const name=names[index]??null; const within=name?longitude-index*span:0; const pada=name?Math.min(4,Math.floor(within/(span/4))+1):null;
+  return {name,pada,lord:name?lords[index%9]:null,source:name?"KALP_CALCULATED":"UNAVAILABLE"};
 }
 function adaptOpenKundali(raw:unknown){
  const root=obj(raw); const data=obj(root.data) && Object.keys(obj(root.data)).length ? obj(root.data) : root;
  const planets=arr(data.planets); const moon=planetByName(planets,["Moon","Chandra"]); const sun=planetByName(planets,["Sun","Surya","Ravi"]);
  const moonSign=firstValue(moon,["sign","rashi","zodiac"]); const sunSign=firstValue(sun,["sign","rashi","zodiac"]);
- const nak=n akshatraFromMoon(moon); const periods=dashaPeriods(data); const dash=currentDasha(periods,data);
+ const nak=nakshatraFromMoon(moon); const periods=dashaPeriods(data); const dash=currentDasha(periods,data);
  const yogas=arr(data.yogas).length?arr(data.yogas):arr(data.yogaDetails);
  const manglik=firstValue(data,["mangalDosha","manglik","manglikDosha","mangal_dosha"]);
  const tithi=firstValue(data,["tithi","tithiName"]), karana=firstValue(data,["karana","karanaName"]), yoga=firstValue(data,["yoga","yogaName"]);
