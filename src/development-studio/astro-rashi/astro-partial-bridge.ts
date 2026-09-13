@@ -14,9 +14,31 @@ function patchPayload(payload: Obj): Obj {
   const data: Obj = { ...source };
   const kalp = payload.kalpLagna ?? source.lagna ?? canonical.lagna;
   if (kalp && typeof kalp === "object") data.lagna = kalp;
-  for (const key of ["tithi","karana","yoga","dasha","dashaPeriods"]) {
+
+  for (const key of ["tithi","karana","yoga","dasha","dashaPeriods","yogaDetails","mangalDosha","moonSign","sunSign","nakshatra","nakshatraPada","nakshatraLord"]) {
     if (data[key] === undefined && canonical[key] !== undefined) data[key] = canonical[key];
   }
+
+  // Compatibility projection for the current browser renderer. The source of truth remains
+  // the KALP canonical fields above; this only exposes them through the legacy UI shape.
+  if (data.moonSign != null) data.nakshatra_details = { ...object(data.nakshatra_details), chandra_rasi: { name: data.moonSign } };
+  if (data.sunSign != null) data.nakshatra_details = { ...object(data.nakshatra_details), soorya_rasi: { name: data.sunSign } };
+  if (data.nakshatra != null || data.nakshatraPada != null || data.nakshatraLord != null) {
+    const existing = object(data.nakshatra_details);
+    data.nakshatra_details = {
+      ...existing,
+      nakshatra: {
+        ...object(existing.nakshatra),
+        name: data.nakshatra,
+        pada: data.nakshatraPada,
+        lord: data.nakshatraLord,
+      },
+    };
+  }
+  if (data.yogaDetails !== undefined && data.yoga_details === undefined) data.yoga_details = data.yogaDetails;
+  if (data.dashaPeriods !== undefined && data.dasha_periods === undefined) data.dasha_periods = data.dashaPeriods;
+  if (data.mangalDosha !== undefined && data.mangal_dosha === undefined) data.mangal_dosha = data.mangalDosha;
+
   if (payload.status === "PARTIAL_SUCCESS") {
     data.__kalpPartial = true;
     data.__providerStatus = payload.providerStatus ?? null;
