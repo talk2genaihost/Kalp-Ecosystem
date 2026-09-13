@@ -7,15 +7,23 @@ let lastPartial = false;
 function escapeHtml(value: string): string {
   return value.replace(/[&<>\"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"})[c] ?? c);
 }
+function object(value: unknown): Obj { return value && typeof value === "object" && !Array.isArray(value) ? value as Obj : {}; }
 function patchPayload(payload: Obj): Obj {
-  if (payload.status !== "PARTIAL_SUCCESS") return payload;
-  const kalp = payload.kalpLagna;
-  const data = payload.data && typeof payload.data === "object" ? { ...(payload.data as Obj) } : {};
+  const source = object(payload.data);
+  const canonical = object(source.canonical);
+  const data: Obj = { ...source };
+  const kalp = payload.kalpLagna ?? source.lagna ?? canonical.lagna;
   if (kalp && typeof kalp === "object") data.lagna = kalp;
-  data.__kalpPartial = true;
-  data.__providerStatus = payload.providerStatus ?? null;
-  data.__providerStage = payload.providerStage ?? null;
-  return { ...payload, status: "SUCCESS", sourceStatus: "PARTIAL", data };
+  for (const key of ["tithi","karana","yoga","dasha","dashaPeriods"]) {
+    if (data[key] === undefined && canonical[key] !== undefined) data[key] = canonical[key];
+  }
+  if (payload.status === "PARTIAL_SUCCESS") {
+    data.__kalpPartial = true;
+    data.__providerStatus = payload.providerStatus ?? null;
+    data.__providerStage = payload.providerStage ?? null;
+    return { ...payload, status: "SUCCESS", sourceStatus: "PARTIAL", data };
+  }
+  return { ...payload, data };
 }
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
@@ -28,10 +36,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
   let body: unknown;
   try { body = await clone.json(); } catch { lastPartial = false; return response; }
   if (!body || typeof body !== "object") { lastPartial = false; return response; }
-  if ((body as Obj).status !== "PARTIAL_SUCCESS") { lastPartial = false; return response; }
-  lastPartial = true;
-  const patched = patchPayload(body as Obj);
-  return new Response(JSON.stringify(patched), { status: 200, headers: new Headers({ "Content-Type": "application/json" }) });
+  const payload = body as Obj;
+  if (payload.status !== "PARTIAL_SUCCESS" && payload.status !== "SUCCESS") { lastPartial = false; return response; }
+  lastPartial = payload.status === "PARTIAL_SUCCESS";
+  const patched = patchPayload(payload);
+  return new Response(JSON.stringify(patched), { status: response.ok ? response.status : 200, headers: new Headers({ "Content-Type": "application/json" }) });
 };
 
 function renderPartialNotice(answer: HTMLElement): void {
@@ -39,8 +48,8 @@ function renderPartialNotice(answer: HTMLElement): void {
   const json = answer.querySelector(".kundli-json");
   let payload: Obj = {};
   try { payload = JSON.parse(json?.textContent ?? "{}") as Obj; } catch { return; }
-  const data = payload.data && typeof payload.data === "object" ? payload.data as Obj : {};
-  const lagna = data.lagna && typeof data.lagna === "object" ? data.lagna as Obj : {};
+  const data = object(payload.data);
+  const lagna = object(data.lagna);
   const notice = document.createElement("section");
   notice.className = "kalp-partial-notice";
   notice.style.cssText = "margin-top:14px;padding:12px;border:1px solid #f59e0b;border-radius:12px;background:#fffbeb";
