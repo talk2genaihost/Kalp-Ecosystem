@@ -1,3 +1,5 @@
+import { buildEvidenceContext, validateInterpretation, type EvidenceContext } from "./kalp-evidence-gate.ts";
+
 const SUPABASE_URL = "https://cfwrgalgscieddkcrtde.supabase.co";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 const GATEWAY_ENDPOINT = `${SUPABASE_URL}/functions/v1/kalp-intelligence-gateway`;
@@ -86,25 +88,40 @@ async function getGatewayToken(): Promise<string> {
   return body.access_token;
 }
 
+function evidencePrompt(evidence: EvidenceContext): string {
+  return [
+    "EVIDENCE GATE — THIS IS A HARD CONSTRAINT, NOT A SUGGESTION.",
+    `Evidence provider: ${evidence.provider}`,
+    `Canonical model: ${evidence.model}`,
+    `Field evidence status: ${JSON.stringify(evidence.statuses)}`,
+    `Evidence-safe facts ONLY: ${JSON.stringify(evidence.facts)}`,
+    `Unavailable fields: ${JSON.stringify(evidence.unavailable)}`,
+    "Authoritative rules:",
+    ...evidence.rules.map((rule) => `- ${rule}`),
+    "The Evidence-safe facts block is the complete factual boundary for this response. Do not use, reconstruct, calculate, or infer any fact outside it.",
+    "If a field is unavailable, say that the available chart data does not provide it. Do not fill the gap from astrology conventions or your general knowledge.",
+  ].join("\n");
+}
+
 async function interpret(payload: unknown): Promise<Interpretation> {
   const token = await getGatewayToken();
   const root = payload as Record<string, unknown>;
   const requested = root.requested ?? {};
-  const data = root.data ?? {};
+  const evidence = buildEvidenceContext(payload);
   const name = (document.getElementById("birthName") as HTMLInputElement | null)?.value.trim() ?? "";
   const sex = (document.getElementById("birthSex") as HTMLSelectElement | null)?.value ?? "";
   const prompt = [
     "You are the KALP Astro Rashi interpretation layer for a detailed Vedic astrology reading.",
-    "Use only the supplied Vedic chart/provider facts. Never invent a planet, house, sign, nakshatra, yoga, dasha, degree, aspect, or placement that is not present in the supplied data.",
+    "Use only the supplied Evidence-safe facts. Never invent a planet, house, sign, nakshatra, yoga, dasha, degree, aspect, or placement that is not present in that evidence.",
     "Explain what the supplied facts can reasonably indicate, and explicitly avoid overclaiming when data is missing.",
     "Use cautious, non-deterministic language such as 'संकेत मिलते हैं', 'संभावना हो सकती है', or 'यह प्रवृत्ति दिखाई देती है'. Do not present astrology as scientific certainty.",
     "Do not provide medical diagnosis/treatment, guaranteed predictions, legal advice, or guaranteed financial outcomes. For finance, discuss behavioral tendencies only, not investment instructions. For relationships, discuss communication and tendencies, not guaranteed events.",
     "Return JSON only with exactly these keys: summary (string), personality (string[]), career (string[]), relationships (string[]), finance (string[]), dasha (string[]), nakshatra (string[]), yogas (string[]), strengths (string[]), cautions (string[]), focus (string[]), guidance (string[]).",
     "Write all values in natural, conversational Hindi. Keep each bullet informative but concise. Aim for 2-4 bullets in each section when the supplied facts support it; otherwise return a shorter list.",
     "The reading should feel like a complete personal chart overview, not a generic zodiac horoscope.",
+    evidencePrompt(evidence),
     `Person details: ${JSON.stringify({ name, sex })}`,
     `Requested birth context: ${JSON.stringify(requested)}`,
-    `Full normalized provider data: ${JSON.stringify(data)}`,
   ].join("\n\n");
 
   const response = await fetch(GATEWAY_ENDPOINT, {
@@ -125,7 +142,18 @@ async function interpret(payload: unknown): Promise<Interpretation> {
     const detail = Array.isArray(body.attempts) && body.attempts.length ? ` ${body.attempts.map((attempt) => JSON.stringify(attempt)).join(" ")}` : "";
     throw new Error((body.message ?? `KALP Gemini request failed (${response.status}).`) + detail);
   }
-  const parsed = JSON.parse(body.output) as Interpretation;
+
+  let parsed: Interpretation;
+  try {
+    parsed = JSON.parse(body.output) as Interpretation;
+  } catch {
+    throw new Error("KALP Evidence Gate rejected the Gemini response because it was not valid JSON.");
+  }
+  const validation = validateInterpretation(parsed, evidence);
+  if (!validation.ok) {
+    throw new Error(`KALP Evidence Gate rejected unsupported Gemini claims: ${validation.violations.join("; ")}`);
+  }
+
   return {
     summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
     personality: asList(parsed.personality),
@@ -153,7 +181,7 @@ function renderInterpretation(value: Interpretation, answer: HTMLElement): void 
   section.innerHTML = `
     <div class="kalp-gemini-header">
       <div><span class="kalp-gemini-eyebrow">KALP · Gemini</span><h3>विस्तृत वैदिक व्याख्या</h3></div>
-      <span class="kalp-gemini-badge">AI Interpretation</span>
+      <span class="kalp-gemini-badge">AI Interpretation · Evidence Gated</span>
     </div>
     <p class="kalp-gemini-summary">${escapeHtml(value.summary ?? "इस चार्ट के लिए पर्याप्त व्याख्यात्मक तथ्य उपलब्ध नहीं हैं।")}</p>
     <div class="kalp-gemini-sections">
@@ -169,7 +197,7 @@ function renderInterpretation(value: Interpretation, answer: HTMLElement): void 
       ${renderListSection("अभी ध्यान देने के क्षेत्र", value.focus ?? [])}
       ${renderListSection("व्यावहारिक मार्गदर्शन", value.guidance ?? [])}
     </div>
-    <small>यह व्याख्या उपलब्ध वैदिक चार्ट डेटा पर आधारित AI interpretation है; इसे निश्चित भविष्यवाणी या पेशेवर सलाह न माना जाए।</small>`;
+    <small>यह व्याख्या उपलब्ध और evidence-gated वैदिक चार्ट डेटा पर आधारित AI interpretation है; इसे निश्चित भविष्यवाणी या पेशेवर सलाह न माना जाए।</small>`;
   const details = answer.querySelector(".kundli-result > details, details");
   if (details) answer.insertBefore(section, details);
   else answer.insertBefore(section, answer.firstChild);
@@ -190,7 +218,7 @@ function processKundliResult(answer: HTMLElement): void {
   answer.dataset.kalpGeminiProcessed = "true";
   const loading = document.createElement("section");
   loading.className = "kalp-gemini-interpretation kalp-gemini-loading";
-  loading.innerHTML = `<h3>विस्तृत KALP Gemini व्याख्या</h3><p>चार्ट के उपलब्ध संकेतों का विस्तृत विश्लेषण तैयार किया जा रहा है…</p>`;
+  loading.innerHTML = `<h3>विस्तृत KALP Gemini व्याख्या</h3><p>चार्ट के evidence-gated संकेतों का विस्तृत विश्लेषण तैयार किया जा रहा है…</p>`;
   const details = answer.querySelector("details");
   if (details) answer.insertBefore(loading, details);
   else answer.insertBefore(loading, answer.firstChild);
@@ -201,7 +229,7 @@ function processKundliResult(answer: HTMLElement): void {
       renderInterpretation(result, answer);
     })
     .catch((error) => {
-      loading.innerHTML = `<h3>विस्तृत KALP Gemini व्याख्या</h3><p>${escapeHtml(error instanceof Error ? error.message : "KALP Gemini व्याख्या उपलब्ध नहीं है।")}</p>`;
+      loading.innerHTML = `<h3>विस्तृत KALP Gemini व्याख्या</h3><p>${escapeHtml(error instanceof Error ? error.message : "KALP Gemini व्याख्या Evidence Gate द्वारा उपलब्ध नहीं कराई गई।")}</p>`;
     });
 }
 
