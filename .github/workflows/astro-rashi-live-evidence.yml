@@ -1,0 +1,27 @@
+name: Astro Rashi Live Evidence Validation
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  live-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository without external action
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git init .
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --depth 1 origin "${GITHUB_REF}"
+          git checkout --detach FETCH_HEAD
+
+      - name: Verify Node runtime
+        run: node --version
+
+      - name: Execute live canonical evidence validation
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/verify-astro-rashi-live.mjs
