@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx src/main.ts",
     "dev:astro-rashi": "vite",
+    "dev:mtr-gateway": "tsx src/market-to-revenue/runtime-gateway-main.ts",
     "build": "tsc",
     "build:astro-rashi": "vite build",
     "test": "tsx --test tests/**/*.test.ts"
