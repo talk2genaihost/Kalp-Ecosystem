@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import type { Cache, KalpRequest, KalpResponse, ProviderAdapter } from "../../../contracts/kalp-reference.js";
 
 export class ReferenceMcpGateway {
+  private readonly inFlight = new Map<string, Promise<KalpResponse>>();
+
   constructor(
     private readonly cache: Cache,
     private readonly providers: Map<string, ProviderAdapter>,
@@ -23,12 +25,28 @@ export class ReferenceMcpGateway {
       };
     }
 
+    const existing = this.inFlight.get(cacheKey);
+    if (existing) {
+      const result = await existing;
+      return { ...result, request_id: request.request_id, execution: { ...result.execution, cache_status: cached.status, latency_ms: Date.now() - started } };
+    }
+
+    const execution = this.fetchAndCache(request, cacheKey, cached.status, started);
+    this.inFlight.set(cacheKey, execution);
+    try {
+      return await execution;
+    } finally {
+      this.inFlight.delete(cacheKey);
+    }
+  }
+
+  private async fetchAndCache(request: KalpRequest, cacheKey: string, cacheStatus: "miss" | "expired", started: number): Promise<KalpResponse> {
     const provider = this.providers.values().next().value as ProviderAdapter | undefined;
     if (!provider) {
       return {
         request_id: request.request_id,
         status: "error",
-        execution: { cache_status: cached.status, latency_ms: Date.now() - started },
+        execution: { cache_status: cacheStatus, latency_ms: Date.now() - started },
         error: { code: "NO_PROVIDER", message: "No provider adapter is registered." },
       };
     }
@@ -40,7 +58,7 @@ export class ReferenceMcpGateway {
         return {
           request_id: request.request_id,
           status: "error",
-          execution: { cache_status: cached.status, provider: provider.provider_id, latency_ms: Date.now() - started },
+          execution: { cache_status: cacheStatus, provider: provider.provider_id, latency_ms: Date.now() - started },
           error: { code: "VALIDATION_FAILED", message: "Provider response failed KALP validation." },
         };
       }
@@ -51,13 +69,13 @@ export class ReferenceMcpGateway {
         result: normalized,
         provenance: normalized.provenance,
         freshness: { retrieved_at: normalized.retrieved_at, expires_at: normalized.expires_at },
-        execution: { cache_status: cached.status, provider: provider.provider_id, latency_ms: Date.now() - started },
+        execution: { cache_status: cacheStatus, provider: provider.provider_id, latency_ms: Date.now() - started },
       };
     } catch {
       return {
         request_id: request.request_id,
         status: "error",
-        execution: { cache_status: cached.status, provider: provider.provider_id, latency_ms: Date.now() - started },
+        execution: { cache_status: cacheStatus, provider: provider.provider_id, latency_ms: Date.now() - started },
         error: { code: "PROVIDER_ERROR", message: "Provider adapter execution failed." },
       };
     }
