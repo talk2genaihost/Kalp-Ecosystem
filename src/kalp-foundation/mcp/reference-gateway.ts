@@ -31,7 +31,8 @@ export class ReferenceMcpGateway {
       return { ...result, request_id: request.request_id, execution: { ...result.execution, cache_status: cached.status, latency_ms: Date.now() - started } };
     }
 
-    const execution = this.fetchAndCache(request, cacheKey, cached.status, started);
+    const cacheStatus: "miss" | "expired" = cached.status === "expired" ? "expired" : "miss";
+    const execution = this.fetchAndCache(request, cacheKey, cacheStatus, started);
     this.inFlight.set(cacheKey, execution);
     try {
       return await execution;
