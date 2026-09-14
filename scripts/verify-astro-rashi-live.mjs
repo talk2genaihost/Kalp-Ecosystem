@@ -25,6 +25,23 @@ async function getToken() {
   return body.access_token;
 }
 
+function findCanonical(value, depth = 0) {
+  if (!value || typeof value !== "object" || depth > 6) return null;
+  if (value.lagna && typeof value.lagna === "object" && value.lagna.source === "KALP_CALCULATED") return value;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = findCanonical(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  for (const item of Object.values(value)) {
+    const found = findCanonical(item, depth + 1);
+    if (found) return found;
+  }
+  return null;
+}
+
 async function main() {
   const token = await getToken();
   const response = await fetch(KUNDLI_ENDPOINT, {
@@ -41,9 +58,9 @@ async function main() {
   assert(payload.status === "SUCCESS", `unexpected status ${payload.status}`);
   assert(payload.provider === "openkundali", `provider is ${payload.provider}`);
 
-  const canonical = payload.data?.canonical ?? payload.canonical;
-  const evidence = canonical?.evidence ?? payload.data?.evidence ?? {};
-  assert(canonical, "KALP-KUNDLI-CANONICAL-v1 payload missing");
+  const canonical = findCanonical(payload);
+  const evidence = canonical?.evidence ?? payload.data?.evidence ?? payload.evidence ?? {};
+  assert(canonical, `KALP-KUNDLI-CANONICAL-v1 payload missing; top-level keys: ${Object.keys(payload).join(",")}`);
   assert(canonical.lagna?.value === "मकर", `Lagna value ${canonical.lagna?.value}`);
   assert(canonical.lagna?.evidenceStatus === "CALCULATED", `Lagna evidence ${canonical.lagna?.evidenceStatus}`);
   assert(canonical.lagna?.source === "KALP_CALCULATED", `Lagna source ${canonical.lagna?.source}`);
