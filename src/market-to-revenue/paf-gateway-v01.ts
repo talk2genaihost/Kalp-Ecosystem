@@ -1,0 +1,4 @@
+import { initialFreeProviderMesh, type NormalizedProviderResult, type ProviderRequest } from "./provider-adapters-v01.js";
+export interface PafSnapshot { observed_at:string; providers:NormalizedProviderResult[]; configured:number; healthy:number; rate_limited:number; }
+export async function runInitialFreeProviderMesh(request:ProviderRequest):Promise<PafSnapshot>{const providers=await Promise.all(initialFreeProviderMesh.map(p=>p.fetch(request)));return{observed_at:new Date().toISOString(),providers,configured:providers.filter(p=>p.status!=="not_configured").length,healthy:providers.filter(p=>p.status==="ok").length,rate_limited:providers.filter(p=>p.status==="rate_limited").length};}
+export function selectEvidenceProviders(results:NormalizedProviderResult[]):NormalizedProviderResult[]{return results.filter(r=>r.status==="ok"&&r.provider_id!=="MM-PAF-FIXTURE");}
