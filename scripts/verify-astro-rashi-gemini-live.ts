@@ -34,12 +34,16 @@ async function main() {
   assert(evidence.provider === "openkundali", `provider ${evidence.provider}`);
   const prompt = [
     "You are KALP's Full Kundli Intelligence layer. Produce a structured, evidence-gated Vedic chart interpretation from the supplied canonical evidence.",
-    "Use only the supplied evidence-safe facts. Do not reconstruct or infer unsupported facts.",
-    "A planet's sign or degree alone does NOT authorize house, aspect, conjunction, dignity, lordship, placement, or event claims.",
+    "Use only the supplied evidence-safe facts. Do not reconstruct, calculate, derive, or infer unsupported facts.",
+    "A planet's sign or degree alone authorizes ONLY that planet's supplied name, sign, degree, retrograde, and combust status.",
+    "CRITICAL: KP Houses are cusp records only in this evidence. They do NOT provide a planet-to-house mapping. Therefore do not say that any planet is in, placed in, situated in, or rules any house.",
+    "CRITICAL: Do not mention drishti/aspect, yuti/conjunction, planetary relationship, dignity/exaltation/debilitation, own-sign, moolatrikona, bhavesh/lordship, or planetary house placement unless that exact relationship is explicitly present in the supplied evidence. The current evidence does not supply those planetary relationships.",
     "Do not derive new yogas. Discuss only supplied yogaDetails. Do not derive Tithi, Karana, Mangal Dosha, houses, aspects, or Dasha subperiods from other facts.",
+    "For planetaryAnalysis, keep discussion limited to supplied planet facts and supplied Shadbala where applicable. Do not attach planets to houses or aspects.",
+    "For houseAnalysis, discuss only the supplied KP-house cusp/star-lord/sub-lord records as house evidence; do not assign planets to those houses.",
     "Use cautious, non-deterministic language. No medical diagnosis/treatment, deterministic predictions, legal advice, or guaranteed financial outcomes.",
     "Return JSON only with exactly these keys: summary, chartSynthesis, personality, planetaryAnalysis, houseAnalysis, career, relationships, finance, dasha, dashaTimeline, nakshatra, yogas, yogaAnalysis, strengths, cautions, focus, guidance. summary is a string; every other key is string[].",
-    "Write natural conversational Hindi. Return an empty array when evidence does not support a section.",
+    "Write natural conversational Hindi. Return an empty array when evidence does not support a section. Do not fill unsupported sections with generic astrology claims.",
     evidencePrompt(evidence),
   ].join("\n\n");
   const response = await fetch(GATEWAY_ENDPOINT, { method: "POST", headers: { Authorization: `Bearer ${auth}`, apikey: ANON_KEY!, "Content-Type": "application/json" }, body: JSON.stringify({ provider: "gemini", gemini_models: ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"], prompt }) });
