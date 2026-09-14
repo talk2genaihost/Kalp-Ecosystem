@@ -2,6 +2,7 @@ import { createAstroRashiRuntime } from "./runtime.js";
 import { unavailableCalculationProvider } from "./demo-provider.js";
 import { createLiveHoroscopeProvider, fetchLiveHoroscopes, SIGN_MAP } from "./live-horoscope-provider.js";
 import { rashis } from "./localization.js";
+import { renderGeminiForPayload } from "./kalp-gemini-entry.js";
 import type { Locale, Rashi } from "./domain.js";
 
 const liveProvider = createLiveHoroscopeProvider();
@@ -19,19 +20,12 @@ function escapeHtml(value: string): string {
   return value.replace(/[&<>\"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#39;" })[character] ?? character);
 }
 
-/**
- * Frontend boundary for Kundli data.
- *
- * This function deliberately does not map, interpret, localize, or render
- * individual Kundli fields. The canonical renderer owns that responsibility.
- * We only publish the exact backend payload into the DOM in the format the
- * canonical renderer and provenance UI consume.
- */
 function publishKundliPayload(payload: unknown): void {
   const answer = $("answer");
   answer.className = "notice kundli-result";
   answer.hidden = false;
   answer.innerHTML = `<h3>KALP Kundli</h3><p>Canonical chart data प्राप्त हुआ है। नीचे का दृश्य केवल KALP-KUNDLI-CANONICAL-v1 से render होता है।</p><details><summary>पूरा प्रदाता डेटा देखें</summary><pre class="kundli-json">${escapeHtml(JSON.stringify(payload, null, 2))}</pre></details>`;
+  renderGeminiForPayload(payload, answer);
 }
 
 async function getAccessToken(): Promise<string> {
