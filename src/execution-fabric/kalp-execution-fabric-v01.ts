@@ -1,8 +1,7 @@
 import {
   initialFreeProviderMesh,
   type NormalizedProviderResult,
-  type ProviderAdapter,
-  type ProviderRequest
+  type ProviderAdapter
 } from "../market-to-revenue/provider-adapters-v01.js";
 
 export type ExecutionStatus = "SUCCESS" | "PARTIAL" | "FAILED" | "REJECTED";
@@ -46,6 +45,7 @@ export interface QualityAssessment {
   score: number;
   completeness: number;
   freshness: number;
+  consistency: number;
   schemaValidity: number;
   sourceAuthority: number;
   warnings: string[];
@@ -137,11 +137,11 @@ function stringField(data: Record<string, unknown>, ...keys: string[]): string |
   return undefined;
 }
 
-function normalizeQuote(raw: NormalizedProviderResult): MarketQuoteV1 | undefined {
+function normalizeQuote(raw: NormalizedProviderResult, requestedSymbol: string): MarketQuoteV1 | undefined {
   if (raw.status !== "ok") return undefined;
   const data = raw.data;
-  const symbol = stringField(data, "symbol", "Symbol");
   const quote = (data["Global Quote"] ?? data["quote"] ?? data) as Record<string, unknown>;
+  const symbol = stringField(data, "symbol", "Symbol") ?? stringField(quote, "01. symbol") ?? requestedSymbol;
   const price = numberField(quote, "05. price", "c", "price");
   if (!symbol || price === undefined || price <= 0) return undefined;
 
@@ -173,7 +173,7 @@ function assessQuote(quote: MarketQuoteV1, request: MarketQuoteRequestV1, now: D
   if (completeness < 1) warnings.push("PARTIAL_DATA");
   if (authority < 0.7) warnings.push("SOURCE_AUTHORITY_LOW");
   const status: QualityStatus = schemaValidity === 0 ? "REJECTED" : score >= 0.65 ? "VALID" : "CAUTION";
-  return { status, score, completeness, freshness, schemaValidity, sourceAuthority: authority, warnings };
+  return { status, score, completeness, freshness, consistency: 1, schemaValidity, sourceAuthority: authority, warnings };
 }
 
 function median(values: number[]): number {
@@ -236,7 +236,7 @@ export class KalpExecutionFabricV01 {
         return;
       }
       const completed = this.now();
-      const normalized = normalizeQuote(raw);
+      const normalized = normalizeQuote(raw, request.symbol);
       telemetry.push({ attemptId: this.id(), providerId: candidate.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: normalized ? "success" : "failure", httpStatus: raw.status === "ok" ? 200 : raw.status === "rate_limited" ? 429 : 500, failureCode: normalized ? undefined : raw.error ?? "NORMALIZATION_FAILED", fallbackTriggered: attemptNumber > 1 });
       if (!normalized) return;
       const quality = assessQuote(normalized, request, completed, candidate.authority);
@@ -269,12 +269,11 @@ export class KalpExecutionFabricV01 {
     const qualityScore = clamp(accepted.reduce((sum, item) => sum + item.quality.score, 0) / accepted.length * (0.7 + agreement.score * 0.3));
     const warnings = [...new Set(accepted.flatMap(item => item.quality.warnings))];
     if (agreement.outliers > 0) warnings.push("OUTLIER_DETECTED");
-    if (accepted.length < evidence.length) warnings.push("REJECTED_EVIDENCE_PRESENT");
     const provenance = accepted.flatMap(item => item.provenance);
     provenance.push({ id: `fusion-${this.id()}`, type: "fusion", parentIds: provenance.filter(node => node.type === "transformation").map(node => node.id), retrievedAt: this.now().toISOString(), transformation: accepted.length === 1 ? "single_source" : "median_price_fusion" });
     const result: ResultIntelligence<MarketQuoteV1> = {
       result: fused,
-      quality: { ...accepted[0].quality, status: qualityScore >= 0.65 ? "VALID" : "CAUTION", score: qualityScore, consistency: agreement.score } as QualityAssessment & { consistency?: number },
+      quality: { ...accepted[0].quality, consistency: agreement.score, status: qualityScore >= 0.65 ? "VALID" : "CAUTION", score: qualityScore },
       confidence: qualityScore,
       evidence: accepted,
       provenance,
@@ -290,5 +289,3 @@ export function createKalpExecutionFabricV01(dependencies: FabricDependencies = 
 }
 
 export const defaultKalpExecutionFabricV01 = createKalpExecutionFabricV01();
-
-export type { ProviderAdapter, ProviderRequest };
