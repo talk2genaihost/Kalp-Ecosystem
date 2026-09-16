@@ -9,7 +9,8 @@
     "dev:mtr-gateway": "tsx src/market-to-revenue/runtime-gateway-main.ts",
     "build": "tsc",
     "build:astro-rashi": "vite build",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/**/*.test.ts",
+    "mtr:live": "tsx src/market-to-revenue/run-live-mtr-v01.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

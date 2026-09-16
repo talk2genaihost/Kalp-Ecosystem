@@ -4,6 +4,10 @@ export interface MarketManthanSignalSource {
   getSignal(): MarketSignal;
 }
 
+export interface AsyncMarketManthanSignalSource {
+  getSignal(now?: string): Promise<MarketSignal>;
+}
+
 /** Controlled v0.1 provider boundary. Replace this adapter with Market Manthan runtime output without changing MTR contracts. */
 export class DeterministicMarketManthanFixture implements MarketManthanSignalSource {
   getSignal(): MarketSignal {
@@ -22,7 +26,15 @@ export class DeterministicMarketManthanFixture implements MarketManthanSignalSou
 }
 
 export function runMTR001(source: MarketManthanSignalSource, now = "2026-09-12T14:05:00Z"): MTRVerticalSlice {
-  const signal = source.getSignal();
+  return runMTR001FromSignal(source.getSignal(), now);
+}
+
+/** Live/provider-neutral execution path: fetch the MarketSignal asynchronously, then execute the same MTR lineage. */
+export async function runMTR001Live(source: AsyncMarketManthanSignalSource, now = new Date().toISOString()): Promise<MTRVerticalSlice> {
+  return runMTR001FromSignal(await source.getSignal(now), now);
+}
+
+export function runMTR001FromSignal(signal: MarketSignal, now = new Date().toISOString()): MTRVerticalSlice {
   const opportunity: Opportunity = {
     opportunity_id: "MTR-OPP-001",
     signal_id: signal.signal_id,
@@ -78,6 +90,5 @@ export function runMTR001(source: MarketManthanSignalSource, now = "2026-09-12T1
     revenue_id: revenue.revenue_id,
     lesson: "The identified Delhi NCR convenience-demand signal produced an attributable INR 10,000 revenue outcome through the selected campaign action."
   };
-  const slice = { signal, opportunity, action, campaign, response, conversion, revenue, attribution, learning };
-  return slice;
+  return { signal, opportunity, action, campaign, response, conversion, revenue, attribution, learning };
 }
