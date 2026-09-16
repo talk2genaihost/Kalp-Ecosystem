@@ -12,92 +12,27 @@ import type {
   ProvenanceNode,
   QualityAssessment,
   RequestContext,
-  ExecutionTelemetry
+  ExecutionTelemetry,
+  ProviderId
 } from "../contracts/index.js";
+import { createProviderRegistry, type ProviderRegistryV01 } from "../paf/registry/provider-registry-v01.js";
+import { createCapabilityRegistry, type CapabilityRegistryV01 } from "../paf/registry/capability-registry-v01.js";
 
-export type MarketQuoteRequestV1 = {
-  symbol: string;
-  exchange?: string;
-  freshnessMaxAgeMs?: number;
-  parallel?: boolean;
-  maxProviders?: number;
-};
-
+export type MarketQuoteRequestV1 = { symbol: string; exchange?: string; freshnessMaxAgeMs?: number; parallel?: boolean; maxProviders?: number };
 export type ExecutionStatus = "SUCCESS" | "PARTIAL" | "FAILED" | "REJECTED";
-export type QualityStatus = "VALID" | "CAUTION" | "REJECTED";
 export type FusionMode = "single_source" | "median";
 
-interface EvidenceRecord<T> {
-  evidenceId: string;
-  providerId: string;
-  providerName: string;
-  payload: T;
-  observedAt: ISODateTime;
-  quality: QualityAssessment;
-  provenance: ProvenanceNode[];
-}
+type EvidenceRecord<T> = { evidenceId: string; providerId: string; providerName: string; payload: T; observedAt: ISODateTime; quality: QualityAssessment; provenance: ProvenanceNode[] };
+type FusionAssessment = { mode: FusionMode; evidenceCount: number; acceptedCount: number; rejectedCount: number; agreementScore: number; outlierCount: number };
+type ProviderCandidate = { adapter: ProviderAdapter; target: ExecutionTarget; providerName: string; authority: number };
 
-interface FusionAssessment {
-  mode: FusionMode;
-  evidenceCount: number;
-  acceptedCount: number;
-  rejectedCount: number;
-  agreementScore: number;
-  outlierCount: number;
-}
-
-interface ProviderCandidate {
-  adapter: ProviderAdapter;
-  target: ExecutionTarget;
-  providerName: string;
-  authority: number;
-}
-
-export interface ResultIntelligence<T> {
-  result: NormalizedResult<T>;
-  quality: QualityAssessment;
-  confidence: number;
-  evidence: EvidenceRecord<T>[];
-  provenance: ProvenanceNode[];
-  fusion: FusionAssessment;
-  warnings: string[];
-}
-
-/**
- * Runtime transport envelope. Boundary payloads inside `result` use canonical
- * RE-06 contracts; this status wrapper is transport/orchestration metadata.
- */
-export interface ExecutionFabricResponse<T> {
-  requestId: string;
-  executionId: string;
-  status: ExecutionStatus;
-  result?: ResultIntelligence<T>;
-  telemetry: ExecutionTelemetry[];
-  warnings: string[];
-}
-
-export interface FabricDependencies {
-  providers?: ProviderAdapter[];
-  now?: () => Date;
-  id?: () => string;
-}
+export type ResultIntelligence<T> = { result: NormalizedResult<T>; quality: QualityAssessment; confidence: number; evidence: EvidenceRecord<T>[]; provenance: ProvenanceNode[]; fusion: FusionAssessment; warnings: string[] };
+export interface ExecutionFabricResponse<T> { requestId: string; executionId: string; status: ExecutionStatus; result?: ResultIntelligence<T>; telemetry: ExecutionTelemetry[]; warnings: string[]; }
+export interface FabricDependencies { providers?: ProviderAdapter[]; providerRegistry?: ProviderRegistryV01; capabilityRegistry?: CapabilityRegistryV01; now?: () => Date; id?: () => string; }
 
 function clamp(value: number): number { return Math.max(0, Math.min(1, value)); }
-
-function numberField(data: Record<string, unknown>, ...keys: string[]): number | undefined {
-  for (const key of keys) {
-    const value = data[key];
-    const number = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
-    if (Number.isFinite(number)) return number;
-  }
-  return undefined;
-}
-
-function stringField(data: Record<string, unknown>, ...keys: string[]): string | undefined {
-  for (const key of keys) if (typeof data[key] === "string" && data[key]) return data[key] as string;
-  return undefined;
-}
-
+function numberField(data: Record<string, unknown>, ...keys: string[]): number | undefined { for (const key of keys) { const value = data[key]; const number = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN; if (Number.isFinite(number)) return number; } return undefined; }
+function stringField(data: Record<string, unknown>, ...keys: string[]): string | undefined { for (const key of keys) if (typeof data[key] === "string" && data[key]) return data[key] as string; return undefined; }
 function normalizeQuote(raw: NormalizedProviderResult, requestedSymbol: string): MarketQuoteV1 | undefined {
   if (raw.status !== "ok") return undefined;
   const data = raw.data;
@@ -105,21 +40,8 @@ function normalizeQuote(raw: NormalizedProviderResult, requestedSymbol: string):
   const symbol = stringField(data, "symbol", "Symbol") ?? stringField(quote, "01. symbol") ?? requestedSymbol;
   const price = numberField(quote, "05. price", "c", "price");
   if (!symbol || price === undefined || price <= 0) return undefined;
-  return {
-    symbol,
-    exchange: stringField(data, "exchange", "Exchange"),
-    price,
-    open: numberField(quote, "02. open", "o", "open"),
-    high: numberField(quote, "03. high", "h", "high"),
-    low: numberField(quote, "04. low", "l", "low"),
-    previousClose: numberField(quote, "08. previous close", "pc", "previousClose"),
-    volume: numberField(quote, "06. volume", "v", "volume"),
-    currency: stringField(data, "currency", "Currency"),
-    asOf: raw.observed_at,
-    source: { providerId: raw.provider_id }
-  };
+  return { symbol, exchange: stringField(data, "exchange", "Exchange"), price, open: numberField(quote, "02. open", "o", "open"), high: numberField(quote, "03. high", "h", "high"), low: numberField(quote, "04. low", "l", "low"), previousClose: numberField(quote, "08. previous close", "pc", "previousClose"), volume: numberField(quote, "06. volume", "v", "volume"), currency: stringField(data, "currency", "Currency"), asOf: raw.observed_at, source: { providerId: raw.provider_id } };
 }
-
 function assessQuote(quote: MarketQuoteV1, request: MarketQuoteRequestV1, now: Date, authority: number): QualityAssessment {
   const completeFields = [quote.symbol, quote.price, quote.asOf].filter(value => value !== undefined && value !== "").length;
   const completeness = completeFields / 3;
@@ -132,103 +54,46 @@ function assessQuote(quote: MarketQuoteV1, request: MarketQuoteRequestV1, now: D
   if (freshness < 0.5) warnings.push("STALE_DATA");
   if (completeness < 1) warnings.push("PARTIAL_DATA");
   if (authority < 0.7) warnings.push("SOURCE_AUTHORITY_LOW");
-  return {
-    score,
-    completeness,
-    freshness,
-    consistency: 1,
-    schemaValidity,
-    sourceAuthority: authority,
-    confidence: score,
-    warnings,
-    assessedAt: now.toISOString()
-  };
+  return { score, completeness, freshness, consistency: 1, schemaValidity, sourceAuthority: authority, confidence: score, warnings, assessedAt: now.toISOString() };
 }
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
-}
-
-function agreementScore(values: number[]): { score: number; outliers: number } {
-  if (values.length <= 1) return { score: 1, outliers: 0 };
-  const center = median(values);
-  if (center === 0) return { score: 0, outliers: 0 };
-  const deviations = values.map(value => Math.abs(value - center) / center);
-  return { score: clamp(1 - Math.min(Math.max(...deviations), 1)), outliers: deviations.filter(value => value > 0.05).length };
-}
-
-function context(requestId: string, now: Date): RequestContext {
-  return { requestId, correlationId: requestId, createdAt: now.toISOString() };
-}
+function median(values: number[]): number { const sorted = [...values].sort((a, b) => a - b); const middle = Math.floor(sorted.length / 2); return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle]; }
+function agreementScore(values: number[]): { score: number; outliers: number } { if (values.length <= 1) return { score: 1, outliers: 0 }; const center = median(values); if (center === 0) return { score: 0, outliers: 0 }; const deviations = values.map(value => Math.abs(value - center) / center); return { score: clamp(1 - Math.min(Math.max(...deviations), 1)), outliers: deviations.filter(value => value > 0.05).length }; }
+function context(requestId: string, now: Date): RequestContext { return { requestId, correlationId: requestId, createdAt: now.toISOString() }; }
+function quoteCapability(): CapabilityRequirement { return { capabilityId: "market.quote", operation: "getQuote", outputSchema: "MarketQuoteV1", requiredInputs: { symbol: "string" } }; }
 
 export class KalpExecutionFabricV01 {
-  private readonly providers: ProviderAdapter[];
+  private readonly providerRegistry: ProviderRegistryV01;
+  private readonly capabilityRegistry: CapabilityRegistryV01;
   private readonly now: () => Date;
   private readonly id: () => string;
 
   constructor(dependencies: FabricDependencies = {}) {
-    this.providers = dependencies.providers ?? initialFreeProviderMesh;
+    this.providerRegistry = dependencies.providerRegistry ?? createProviderRegistry(dependencies.providers ?? initialFreeProviderMesh);
+    this.capabilityRegistry = dependencies.capabilityRegistry ?? createCapabilityRegistry();
     this.now = dependencies.now ?? (() => new Date());
     this.id = dependencies.id ?? (() => crypto.randomUUID());
   }
 
   discoverCandidates(): ProviderCandidate[] {
-    return this.providers
-      .filter(provider => provider.role === "market-data")
-      .map(provider => ({
-        adapter: provider,
-        providerName: provider.provider_name,
-        target: { providerId: provider.provider_id, capabilityId: "market.quote" },
-        authority: provider.provider_id.includes("FINNHUB") ? 0.9 : 0.85
-      }))
-      .sort((a, b) => b.authority - a.authority || a.target.providerId.localeCompare(b.target.providerId));
+    const capability = this.capabilityRegistry.get("market.quote");
+    if (!capability) return [];
+    return this.providerRegistry.findByCapability(capability.capabilityId).map(adapter => {
+      const descriptor = this.providerRegistry.descriptor(adapter.provider_id);
+      const declared = descriptor?.capabilities.find(item => item.capabilityId === capability.capabilityId);
+      return { adapter, providerName: adapter.provider_name, target: { providerId: adapter.provider_id as ProviderId, capabilityId: capability.capabilityId }, authority: declared?.sourceAuthority ?? 0.85 };
+    }).sort((a, b) => b.authority - a.authority || a.target.providerId.localeCompare(b.target.providerId));
   }
 
   async executeMarketQuote(request: MarketQuoteRequestV1): Promise<ExecutionFabricResponse<MarketQuoteV1>> {
-    const requestId = this.id();
-    const executionId = this.id();
-    const planId = this.id();
-    const candidates = this.discoverCandidates().slice(0, request.maxProviders ?? this.providers.length);
-    const capability: CapabilityRequirement = {
-      capabilityId: "market.quote",
-      operation: "getQuote",
-      outputSchema: "MarketQuoteV1",
-      requiredInputs: { symbol: "string" }
-    };
-    void capability;
-    const requestContext = context(requestId, this.now());
-
-    if (!request.symbol.trim() || candidates.length === 0) {
-      return { requestId, executionId, status: "REJECTED", telemetry: [], warnings: ["NO_ELIGIBLE_PROVIDER_OR_INVALID_REQUEST"] };
-    }
-
-    const telemetry: ExecutionTelemetry[] = [];
-    const evidence: EvidenceRecord<MarketQuoteV1>[] = [];
+    const requestId = this.id(); const executionId = this.id(); const planId = this.id(); const capability = quoteCapability(); const requestContext = context(requestId, this.now());
+    const candidates = this.discoverCandidates().slice(0, request.maxProviders ?? Number.MAX_SAFE_INTEGER);
+    if (!this.capabilityRegistry.has(capability.capabilityId) || !request.symbol.trim() || candidates.length === 0) return { requestId, executionId, status: "REJECTED", telemetry: [], warnings: ["NO_ELIGIBLE_PROVIDER_OR_INVALID_REQUEST"] };
+    const telemetry: ExecutionTelemetry[] = []; const evidence: EvidenceRecord<MarketQuoteV1>[] = [];
     const run = async (candidate: ProviderCandidate, attemptNumber: number): Promise<void> => {
       const started = this.now();
       try {
-        const raw = await candidate.adapter.fetch({ symbol: request.symbol });
-        const completed = this.now();
-        const normalized = normalizeQuote(raw, request.symbol);
-        telemetry.push({
-          requestId,
-          decisionId: requestId,
-          planId,
-          executionId,
-          attemptId: this.id(),
-          providerId: candidate.target.providerId,
-          modelId: candidate.target.modelId,
-          attemptNumber,
-          startedAt: started.toISOString(),
-          completedAt: completed.toISOString(),
-          latencyMs: completed.getTime() - started.getTime(),
-          status: normalized ? "success" : "failure",
-          httpStatus: raw.status === "ok" ? 200 : raw.status === "rate_limited" ? 429 : 500,
-          failureCode: normalized ? undefined : raw.error ?? "NORMALIZATION_FAILED",
-          fallbackTriggered: attemptNumber > 1
-        });
+        const raw = await candidate.adapter.fetch({ symbol: request.symbol }); const completed = this.now(); const normalized = normalizeQuote(raw, request.symbol);
+        telemetry.push({ requestId, decisionId: requestId, planId, executionId, attemptId: this.id(), providerId: candidate.target.providerId, modelId: candidate.target.modelId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: normalized ? "success" : "failure", httpStatus: raw.status === "ok" ? 200 : raw.status === "rate_limited" ? 429 : 500, failureCode: normalized ? undefined : raw.error ?? "NORMALIZATION_FAILED", fallbackTriggered: attemptNumber > 1 });
         if (!normalized) return;
         const quality = assessQuote(normalized, request, completed, candidate.authority);
         const requestNode: ProvenanceNode = { id: `req-${requestId}`, type: "request", parentIds: [], retrievedAt: requestContext.createdAt };
@@ -237,54 +102,20 @@ export class KalpExecutionFabricV01 {
         const transformNode: ProvenanceNode = { id: `transform-${this.id()}`, type: "transformation", parentIds: [responseNode.id], providerId: candidate.target.providerId, transformation: "provider-response -> MarketQuoteV1", retrievedAt: completed.toISOString() };
         evidence.push({ evidenceId: `evidence-${this.id()}`, providerId: candidate.target.providerId, providerName: candidate.providerName, payload: normalized, observedAt: raw.observed_at, quality, provenance: [requestNode, providerNode, responseNode, transformNode] });
       } catch (error) {
-        const completed = this.now();
-        telemetry.push({ requestId, decisionId: requestId, planId, executionId, attemptId: this.id(), providerId: candidate.target.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: "failure", failureCode: error instanceof Error ? error.message : "UNKNOWN", fallbackTriggered: true });
+        const completed = this.now(); telemetry.push({ requestId, decisionId: requestId, planId, executionId, attemptId: this.id(), providerId: candidate.target.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: "failure", failureCode: error instanceof Error ? error.message : "UNKNOWN", fallbackTriggered: true });
       }
     };
-
-    if (request.parallel) await Promise.all(candidates.map((candidate, index) => run(candidate, index + 1)));
-    else for (const [index, candidate] of candidates.entries()) {
-      await run(candidate, index + 1);
-      if (evidence.length > 0) break;
-    }
-
-    const accepted = evidence.filter(item => item.quality.schemaValidity === 1);
-    if (accepted.length === 0) return { requestId, executionId, status: "FAILED", telemetry, warnings: ["NO_USABLE_EVIDENCE"] };
-
-    const prices = accepted.map(item => item.payload.price);
-    const agreement = agreementScore(prices);
-    const fusedPrice = prices.length === 1 ? prices[0] : median(prices);
-    const base = accepted[0].payload;
+    if (request.parallel) await Promise.all(candidates.map((candidate, index) => run(candidate, index + 1))); else for (const [index, candidate] of candidates.entries()) { await run(candidate, index + 1); if (evidence.length > 0) break; }
+    const accepted = evidence.filter(item => item.quality.schemaValidity === 1); if (accepted.length === 0) return { requestId, executionId, status: "FAILED", telemetry, warnings: ["NO_USABLE_EVIDENCE"] };
+    const prices = accepted.map(item => item.payload.price); const agreement = agreementScore(prices); const fusedPrice = prices.length === 1 ? prices[0] : median(prices); const base = accepted[0].payload;
     const fused: MarketQuoteV1 = { ...base, price: fusedPrice, source: { providerId: accepted.length === 1 ? base.source.providerId : "KALP-FUSION" } };
-    const qualityScore = clamp(accepted.reduce((sum, item) => sum + item.quality.score, 0) / accepted.length * (0.7 + agreement.score * 0.3));
-    const warnings = [...new Set(accepted.flatMap(item => item.quality.warnings))];
-    if (agreement.outliers > 0) warnings.push("OUTLIER_DETECTED");
-    const provenance = accepted.flatMap(item => item.provenance);
-    provenance.push({ id: `fusion-${this.id()}`, type: "fusion", parentIds: provenance.filter(node => node.type === "transformation").map(node => node.id), retrievedAt: this.now().toISOString(), transformation: accepted.length === 1 ? "single_source" : "median_price_fusion", confidence: agreement.score });
-
-    const normalizedResult: NormalizedResult<MarketQuoteV1> = {
-      requestId,
-      executionId,
-      providerId: accepted.length === 1 ? base.source.providerId : "KALP-FUSION",
-      capabilityId: "market.quote",
-      data: fused,
-      schema: "MarketQuoteV1",
-      retrievedAt: this.now().toISOString(),
-      metadata: { cached: false, transformed: true, sourceIds: accepted.map(item => item.evidenceId) }
-    };
+    const qualityScore = clamp(accepted.reduce((sum, item) => sum + item.quality.score, 0) / accepted.length * (0.7 + agreement.score * 0.3)); const warnings = [...new Set(accepted.flatMap(item => item.quality.warnings))]; if (agreement.outliers > 0) warnings.push("OUTLIER_DETECTED");
+    const provenance = accepted.flatMap(item => item.provenance); provenance.push({ id: `fusion-${this.id()}`, type: "fusion", parentIds: provenance.filter(node => node.type === "transformation").map(node => node.id), retrievedAt: this.now().toISOString(), transformation: accepted.length === 1 ? "single_source" : "median_price_fusion", confidence: agreement.score });
+    const normalizedResult: NormalizedResult<MarketQuoteV1> = { requestId, executionId, providerId: accepted.length === 1 ? base.source.providerId : "KALP-FUSION", capabilityId: capability.capabilityId, data: fused, schema: capability.outputSchema ?? "MarketQuoteV1", retrievedAt: this.now().toISOString(), metadata: { cached: false, transformed: true, sourceIds: accepted.map(item => item.evidenceId) } };
     const quality: QualityAssessment = { ...accepted[0].quality, consistency: agreement.score, score: qualityScore, confidence: qualityScore, assessedAt: this.now().toISOString() };
-    const result: ResultIntelligence<MarketQuoteV1> = {
-      result: normalizedResult,
-      quality,
-      confidence: qualityScore,
-      evidence: accepted,
-      provenance,
-      fusion: { mode: accepted.length === 1 ? "single_source" : "median", evidenceCount: evidence.length, acceptedCount: accepted.length, rejectedCount: evidence.length - accepted.length, agreementScore: agreement.score, outlierCount: agreement.outliers },
-      warnings
-    };
+    const result: ResultIntelligence<MarketQuoteV1> = { result: normalizedResult, quality, confidence: qualityScore, evidence: accepted, provenance, fusion: { mode: accepted.length === 1 ? "single_source" : "median", evidenceCount: evidence.length, acceptedCount: accepted.length, rejectedCount: evidence.length - accepted.length, agreementScore: agreement.score, outlierCount: agreement.outliers }, warnings };
     return { requestId, executionId, status: agreement.outliers > 0 ? "PARTIAL" : "SUCCESS", result, telemetry, warnings };
   }
 }
-
 export function createKalpExecutionFabricV01(dependencies: FabricDependencies = {}): KalpExecutionFabricV01 { return new KalpExecutionFabricV01(dependencies); }
 export const defaultKalpExecutionFabricV01 = createKalpExecutionFabricV01();
