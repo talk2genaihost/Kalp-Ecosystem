@@ -3,78 +3,41 @@ import {
   type NormalizedProviderResult,
   type ProviderAdapter
 } from "../market-to-revenue/provider-adapters-v01.js";
+import type {
+  CapabilityRequirement,
+  ExecutionTarget,
+  ISODateTime,
+  MarketQuoteV1,
+  NormalizedResult,
+  ProvenanceNode,
+  QualityAssessment,
+  RequestContext,
+  ExecutionTelemetry
+} from "../contracts/index.js";
 
-export type ExecutionStatus = "SUCCESS" | "PARTIAL" | "FAILED" | "REJECTED";
-export type QualityStatus = "VALID" | "CAUTION" | "REJECTED";
-export type FusionMode = "single_source" | "median";
-
-export interface MarketQuoteRequestV1 {
+export type MarketQuoteRequestV1 = {
   symbol: string;
   exchange?: string;
   freshnessMaxAgeMs?: number;
   parallel?: boolean;
   maxProviders?: number;
-}
+};
 
-export interface MarketQuoteV1 {
-  symbol: string;
-  exchange?: string;
-  price: number;
-  open?: number;
-  high?: number;
-  low?: number;
-  previousClose?: number;
-  volume?: number;
-  currency?: string;
-  asOf: string;
-  source: { providerId: string };
-}
+export type ExecutionStatus = "SUCCESS" | "PARTIAL" | "FAILED" | "REJECTED";
+export type QualityStatus = "VALID" | "CAUTION" | "REJECTED";
+export type FusionMode = "single_source" | "median";
 
-export interface EvidenceRecord<T = unknown> {
+interface EvidenceRecord<T> {
   evidenceId: string;
   providerId: string;
   providerName: string;
   payload: T;
-  observedAt: string;
+  observedAt: ISODateTime;
   quality: QualityAssessment;
   provenance: ProvenanceNode[];
 }
 
-export interface QualityAssessment {
-  status: QualityStatus;
-  score: number;
-  completeness: number;
-  freshness: number;
-  consistency: number;
-  schemaValidity: number;
-  sourceAuthority: number;
-  warnings: string[];
-}
-
-export interface ProvenanceNode {
-  id: string;
-  type: "request" | "provider" | "response" | "transformation" | "source" | "fusion";
-  parentIds: string[];
-  providerId?: string;
-  sourceId?: string;
-  retrievedAt?: string;
-  transformation?: string;
-}
-
-export interface AttemptTelemetry {
-  attemptId: string;
-  providerId: string;
-  attemptNumber: number;
-  startedAt: string;
-  completedAt: string;
-  latencyMs: number;
-  status: "success" | "failure";
-  httpStatus?: number;
-  failureCode?: string;
-  fallbackTriggered: boolean;
-}
-
-export interface FusionAssessment {
+interface FusionAssessment {
   mode: FusionMode;
   evidenceCount: number;
   acceptedCount: number;
@@ -83,8 +46,15 @@ export interface FusionAssessment {
   outlierCount: number;
 }
 
+interface ProviderCandidate {
+  adapter: ProviderAdapter;
+  target: ExecutionTarget;
+  providerName: string;
+  authority: number;
+}
+
 export interface ResultIntelligence<T> {
-  result: T;
+  result: NormalizedResult<T>;
   quality: QualityAssessment;
   confidence: number;
   evidence: EvidenceRecord<T>[];
@@ -93,22 +63,17 @@ export interface ResultIntelligence<T> {
   warnings: string[];
 }
 
-export interface KalpExecutionResult<T> {
+/**
+ * Runtime transport envelope. Boundary payloads inside `result` use canonical
+ * RE-06 contracts; this status wrapper is transport/orchestration metadata.
+ */
+export interface ExecutionFabricResponse<T> {
   requestId: string;
   executionId: string;
   status: ExecutionStatus;
   result?: ResultIntelligence<T>;
-  telemetry: AttemptTelemetry[];
+  telemetry: ExecutionTelemetry[];
   warnings: string[];
-}
-
-export interface ProviderCandidate {
-  adapter: ProviderAdapter;
-  providerId: string;
-  providerName: string;
-  capability: "market.quote";
-  authority: number;
-  enabled: boolean;
 }
 
 export interface FabricDependencies {
@@ -117,9 +82,7 @@ export interface FabricDependencies {
   id?: () => string;
 }
 
-function clamp(value: number): number {
-  return Math.max(0, Math.min(1, value));
-}
+function clamp(value: number): number { return Math.max(0, Math.min(1, value)); }
 
 function numberField(data: Record<string, unknown>, ...keys: string[]): number | undefined {
   for (const key of keys) {
@@ -131,9 +94,7 @@ function numberField(data: Record<string, unknown>, ...keys: string[]): number |
 }
 
 function stringField(data: Record<string, unknown>, ...keys: string[]): string | undefined {
-  for (const key of keys) {
-    if (typeof data[key] === "string" && data[key]) return data[key] as string;
-  }
+  for (const key of keys) if (typeof data[key] === "string" && data[key]) return data[key] as string;
   return undefined;
 }
 
@@ -144,7 +105,6 @@ function normalizeQuote(raw: NormalizedProviderResult, requestedSymbol: string):
   const symbol = stringField(data, "symbol", "Symbol") ?? stringField(quote, "01. symbol") ?? requestedSymbol;
   const price = numberField(quote, "05. price", "c", "price");
   if (!symbol || price === undefined || price <= 0) return undefined;
-
   return {
     symbol,
     exchange: stringField(data, "exchange", "Exchange"),
@@ -172,8 +132,17 @@ function assessQuote(quote: MarketQuoteV1, request: MarketQuoteRequestV1, now: D
   if (freshness < 0.5) warnings.push("STALE_DATA");
   if (completeness < 1) warnings.push("PARTIAL_DATA");
   if (authority < 0.7) warnings.push("SOURCE_AUTHORITY_LOW");
-  const status: QualityStatus = schemaValidity === 0 ? "REJECTED" : score >= 0.65 ? "VALID" : "CAUTION";
-  return { status, score, completeness, freshness, consistency: 1, schemaValidity, sourceAuthority: authority, warnings };
+  return {
+    score,
+    completeness,
+    freshness,
+    consistency: 1,
+    schemaValidity,
+    sourceAuthority: authority,
+    confidence: score,
+    warnings,
+    assessedAt: now.toISOString()
+  };
 }
 
 function median(values: number[]): number {
@@ -187,8 +156,11 @@ function agreementScore(values: number[]): { score: number; outliers: number } {
   const center = median(values);
   if (center === 0) return { score: 0, outliers: 0 };
   const deviations = values.map(value => Math.abs(value - center) / center);
-  const outliers = deviations.filter(value => value > 0.05).length;
-  return { score: clamp(1 - Math.min(Math.max(...deviations), 1)), outliers };
+  return { score: clamp(1 - Math.min(Math.max(...deviations), 1)), outliers: deviations.filter(value => value > 0.05).length };
+}
+
+function context(requestId: string, now: Date): RequestContext {
+  return { requestId, correlationId: requestId, createdAt: now.toISOString() };
 }
 
 export class KalpExecutionFabricV01 {
@@ -207,60 +179,77 @@ export class KalpExecutionFabricV01 {
       .filter(provider => provider.role === "market-data")
       .map(provider => ({
         adapter: provider,
-        providerId: provider.provider_id,
         providerName: provider.provider_name,
-        capability: "market.quote" as const,
-        authority: provider.provider_id.includes("FINNHUB") ? 0.9 : 0.85,
-        enabled: true
+        target: { providerId: provider.provider_id, capabilityId: "market.quote" },
+        authority: provider.provider_id.includes("FINNHUB") ? 0.9 : 0.85
       }))
-      .sort((a, b) => b.authority - a.authority || a.providerId.localeCompare(b.providerId));
+      .sort((a, b) => b.authority - a.authority || a.target.providerId.localeCompare(b.target.providerId));
   }
 
-  async executeMarketQuote(request: MarketQuoteRequestV1): Promise<KalpExecutionResult<MarketQuoteV1>> {
+  async executeMarketQuote(request: MarketQuoteRequestV1): Promise<ExecutionFabricResponse<MarketQuoteV1>> {
     const requestId = this.id();
     const executionId = this.id();
+    const planId = this.id();
     const candidates = this.discoverCandidates().slice(0, request.maxProviders ?? this.providers.length);
+    const capability: CapabilityRequirement = {
+      capabilityId: "market.quote",
+      operation: "getQuote",
+      outputSchema: "MarketQuoteV1",
+      requiredInputs: { symbol: "string" }
+    };
+    void capability;
+    const requestContext = context(requestId, this.now());
+
     if (!request.symbol.trim() || candidates.length === 0) {
       return { requestId, executionId, status: "REJECTED", telemetry: [], warnings: ["NO_ELIGIBLE_PROVIDER_OR_INVALID_REQUEST"] };
     }
 
-    const telemetry: AttemptTelemetry[] = [];
+    const telemetry: ExecutionTelemetry[] = [];
     const evidence: EvidenceRecord<MarketQuoteV1>[] = [];
     const run = async (candidate: ProviderCandidate, attemptNumber: number): Promise<void> => {
       const started = this.now();
-      let raw: NormalizedProviderResult;
       try {
-        raw = await candidate.adapter.fetch({ symbol: request.symbol });
+        const raw = await candidate.adapter.fetch({ symbol: request.symbol });
+        const completed = this.now();
+        const normalized = normalizeQuote(raw, request.symbol);
+        telemetry.push({
+          requestId,
+          decisionId: requestId,
+          planId,
+          executionId,
+          attemptId: this.id(),
+          providerId: candidate.target.providerId,
+          modelId: candidate.target.modelId,
+          attemptNumber,
+          startedAt: started.toISOString(),
+          completedAt: completed.toISOString(),
+          latencyMs: completed.getTime() - started.getTime(),
+          status: normalized ? "success" : "failure",
+          httpStatus: raw.status === "ok" ? 200 : raw.status === "rate_limited" ? 429 : 500,
+          failureCode: normalized ? undefined : raw.error ?? "NORMALIZATION_FAILED",
+          fallbackTriggered: attemptNumber > 1
+        });
+        if (!normalized) return;
+        const quality = assessQuote(normalized, request, completed, candidate.authority);
+        const requestNode: ProvenanceNode = { id: `req-${requestId}`, type: "request", parentIds: [], retrievedAt: requestContext.createdAt };
+        const providerNode: ProvenanceNode = { id: `provider-${candidate.target.providerId}`, type: "provider", parentIds: [requestNode.id], providerId: candidate.target.providerId, retrievedAt: raw.observed_at };
+        const responseNode: ProvenanceNode = { id: `response-${this.id()}`, type: "response", parentIds: [providerNode.id], providerId: candidate.target.providerId, retrievedAt: raw.observed_at };
+        const transformNode: ProvenanceNode = { id: `transform-${this.id()}`, type: "transformation", parentIds: [responseNode.id], providerId: candidate.target.providerId, transformation: "provider-response -> MarketQuoteV1", retrievedAt: completed.toISOString() };
+        evidence.push({ evidenceId: `evidence-${this.id()}`, providerId: candidate.target.providerId, providerName: candidate.providerName, payload: normalized, observedAt: raw.observed_at, quality, provenance: [requestNode, providerNode, responseNode, transformNode] });
       } catch (error) {
         const completed = this.now();
-        telemetry.push({ attemptId: this.id(), providerId: candidate.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: "failure", failureCode: error instanceof Error ? error.message : "UNKNOWN", fallbackTriggered: true });
-        return;
+        telemetry.push({ requestId, decisionId: requestId, planId, executionId, attemptId: this.id(), providerId: candidate.target.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: "failure", failureCode: error instanceof Error ? error.message : "UNKNOWN", fallbackTriggered: true });
       }
-      const completed = this.now();
-      const normalized = normalizeQuote(raw, request.symbol);
-      telemetry.push({ attemptId: this.id(), providerId: candidate.providerId, attemptNumber, startedAt: started.toISOString(), completedAt: completed.toISOString(), latencyMs: completed.getTime() - started.getTime(), status: normalized ? "success" : "failure", httpStatus: raw.status === "ok" ? 200 : raw.status === "rate_limited" ? 429 : 500, failureCode: normalized ? undefined : raw.error ?? "NORMALIZATION_FAILED", fallbackTriggered: attemptNumber > 1 });
-      if (!normalized) return;
-      const quality = assessQuote(normalized, request, completed, candidate.authority);
-      const requestNode = { id: `req-${requestId}`, type: "request" as const, parentIds: [] };
-      const providerNode = { id: `provider-${candidate.providerId}`, type: "provider" as const, parentIds: [requestNode.id], providerId: candidate.providerId, retrievedAt: raw.observed_at };
-      const responseNode = { id: `response-${this.id()}`, type: "response" as const, parentIds: [providerNode.id], providerId: candidate.providerId, retrievedAt: raw.observed_at };
-      const transformNode = { id: `transform-${this.id()}`, type: "transformation" as const, parentIds: [responseNode.id], providerId: candidate.providerId, transformation: "provider-response -> MarketQuoteV1" };
-      evidence.push({ evidenceId: `evidence-${this.id()}`, providerId: candidate.providerId, providerName: candidate.providerName, payload: normalized, observedAt: raw.observed_at, quality, provenance: [requestNode, providerNode, responseNode, transformNode] });
     };
 
-    if (request.parallel) {
-      await Promise.all(candidates.map((candidate, index) => run(candidate, index + 1)));
-    } else {
-      for (const [index, candidate] of candidates.entries()) {
-        await run(candidate, index + 1);
-        if (evidence.some(item => item.quality.status === "VALID")) break;
-      }
+    if (request.parallel) await Promise.all(candidates.map((candidate, index) => run(candidate, index + 1)));
+    else for (const [index, candidate] of candidates.entries()) {
+      await run(candidate, index + 1);
+      if (evidence.length > 0) break;
     }
 
-    const accepted = evidence.filter(item => item.quality.status !== "REJECTED");
-    if (accepted.length === 0) {
-      return { requestId, executionId, status: "FAILED", telemetry, warnings: ["NO_USABLE_EVIDENCE"] };
-    }
+    const accepted = evidence.filter(item => item.quality.schemaValidity === 1);
+    if (accepted.length === 0) return { requestId, executionId, status: "FAILED", telemetry, warnings: ["NO_USABLE_EVIDENCE"] };
 
     const prices = accepted.map(item => item.payload.price);
     const agreement = agreementScore(prices);
@@ -271,22 +260,31 @@ export class KalpExecutionFabricV01 {
     const warnings = [...new Set(accepted.flatMap(item => item.quality.warnings))];
     if (agreement.outliers > 0) warnings.push("OUTLIER_DETECTED");
     const provenance = accepted.flatMap(item => item.provenance);
-    provenance.push({ id: `fusion-${this.id()}`, type: "fusion", parentIds: provenance.filter(node => node.type === "transformation").map(node => node.id), retrievedAt: this.now().toISOString(), transformation: accepted.length === 1 ? "single_source" : "median_price_fusion" });
+    provenance.push({ id: `fusion-${this.id()}`, type: "fusion", parentIds: provenance.filter(node => node.type === "transformation").map(node => node.id), retrievedAt: this.now().toISOString(), transformation: accepted.length === 1 ? "single_source" : "median_price_fusion", confidence: agreement.score });
+
+    const normalizedResult: NormalizedResult<MarketQuoteV1> = {
+      requestId,
+      executionId,
+      providerId: accepted.length === 1 ? base.source.providerId : "KALP-FUSION",
+      capabilityId: "market.quote",
+      data: fused,
+      schema: "MarketQuoteV1",
+      retrievedAt: this.now().toISOString(),
+      metadata: { cached: false, transformed: true, sourceIds: accepted.map(item => item.evidenceId) }
+    };
+    const quality: QualityAssessment = { ...accepted[0].quality, consistency: agreement.score, score: qualityScore, confidence: qualityScore, assessedAt: this.now().toISOString() };
     const result: ResultIntelligence<MarketQuoteV1> = {
-      result: fused,
-      quality: { ...accepted[0].quality, consistency: agreement.score, status: qualityScore >= 0.65 ? "VALID" : "CAUTION", score: qualityScore },
+      result: normalizedResult,
+      quality,
       confidence: qualityScore,
       evidence: accepted,
       provenance,
       fusion: { mode: accepted.length === 1 ? "single_source" : "median", evidenceCount: evidence.length, acceptedCount: accepted.length, rejectedCount: evidence.length - accepted.length, agreementScore: agreement.score, outlierCount: agreement.outliers },
       warnings
     };
-    return { requestId, executionId, status: warnings.includes("OUTLIER_DETECTED") ? "PARTIAL" : "SUCCESS", result, telemetry, warnings };
+    return { requestId, executionId, status: agreement.outliers > 0 ? "PARTIAL" : "SUCCESS", result, telemetry, warnings };
   }
 }
 
-export function createKalpExecutionFabricV01(dependencies: FabricDependencies = {}): KalpExecutionFabricV01 {
-  return new KalpExecutionFabricV01(dependencies);
-}
-
+export function createKalpExecutionFabricV01(dependencies: FabricDependencies = {}): KalpExecutionFabricV01 { return new KalpExecutionFabricV01(dependencies); }
 export const defaultKalpExecutionFabricV01 = createKalpExecutionFabricV01();
