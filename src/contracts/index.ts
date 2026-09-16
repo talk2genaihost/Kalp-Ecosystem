@@ -9,3 +9,4 @@ export * from "./execution.js";
 export * from "./result.js";
 export * from "./telemetry.js";
 export * from "./provenance.js";
+export * from "./market-data.js";
