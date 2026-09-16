@@ -212,7 +212,8 @@ export class KalpExecutionFabricV01 {
         capability: "market.quote" as const,
         authority: provider.provider_id.includes("FINNHUB") ? 0.9 : 0.85,
         enabled: true
-      }));
+      }))
+      .sort((a, b) => b.authority - a.authority || a.providerId.localeCompare(b.providerId));
   }
 
   async executeMarketQuote(request: MarketQuoteRequestV1): Promise<KalpExecutionResult<MarketQuoteV1>> {
