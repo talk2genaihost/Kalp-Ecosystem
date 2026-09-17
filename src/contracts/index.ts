@@ -1,5 +1,6 @@
 export * from "./common.js";
 export * from "./intent.js";
+export * from "./music-intent.js";
 export * from "./capability.js";
 export * from "./governance.js";
 export * from "./provider.js";
