@@ -122,9 +122,32 @@
 <script>
 const stages=["Book Intake","Knowledge Pack","Discourse Plan","Speaker Style","Voice Registry","Performance Plan","TTS Provider","Audio Master","QA + Provenance","One-click Production"];
 const state={active:5};
+const RUNTIME_URL = window.KALPGYAN_RUNTIME_URL || "http://localhost:4310";
 const pipeline=document.getElementById("pipeline");
 function render(){pipeline.innerHTML=stages.map((s,i)=>'<div class="stage '+(i<state.active?'done ':'')+(i===state.active?'active':'')+'"><div class="n">STAGE '+String(i+1).padStart(2,"0")+'</div><strong>'+s+'</strong><span class="pill">'+(i<state.active?'COMPLETE':i===state.active?'ACTIVE':'PENDING')+'</span></div>').join("");document.getElementById("statStage").textContent=(state.active+1)+"/10";document.getElementById("stamp").textContent=new Date().toLocaleString();document.getElementById("result").textContent=state.active===9?"Production package assembled.":"Pipeline ready at "+stages[state.active]+"."}
-function run(){state.active=Math.min(9,state.active+1);render();document.getElementById("result").textContent="Production step executed in dashboard simulation: "+stages[state.active];}
+async function run(){
+  const bookTitle=document.getElementById("book").value.trim() || "Untitled Book";
+  const duration=Number(document.getElementById("duration").value);
+  const style=document.getElementById("style").value;
+  const themes=document.getElementById("themes").value.split(",").map(x=>x.trim()).filter(Boolean);
+  const result=document.getElementById("result");
+  result.textContent="Executing KalpGyan runtime…";
+  try{
+    const response=await fetch(RUNTIME_URL+"/api/production",{method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        request:{book:{bookId:"dashboard-"+Date.now(),title:bookTitle,language:"hi"},topic:themes.join(", ")||bookTitle,durationMinutes:duration,speakerStyleId:style,voiceId:"kalp-original-hi-01"},
+        voice:{voiceId:"kalp-original-hi-01",label:"KALP Original Hindi",kind:"kalp-original",language:"hi",provider:"kalp",rightsStatus:"internal"}
+      })
+    });
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.error || data.qa?.reasons?.join(", ") || "Runtime rejected production");
+    state.active=9;
+    render();
+    result.innerHTML="<strong>Runtime production ready.</strong><br>Production ID: "+data.productionId+"<br>Chapters: "+data.chapters.length+" · Audio: "+(data.audio?.format||"n/a");
+  }catch(error){
+    result.textContent="Runtime connection/error: "+(error instanceof Error?error.message:String(error));
+  }
+}
 document.getElementById("run").onclick=run;document.getElementById("run2").onclick=run;document.getElementById("refresh").onclick=render;render();
 </script>
 </body>
