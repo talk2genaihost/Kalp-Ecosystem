@@ -121,7 +121,7 @@
 </div>
 <script>
 const stages=["Book Intake","Knowledge Pack","Discourse Plan","Speaker Style","Voice Registry","Performance Plan","TTS Provider","Audio Master","QA + Provenance","One-click Production"];
-const state={active:5};
+const state={active:0};
 const RUNTIME_URL = window.KALPGYAN_RUNTIME_URL || "http://localhost:4310";
 const pipeline=document.getElementById("pipeline");
 function render(){pipeline.innerHTML=stages.map((s,i)=>'<div class="stage '+(i<state.active?'done ':'')+(i===state.active?'active':'')+'"><div class="n">STAGE '+String(i+1).padStart(2,"0")+'</div><strong>'+s+'</strong><span class="pill">'+(i<state.active?'COMPLETE':i===state.active?'ACTIVE':'PENDING')+'</span></div>').join("");document.getElementById("statStage").textContent=(state.active+1)+"/10";document.getElementById("stamp").textContent=new Date().toLocaleString();document.getElementById("result").textContent=state.active===9?"Production package assembled.":"Pipeline ready at "+stages[state.active]+"."}
