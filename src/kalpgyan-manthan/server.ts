@@ -37,6 +37,13 @@ const server = createServer(async (req, res) => {
       };
 
       if (!input.request || !input.voice) return json(res, 400, { error: "request and voice are required" });
+      if (!input.request.book?.title?.trim()) return json(res, 400, { error: "book.title is required" });
+      if (!input.request.book?.bookId?.trim()) return json(res, 400, { error: "book.bookId is required" });
+      if (!input.request.topic?.trim()) return json(res, 400, { error: "topic is required" });
+      if (input.request.durationMinutes !== 15 && input.request.durationMinutes !== 20) {
+        return json(res, 400, { error: "durationMinutes must be 15 or 20" });
+      }
+      if (!input.voice.voiceId?.trim()) return json(res, 400, { error: "voice.voiceId is required" });
 
       const result = createProduction(input.request, input.voice);
       return json(res, result.status === "blocked" ? 422 : 200, result);
