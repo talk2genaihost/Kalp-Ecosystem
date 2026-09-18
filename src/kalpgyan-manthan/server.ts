@@ -45,7 +45,7 @@ const server = createServer(async (req, res) => {
       }
       if (!input.voice.voiceId?.trim()) return json(res, 400, { error: "voice.voiceId is required" });
 
-      const result = createProduction(input.request, input.voice);
+      const result = await createProduction(input.request, input.voice);
       return json(res, result.status === "blocked" ? 422 : 200, result);
     } catch (error) {
       return json(res, 400, { error: error instanceof Error ? error.message : "Invalid request" });
