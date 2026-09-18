@@ -33,18 +33,24 @@ export function validateVoiceForProduction(voice: VoiceProfile): string[] {
   return errors;
 }
 
+function qaScript(script: string, durationMinutes: 15 | 20): string[] {
+  const words = script.trim().split(/\s+/).filter(Boolean).length;
+  const target = durationMinutes === 20 ? 2600 : 1950;
+  const tolerance = target * 0.25;
+  const reasons = [`script words: ${words}`, `target: ${target} ± ${Math.round(tolerance)}`];
+  if (Math.abs(words - target) > tolerance) reasons.push("Discourse duration estimate is outside the governed ±25% word-count band.");
+  return reasons;
+}
 
 export async function createProduction(req: ProductionRequest, voice: VoiceProfile): Promise<ProductionResult> {
   const reasons = validateVoiceForProduction(voice);
   if (reasons.length) return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons } };
-
-  if (!req.book.sourceRef) {
-    return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["book.sourceRef is required for real production."] } };
-  }
+  if (!req.book.sourceRef) return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["book.sourceRef is required for real production."] } };
 
   const productionId = crypto.randomUUID();
   try {
     const sourceText = await extractBookText(req.book.sourceRef);
+    if (sourceText.length < 200) throw new Error("Book intake returned too little source text for governed discourse generation.");
     const knowledge = buildKnowledgePack(req.book.bookId, req.topic.split(",").map(x => x.trim()).filter(Boolean));
     const style = SPEAKER_STYLES.find(s => s.id === req.speakerStyleId);
     if (!style) throw new Error(`Unknown speaker style: ${req.speakerStyleId}`);
@@ -57,8 +63,11 @@ export async function createProduction(req: ProductionRequest, voice: VoiceProfi
       style: `${style.label}; writing DNA: ${style.writingDNA.join(", ")}; performance DNA: ${style.performanceDNA.join(", ")}`
     });
     const plan = planDiscourse(req.topic, req.durationMinutes);
+    const qaReasons = qaScript(script, req.durationMinutes);
+    if (qaReasons.some(x => x.startsWith("Discourse duration estimate is"))) throw new Error(qaReasons[qaReasons.length - 1]);
+
     const audio = await synthesizeSpeech(script, req.book.language === "hi" ? "hi-IN" : req.book.language);
-    const audioPath = await persistMp3(productionId, audio.audioBase64);
+    const artifact = await persistMp3(productionId, audio.audioBase64);
 
     return {
       productionId,
@@ -66,12 +75,9 @@ export async function createProduction(req: ProductionRequest, voice: VoiceProfi
       script,
       chapters: plan.sections.map(s => s.title),
       audio: { provider: voice.provider ?? "google-cloud-tts", format: "mp3" },
-      qa: { passed: true, reasons: [`Knowledge pack: ${knowledge.themes.length} theme(s)`, `Audio persisted: ${audioPath}`] }
+      qa: { passed: true, reasons: [...qaReasons, `Audio artifact: ${artifact.path} (${artifact.bytes} bytes)`, "Provenance: sourceRef retained at intake boundary"] }
     };
   } catch (error) {
-    return {
-      productionId, status: "blocked", script: "", chapters: [],
-      qa: { passed: false, reasons: [error instanceof Error ? error.message : "Production failed."] }
-    };
+    return { productionId, status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: [error instanceof Error ? error.message : "Production failed."] } };
   }
 }
