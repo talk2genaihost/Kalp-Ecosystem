@@ -1,4 +1,10 @@
 import type { DiscoursePlan, KnowledgePack, ProductionRequest, ProductionResult, SpeakerStyle, VoiceProfile } from "../../contracts/kalpgyan-manthan-v01.js";
+import { extractBookText } from "./book.js";
+import { generateDiscourse } from "./providers/gemini.js";
+import { synthesizeSpeech } from "./providers/google-tts.js";
+import { persistMp3 } from "./audio.js";
+
+import type { DiscoursePlan, KnowledgePack, ProductionRequest, ProductionResult, SpeakerStyle, VoiceProfile } from "../../contracts/kalpgyan-manthan-v01.js";
 
 export const SPEAKER_STYLES: SpeakerStyle[] = [
   { id: "neutral-philosopher", label: "Neutral Philosopher", writingDNA: ["clear","reflective"], performanceDNA: ["measured","warm"] },
@@ -30,10 +36,52 @@ export function validateVoiceForProduction(voice: VoiceProfile): string[] {
   return errors;
 }
 
-export function createProduction(req: ProductionRequest, voice: VoiceProfile): ProductionResult {
+
+export function validateVoiceForProduction(voice: VoiceProfile): string[] {
+  const errors: string[] = [];
+  if (voice.rightsStatus === "restricted") errors.push("Voice is restricted.");
+  if (voice.kind === "authorized-clone" && voice.rightsStatus !== "verified-authorized") errors.push("Authorized clone requires verified authorization.");
+  return errors;
+}
+
+export async function createProduction(req: ProductionRequest, voice: VoiceProfile): Promise<ProductionResult> {
   const reasons = validateVoiceForProduction(voice);
   if (reasons.length) return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons } };
-  const plan = planDiscourse(req.topic, req.durationMinutes);
-  const script = plan.sections.map(s => "## " + s.title + "\n\n[Generated discourse segment for " + req.speakerStyleId + "]").join("\n\n");
-  return { productionId: crypto.randomUUID(), status: "ready", script, chapters: plan.sections.map(s => s.title), audio: { provider: voice.provider ?? "kalp", format: "mp3" }, qa: { passed: true, reasons: [] } };
+
+  if (!req.book.sourceRef) {
+    return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["book.sourceRef is required for real production."] } };
+  }
+
+  const productionId = crypto.randomUUID();
+  try {
+    const sourceText = await extractBookText(req.book.sourceRef);
+    const knowledge = buildKnowledgePack(req.book.bookId, req.topic.split(",").map(x => x.trim()).filter(Boolean));
+    const style = SPEAKER_STYLES.find(s => s.id === req.speakerStyleId);
+    if (!style) throw new Error(`Unknown speaker style: ${req.speakerStyleId}`);
+
+    const script = await generateDiscourse({
+      sourceText,
+      topic: req.topic,
+      language: req.book.language,
+      durationMinutes: req.durationMinutes,
+      style: `${style.label}; writing DNA: ${style.writingDNA.join(", ")}; performance DNA: ${style.performanceDNA.join(", ")}`
+    });
+    const plan = planDiscourse(req.topic, req.durationMinutes);
+    const audio = await synthesizeSpeech(script, req.book.language === "hi" ? "hi-IN" : req.book.language);
+    const audioPath = await persistMp3(productionId, audio.audioBase64);
+
+    return {
+      productionId,
+      status: "ready",
+      script,
+      chapters: plan.sections.map(s => s.title),
+      audio: { provider: voice.provider ?? "google-cloud-tts", format: "mp3" },
+      qa: { passed: true, reasons: [`Knowledge pack: ${knowledge.themes.length} theme(s)`, `Audio persisted: ${audioPath}`] }
+    };
+  } catch (error) {
+    return {
+      productionId, status: "blocked", script: "", chapters: [],
+      qa: { passed: false, reasons: [error instanceof Error ? error.message : "Production failed."] }
+    };
+  }
 }
