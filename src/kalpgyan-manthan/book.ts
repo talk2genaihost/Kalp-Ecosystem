@@ -1,33 +1,38 @@
 import { readFile } from "node:fs/promises";
 import { loadBookSource } from "./mcp-book-source.js";
 
-export async function extractBookText(sourceRef: string): Promise<string> {
-  const remote = sourceRef.startsWith("http://") || sourceRef.startsWith("https://");
-  const loaded = await loadBookSource(sourceRef);
-  if (remote) return normalizeExtractedText(loaded.text);
-
-  const bytes = await readFile(sourceRef);
-  const signature = bytes.subarray(0, 5).toString("latin1");
-  if (signature === "%PDF-") return normalizeExtractedText(extractPdfText(bytes.toString("latin1")));
-  return normalizeExtractedText(loaded.text);
+function isRemote(ref: string): boolean {
+  return ref.startsWith("http://") || ref.startsWith("https://");
 }
 
-function extractPdfText(pdf: string): string {
+function extractPdfText(bytes: Buffer): string {
+  const raw = bytes.toString("latin1");
   const chunks: string[] = [];
-  for (const match of pdf.matchAll(/BT([\s\S]*?)ET/g)) {
-    const block = match[1];
-    for (const s of block.matchAll(/\(([^()]*)\)\s*Tj/g)) chunks.push(s[1]);
-    for (const arr of block.matchAll(/\[([^\]]*)\]\s*TJ/g)) {
-      chunks.push(arr[1].replace(/\([^)]*\)/g, " ").replace(/\d+(?:\.\d+)?/g, " "));
+  for (const block of raw.matchAll(/BT([\s\S]*?)ET/g)) {
+    const body = block[1];
+    for (const m of body.matchAll(/\((?:\\.|[^\\)])*\)\s*Tj/g)) {
+      const value = m[0].replace(/\)\s*Tj$/, "").replace(/^\(/, "").replace(/\\([\\()])/g, "$1");
+      if (value.trim()) chunks.push(value);
+    }
+    for (const m of body.matchAll(/\[(.*?)\]\s*TJ/gs)) {
+      const values = [...m[1].matchAll(/\((?:\\.|[^\\)])*\)/g)].map(x => x[0].slice(1,-1).replace(/\\([\\()])/g,"$1"));
+      if (values.length) chunks.push(values.join(" "));
     }
   }
-  const cleaned = chunks.join(" ").replace(/\\([\\()])/g, "$1").replace(/\\n/g, " ").replace(/\s+/g, " ").trim();
-  if (!cleaned) throw new Error("PDF text extraction produced no text. Scanned/image-only PDFs require an OCR adapter.");
-  return cleaned;
+  return chunks.join(" ");
 }
 
-function normalizeExtractedText(text: string): string {
-  const normalized = text.replace(/\u0000/g, " ").replace(/\s+/g, " ").trim();
-  if (!normalized) throw new Error("Book intake produced no usable text.");
-  return normalized;
+export async function extractBookText(sourceRef: string): Promise<string> {
+  if (isRemote(sourceRef)) {
+    const loaded = await loadBookSource(sourceRef);
+    return loaded.text;
+  }
+  const bytes = await readFile(sourceRef);
+  if (bytes.subarray(0, 5).toString("ascii") === "%PDF-") {
+    const text = extractPdfText(bytes).replace(/\u0000/g, "").replace(/\s+/g, " ").trim();
+    if (!text) throw new Error("Local PDF contains no extractable text; route scanned PDFs through the MCP OCR/book adapter.");
+    return text;
+  }
+  const loaded = await loadBookSource(sourceRef);
+  return loaded.text;
 }
