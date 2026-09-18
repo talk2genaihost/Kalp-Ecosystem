@@ -17,7 +17,13 @@ A lightweight, dependency-free control dashboard for the KalpGyan Manthan MVP.
 From the repository root:
 
 ```bash
-npm run dev:kalpgyan
+npm run dev:kalpgyan-runtime
+
+In a second terminal:
+
+`npm run dev:kalpgyan`
+
+The dashboard calls `http://localhost:4310/api/production` (override with `window.KALPGYAN_RUNTIME_URL` when embedding it elsewhere).
 ```
 
 The dashboard is currently a UI/control-plane prototype. It does not claim to perform PDF extraction, TTS, or MP3 mastering in-browser; those capabilities remain behind the canonical runtime/provider boundaries.
