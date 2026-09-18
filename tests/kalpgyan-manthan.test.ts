@@ -12,11 +12,12 @@ test("blocks unauthorized clone", () => {
   const errors = validateVoiceForProduction({ voiceId:"v1", label:"Example", kind:"authorized-clone", language:"hi", rightsStatus:"internal" });
   assert.ok(errors.length > 0);
 });
-test("creates an MVP result with an original KALP voice", () => {
-  const result = createProduction({
+test("real production requires a book source", async () => {
+  const result = await createProduction({
     book:{ bookId:"b1", title:"Demo", language:"hi" }, topic:"Wisdom", durationMinutes:15,
     speakerStyleId:"modern-spiritual", voiceId:"kalp-hi-01"
   }, { voiceId:"kalp-hi-01", label:"KALP Hindi 01", kind:"kalp-original", language:"hi", rightsStatus:"internal" });
-  assert.equal(result.status, "ready");
+  assert.equal(result.status, "blocked");
+  assert.match(result.qa.reasons.join(" "), /sourceRef/);
   assert.equal(result.chapters.length, 6);
 });
