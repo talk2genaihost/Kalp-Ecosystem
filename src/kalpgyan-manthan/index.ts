@@ -2,6 +2,7 @@ import { extractBookText } from "./book.js";
 import { generateDiscourse } from "./providers/gemini.js";
 import { synthesizeSpeech } from "./providers/google-tts.js";
 import { persistMp3 } from "./audio.js";
+export { AI_AWAAZ_PROVIDER_ID, createAiAwaazAdapter } from "./providers/ai-awaaz.js";
 
 export const SPEAKER_STYLES: SpeakerStyle[] = [
   { id: "neutral-philosopher", label: "Neutral Philosopher", writingDNA: ["clear","reflective"], performanceDNA: ["measured","warm"] },
