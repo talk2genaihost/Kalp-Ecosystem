@@ -1,29 +1,23 @@
 # KalpGyan Manthan Dashboard
 
-A lightweight, dependency-free control dashboard for the KalpGyan Manthan MVP.
-
-## Scope
-
-- 10-stage Book-to-Discourse/Audio pipeline
-- Book intake and duration controls
-- Knowledge/discourse planning view
-- Speaker style and voice registry view
-- Production control
-- QA/provenance status
-- Runtime event view
+A lightweight control dashboard for the KalpGyan Manthan MVP.
 
 ## Run locally
 
-From the repository root:
+From the repository root, start the runtime:
 
 ```bash
 npm run dev:kalpgyan-runtime
-
-In a second terminal:
-
-`npm run dev:kalpgyan`
-
-The dashboard calls `http://localhost:4310/api/production` (override with `window.KALPGYAN_RUNTIME_URL` when embedding it elsewhere).
 ```
 
-The dashboard is currently a UI/control-plane prototype. It does not claim to perform PDF extraction, TTS, or MP3 mastering in-browser; those capabilities remain behind the canonical runtime/provider boundaries.
+In a second terminal, start the dashboard:
+
+```bash
+npm run dev:kalpgyan
+```
+
+The dashboard calls `http://localhost:4310/api/production`. Override the runtime URL with `window.KALPGYAN_RUNTIME_URL` when embedding the dashboard elsewhere.
+
+## Current boundary
+
+The dashboard invokes the canonical TypeScript production runtime. PDF/EPUB extraction, model-backed discourse generation, real TTS, audio mastering, and persistent artifact storage remain explicit backend/provider boundaries and are not faked by the dashboard.
