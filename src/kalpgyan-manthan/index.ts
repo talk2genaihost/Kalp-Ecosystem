@@ -1,10 +1,7 @@
-import type { DiscoursePlan, KnowledgePack, ProductionRequest, ProductionResult, SpeakerStyle, VoiceProfile } from "../../contracts/kalpgyan-manthan-v01.js";
 import { extractBookText } from "./book.js";
 import { generateDiscourse } from "./providers/gemini.js";
 import { synthesizeSpeech } from "./providers/google-tts.js";
 import { persistMp3 } from "./audio.js";
-
-import type { DiscoursePlan, KnowledgePack, ProductionRequest, ProductionResult, SpeakerStyle, VoiceProfile } from "../../contracts/kalpgyan-manthan-v01.js";
 
 export const SPEAKER_STYLES: SpeakerStyle[] = [
   { id: "neutral-philosopher", label: "Neutral Philosopher", writingDNA: ["clear","reflective"], performanceDNA: ["measured","warm"] },
@@ -36,13 +33,6 @@ export function validateVoiceForProduction(voice: VoiceProfile): string[] {
   return errors;
 }
 
-
-export function validateVoiceForProduction(voice: VoiceProfile): string[] {
-  const errors: string[] = [];
-  if (voice.rightsStatus === "restricted") errors.push("Voice is restricted.");
-  if (voice.kind === "authorized-clone" && voice.rightsStatus !== "verified-authorized") errors.push("Authorized clone requires verified authorization.");
-  return errors;
-}
 
 export async function createProduction(req: ProductionRequest, voice: VoiceProfile): Promise<ProductionResult> {
   const reasons = validateVoiceForProduction(voice);
