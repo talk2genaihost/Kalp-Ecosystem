@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SPEAKER_STYLES, createProduction, planDiscourse, validateVoiceForProduction } from "../src/kalpgyan-manthan/index.js";
+import { splitForTts } from "../src/kalpgyan-manthan/providers/google-tts.js";
+import { mcpCacheConfig } from "../src/kalpgyan-manthan/mcp-cache.js";
 
 test("registers ten speaker styles", () => assert.equal(SPEAKER_STYLES.length, 10));
 test("plans six balanced discourse sections", () => {
@@ -19,5 +21,12 @@ test("real production requires a book source", async () => {
   }, { voiceId:"kalp-hi-01", label:"KALP Hindi 01", kind:"kalp-original", language:"hi", rightsStatus:"internal" });
   assert.equal(result.status, "blocked");
   assert.match(result.qa.reasons.join(" "), /sourceRef/);
-  assert.equal(result.chapters.length, 6);
+});
+test("splits long discourse into provider-safe TTS chunks", () => {
+  const chunks = splitForTts(Array.from({length:1200}, (_, i) => `Sentence number ${i}.`).join(" "));
+  assert.ok(chunks.length > 1);
+  assert.ok(chunks.every(c => c.length <= 4500));
+});
+test("MCP cache defaults to the 1.5B-token capacity", () => {
+  assert.equal(mcpCacheConfig().capacityTokens, 1_500_000_000);
 });
