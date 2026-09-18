@@ -10,7 +10,8 @@
     "build": "tsc",
     "build:astro-rashi": "vite build",
     "test": "tsx --test tests/**/*.test.ts",
-    "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard"
+    "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
+    "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
