@@ -36,7 +36,7 @@
         <h2>Book Intake</h2>
         <div class="row">
           <div class="form">
-            <div class="field"><label>Book / source title</label><input id="book" value="The Wisdom of Life — Demo Book" /></div>
+            <div class="field"><label>Book / source title</label><input id="book" value="The Wisdom of Life — Demo Book" /></div><div class="field"><label>Source reference (MCP/API)</label><input id="sourceRef" placeholder="https://... or server-local path" /></div>
             <div class="field"><label>Source type</label><select><option>PDF</option><option>EPUB</option><option>Text</option><option>URL</option></select></div>
           </div>
           <div class="form">
@@ -73,7 +73,7 @@
           <div class="list">
             <div class="item"><span>Voice rights</span><span class="status">VERIFIED</span></div>
             <div class="item"><span>Performance DNA</span><span class="status">READY</span></div>
-            <div class="item"><span>Provider boundary</span><span class="status">ABSTRACTED</span></div>
+            <div class="item"><span>Provider boundary</span><span class="status">ABSTRACTED</span></div><div class="item"><span>MCP cache</span><span class="status">1.5B TOKENS</span></div>
             <div class="item"><span>Identity continuity</span><span class="status">LOCKED</span></div>
           </div>
         </div>
@@ -136,7 +136,7 @@ async function run(){
   try{
     const response=await fetch(RUNTIME_URL+"/api/production",{method:"POST",headers:{"content-type":"application/json"},
       body:JSON.stringify({
-        request:{book:{bookId:"dashboard-"+Date.now(),title:bookTitle,language:"hi"},topic:themes.join(", ")||bookTitle,durationMinutes:duration,speakerStyleId:style,voiceId:"kalp-original-hi-01"},
+        request:{book:{bookId:"dashboard-"+Date.now(),title:bookTitle,language:"hi",sourceRef:document.getElementById("sourceRef").value.trim()},topic:themes.join(", ")||bookTitle,durationMinutes:duration,speakerStyleId:style,voiceId:"kalp-original-hi-01"},
         voice:{voiceId:"kalp-original-hi-01",label:"KALP Original Hindi",kind:voiceKind,language:"hi",provider:"kalp",rightsStatus:voiceKind==="authorized-clone"?"verified-authorized":"internal"}
       })
     });
