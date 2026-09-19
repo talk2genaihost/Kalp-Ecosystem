@@ -84,7 +84,6 @@ function renderRashis(): void {
 
 function renderDaily(): void {
   const summary = getHindiDailySummary(selectedRashi.id);
-  $("selectedName").textContent = selectedRashi.names[locale];
   $("selectedRashiLabel").textContent = `${selectedRashi.names[locale]} — चयनित राशि`;
   $("selectedRashiHint").textContent = "हिंदी में दैनिक संदेश";
   $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
