@@ -17,7 +17,7 @@ const SIGN_INDEX: Record<string, number> = {
   virgo:5,kanya:5,
   libra:6,tula:6,
   scorpio:7,vrishchika:7,
-  sagittarius:8,sagittarius:8,dhanu:8,
+  sagittarius:8,dhanu:8,
   capricorn:9,makara:9,
   aquarius:10,kumbha:10,
   pisces:11,meena:11,
