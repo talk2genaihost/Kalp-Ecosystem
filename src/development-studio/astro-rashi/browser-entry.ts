@@ -3,6 +3,7 @@ import { unavailableCalculationProvider } from "./demo-provider.js";
 import { createLiveHoroscopeProvider, fetchLiveHoroscopes, SIGN_MAP } from "./live-horoscope-provider.js";
 import { rashis } from "./localization.js";
 import { renderGeminiForPayload } from "./kalp-gemini-entry.js";
+import { deriveCanonicalEvidence } from "./kalp-derived-evidence.js";
 import type { Locale, Rashi } from "./domain.js";
 
 const liveProvider = createLiveHoroscopeProvider();
@@ -11,6 +12,7 @@ const KUNDLI_ENDPOINT = "https://cfwrgalgscieddkcrtde.supabase.co/functions/v1/a
 const SUPABASE_URL = "https://cfwrgalgscieddkcrtde.supabase.co";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 const locale: Locale = "hi-IN";
+void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
 let accessToken: string | null = null;
 let liveStatus = "Loading live daily horoscope…";
