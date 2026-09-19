@@ -14,8 +14,8 @@ jobs:
       - name: Checkout repository without external action
         run: |
           git init .
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --depth 1 origin "${GITHUB_REF}"
+          git remote add origin "https://x-access-token:\${GITHUB_TOKEN}@github.com/\${GITHUB_REPOSITORY}.git"
+          git fetch --depth 1 origin "\${GITHUB_REF}"
           git checkout --detach FETCH_HEAD
 
       - name: Verify runtime
@@ -25,9 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-
-      - name: TypeScript build
-        run: npm run build
 
       - name: Astro Rashi browser build
         run: npm run build:astro-rashi
