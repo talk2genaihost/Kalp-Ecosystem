@@ -1,50 +1,59 @@
 # KALP AI Awaaz Provider Adapter v0.1
 
-## Boundary
+## AWAAZ-02 — API Contract Validation
 
-AI Awaaz is registered as a swappable voice provider:
+Validation date: 2026-09-19
 
-KALP Voice Intent -> Provider Registry -> AI Awaaz Adapter -> KALP Voice Asset
+### Evidence reviewed
 
-KALP owns the canonical voice/persona identity. AI Awaaz owns only provider-side rendering.
+The official AI Awaaz public site documents:
+- text-to-speech generation
+- 20+ Indian languages
+- 140+/150+ voices
+- emotion-based / neural-emotion TTS
+- voice clone functionality
+- MP3 output for creator workflows
 
-## Provider registration
+Official source: https://aiawaaz.io/
+
+### Validation result
+
+**AWAAZ-02 = BLOCKED / NOT YET VALIDATED**
+
+A public, first-party REST API contract could not be established from the official public surface reviewed. The following remain unverified:
+
+1. official API base URL
+2. authentication/header contract
+3. TTS endpoint and HTTP method
+4. request JSON schema
+5. voice/model identifier schema
+6. language identifier schema
+7. emotion/style parameter schema
+8. pitch/speed parameter schema
+9. binary/base64 response contract
+10. rate limits and error schema
+11. programmatic/commercial API entitlement
+12. voice-cloning API authorization and retention terms
+
+### KALP implementation decision
+
+The provider adapter remains registered as:
 
 - Provider ID: KALP-VOICE-AWAAZ-001
-- Provider: AI Awaaz
 - Integration state: discovered
 - Execution state: gated
-- Output contract: canonical KALP MP3 VoiceAsset
+- Canonical output: KALP VoiceAsset / MP3
 
-## Declared capabilities
+No undocumented endpoint has been hard-coded and no browser/UI workflow is being masqueraded as an API integration.
 
-- CAP-VOICE-TTS
-- CAP-VOICE-EMOTION
-- CAP-VOICE-CLONE
-- CAP-VOICE-MULTILINGUAL
-- CAP-VOICE-PITCH
-- CAP-VOICE-SPEED
-- CAP-VOICE-MP3
+### Pass condition
 
-These are provider capabilities observed from the public product surface; they are not treated as a validated API contract.
+AWAAZ-02 becomes PASS only after official AI Awaaz developer/API documentation or a provider-issued API contract and credential set is available.
 
-## Gate
+The controlled test must produce real audio and normalize it into the existing KALP VoiceAsset contract without downstream changes.
 
-Live execution is intentionally blocked until KALP validates:
+### Next gate
 
-1. official API/base URL
-2. authentication mechanism
-3. voice/model identifiers
-4. request parameters for language, emotion, pitch, speed and style
-5. audio response format
-6. rate limits and pricing
-7. commercial/YouTube usage rights
-8. voice-cloning authorization and data-retention terms
+**AWAAZ-03 — Controlled Provider Connectivity Test**
 
-No provider-specific API schema is permitted to leak into KALP core contracts.
-
-## Next implementation gate
-
-AWAAZ-02 — API Contract Validation
-
-Pass condition: a real authenticated test request can be executed and normalized into the canonical KALP VoiceAsset contract without changing downstream consumers.
+AWAAZ-03 starts only after the official API contract and credentials are available.
