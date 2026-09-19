@@ -16,6 +16,33 @@ void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
 let accessToken: string | null = null;
 let liveStatus = "हिंदी दैनिक संदेश लोड हो रहा है…";
+type DailyGuidance = {
+  luckyColor: string;
+  luckyNumber: string;
+  luckyTime: string;
+  focus: string;
+  work: string;
+  money: string;
+  relationships: string;
+  caution: string;
+  mantra: string;
+};
+
+const dailyGuidance: Record<Rashi["id"], DailyGuidance> = {
+  mesha: { luckyColor:"लाल", luckyNumber:"9", luckyTime:"सुबह 9:00–10:30", focus:"पहल और स्पष्ट निर्णय", work:"एक महत्वपूर्ण काम पहले पूरा करें।", money:"जल्दबाज़ी के खर्च से बचें।", relationships:"सीधी लेकिन शांत बातचीत रखें।", caution:"आवेग में निर्णय न लें।", mantra:"मैं ऊर्जा को सही दिशा देता हूँ।" },
+  vrishabha: { luckyColor:"हरा", luckyNumber:"6", luckyTime:"सुबह 10:00–11:30", focus:"स्थिरता और प्राथमिकता", work:"रूटीन और लंबित काम व्यवस्थित करें।", money:"बजट और जरूरी खर्च पर ध्यान दें।", relationships:"धैर्य से सुनना लाभकारी रहेगा।", caution:"जिद या अनावश्यक देरी से बचें।", mantra:"मैं धैर्य से स्थिर प्रगति करता हूँ।" },
+  mithuna: { luckyColor:"हरा", luckyNumber:"5", luckyTime:"सुबह 11:00–12:30", focus:"संवाद और सीखना", work:"विचार स्पष्ट रखें और नई जानकारी अपनाएँ।", money:"खरीद या निवेश से पहले जानकारी जाँचें।", relationships:"स्पष्ट शब्द गलतफहमी कम करेंगे।", caution:"एक साथ बहुत काम न लें।", mantra:"मेरी स्पष्टता मेरी प्रगति है।" },
+  karka: { luckyColor:"सफेद", luckyNumber:"2", luckyTime:"सुबह 8:30–10:00", focus:"भावनात्मक संतुलन", work:"महत्वपूर्ण काम शांत वातावरण में करें।", money:"परिवार से जुड़े खर्च सोच-समझकर करें।", relationships:"सहानुभूति के साथ अपनी बात रखें।", caution:"भावना में आकर प्रतिक्रिया न दें।", mantra:"मैं शांत रहकर सही चुनाव करता हूँ।" },
+  simha: { luckyColor:"सुनहरा", luckyNumber:"1", luckyTime:"सुबह 9:30–11:00", focus:"आत्मविश्वास और नेतृत्व", work:"जिम्मेदारी लेकर काम को दिशा दें।", money:"प्रतिष्ठा से अधिक वास्तविक जरूरत को प्राथमिकता दें।", relationships:"नेतृत्व के साथ दूसरों की राय भी सुनें।", caution:"अहं या कठोरता से बचें।", mantra:"मैं आत्मविश्वास से नेतृत्व करता हूँ।" },
+  kanya: { luckyColor:"हरा", luckyNumber:"5", luckyTime:"सुबह 8:00–9:30", focus:"योजना और विवरण", work:"सूची बनाकर छोटे चरणों में काम करें।", money:"हिसाब-किताब और दस्तावेज जाँचें।", relationships:"छोटी बातों को बड़ा बनाने से बचें।", caution:"अतिविश्लेषण से निर्णय न रोकें।", mantra:"व्यवस्था मुझे स्पष्टता देती है।" },
+  tula: { luckyColor:"नीला", luckyNumber:"6", luckyTime:"दोपहर 12:00–1:30", focus:"संतुलन और सहयोग", work:"साझेदारी वाले काम आगे बढ़ाएँ।", money:"साझा वित्तीय निर्णय में स्पष्टता रखें।", relationships:"समझौते से पहले अपनी जरूरत स्पष्ट करें।", caution:"सबको खुश करने की कोशिश न करें।", mantra:"संतुलन में मेरी शक्ति है।" },
+  vrishchika: { luckyColor:"गहरा लाल", luckyNumber:"9", luckyTime:"दोपहर 1:00–2:30", focus:"एकाग्रता और गहराई", work:"एक कठिन काम पर पूरा ध्यान दें।", money:"गोपनीय या बड़े वित्तीय फैसले जाँचकर लें।", relationships:"विश्वास और पारदर्शिता बनाए रखें।", caution:"संदेह को तथ्य का विकल्प न बनने दें।", mantra:"मैं गहराई से समझकर आगे बढ़ता हूँ।" },
+  dhanu: { luckyColor:"पीला", luckyNumber:"3", luckyTime:"सुबह 7:30–9:00", focus:"दिशा और विस्तार", work:"नई सीख या अवसर को व्यावहारिक योजना से जोड़ें।", money:"बड़े लक्ष्य के साथ खर्च की सीमा तय करें।", relationships:"खुलकर बात करें, पर वादा सोचकर करें।", caution:"अति-आशावाद से बचें।", mantra:"मैं सीखकर आगे बढ़ता हूँ।" },
+  makara: { luckyColor:"नीला", luckyNumber:"8", luckyTime:"सुबह 8:30–10:00", focus:"अनुशासन और निरंतरता", work:"दीर्घकालिक लक्ष्य का एक ठोस कदम पूरा करें।", money:"बचत और आवश्यक खर्च को प्राथमिकता दें।", relationships:"काम के बीच अपने लोगों के लिए समय रखें।", caution:"हर जिम्मेदारी अकेले न उठाएँ।", mantra:"निरंतर प्रयास मेरी ताकत है।" },
+  kumbha: { luckyColor:"बैंगनी", luckyNumber:"8", luckyTime:"दोपहर 2:00–3:30", focus:"नए विचार और उपयोगी बदलाव", work:"नई तकनीक या तरीका आज़माने का अच्छा समय है।", money:"नए अवसर में तथ्य और जोखिम दोनों देखें।", relationships:"अपनी स्वतंत्रता के साथ दूसरे की जरूरत समझें।", caution:"बहुत दूर की योजना में वर्तमान न भूलें।", mantra:"नया विचार, जिम्मेदार कदम।" },
+  meena: { luckyColor:"पीला", luckyNumber:"3", luckyTime:"सुबह 9:00–10:30", focus:"अंतर्ज्ञान और व्यावहारिकता", work:"रचनात्मक विचार को स्पष्ट कार्ययोजना दें।", money:"भावनात्मक खरीद से बचें।", relationships:"संवेदनशीलता को स्पष्ट संवाद से जोड़ें।", caution:"थकान को नजरअंदाज न करें।", mantra:"मैं संवेदना और समझ से आगे बढ़ता हूँ।" }
+};
+
 const hindiFallback: Record<string, string> = {
   mesha: "आज पहल करने, काम को गति देने और स्पष्ट निर्णय लेने का दिन है। जल्दबाज़ी के बजाय एकाग्रता बनाए रखें।",
   vrishabha: "आज स्थिरता और धैर्य से काम लेना लाभकारी रहेगा। जरूरी कामों को प्राथमिकता देकर धीरे-धीरे आगे बढ़ें।",
