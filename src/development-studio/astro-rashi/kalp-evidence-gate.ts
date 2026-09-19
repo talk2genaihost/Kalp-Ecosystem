@@ -31,7 +31,8 @@ function hasPlanetPlacementClaim(text:string):boolean{
       const ends=[lower.indexOf(".",ps+p.length),lower.indexOf("।",ps+p.length)].filter((v)=>v>=0);
       const sentenceEnd=ends.length?Math.min(...ends):lower.length;
       const sentence=lower.slice(sentenceStart,sentenceEnd);
-      if(placementPatterns.some((pattern)=>pattern.test(sentence))&&!isNegated(sentence,0))return true;
+      const metaLanguage=/(mapping|evidence|explicit|supported|supplied|provided|placement language|house claim|house mapping|मैपिंग|साक्ष्य|प्रमाण|स्पष्ट रूप से|उपलब्ध प्रमाण)/i.test(sentence);
+      if(!metaLanguage&&placementPatterns.some((pattern)=>pattern.test(sentence))&&!isNegated(sentence,0))return true;
       ps+=p.length;
     }
     return false;
