@@ -46,15 +46,23 @@ async function main() {
     "Write natural conversational Hindi. Return an empty array when evidence does not support a section. Do not fill unsupported sections with generic astrology claims.",
     evidencePrompt(evidence),
   ].join("\n\n");
-  const response = await fetch(GATEWAY_ENDPOINT, { method: "POST", headers: { Authorization: `Bearer ${auth}`, apikey: ANON_KEY!, "Content-Type": "application/json" }, body: JSON.stringify({ provider: "gemini", gemini_models: ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"], prompt }) });
-  const body = await response.json() as { output?: string; message?: string };
-  assert(response.ok && body.output, `Gemini gateway failed (${response.status}): ${body.message ?? "no output"}`);
+  let workingPrompt = prompt;
   let interpretation: unknown;
-  try { interpretation = JSON.parse(body.output); } catch { throw new Error("LIVE_GEMINI_FAIL: Gemini returned non-JSON output"); }
-  const validation = validateInterpretation(interpretation, evidence);
-  assert(validation.ok, `Evidence Gate rejected Gemini output: ${validation.violations.join("; ")}`);
-  const result = interpretation as Record<string, unknown>;
-  const arrays = Object.entries(result).filter(([, value]) => Array.isArray(value)).reduce((count, [, value]) => count + (value as unknown[]).length, 0);
+  let lastViolations: string[] = [];
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await fetch(GATEWAY_ENDPOINT, { method: "POST", headers: { Authorization: `Bearer ${auth}`, apikey: ANON_KEY!, "Content-Type": "application/json" }, body: JSON.stringify({ provider: "gemini", gemini_models: ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-2.5-flash"], prompt: workingPrompt }) });
+    const body = await response.json() as { output?: string; message?: string };
+    assert(response.ok && body.output, `Gemini gateway failed (${response.status}): ${body.message ?? "no output"}`);
+    try { interpretation = JSON.parse(body.output); } catch { throw new Error("LIVE_GEMINI_FAIL: Gemini returned non-JSON output"); }
+    const validation = validateInterpretation(interpretation, evidence);
+    if (validation.ok) break;
+    lastViolations = validation.violations;
+    if (attempt === 0) {
+      workingPrompt = [prompt, "REPAIR PASS — The previous draft was rejected by the Evidence Gate.", "Remove or rewrite ONLY the unsupported claims below. Preserve every other evidence-supported section and return the complete JSON again.", "Rejected claims:", ...lastViolations.map((v) => `- ${v}`)].join("\\n\\n");
+    }
+  }
+  const finalValidation = validateInterpretation(interpretation, evidence);
+  assert(finalValidation.ok, `Evidence Gate rejected Gemini output: ${lastViolations.join("; ")}`);
   console.log(JSON.stringify({ status: "PASS", provider: evidence.provider, model: evidence.model, evidenceStatus: evidence.statuses, outputKeys: Object.keys(result), supportedArrayItems: arrays, gate: "ACCEPTED" }, null, 2));
 }
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exit(1); });
