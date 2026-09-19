@@ -49,9 +49,6 @@ function patchPayload(payload: Obj): Obj {
 }
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-  if (url.startsWith(GATEWAY) && lastPartial) {
-    return new Response(JSON.stringify({ message: "Gemini interpretation is paused because provider data is partial." }), { status: 409, headers: { "Content-Type": "application/json" } });
-  }
   const response = await originalFetch(input, init);
   if (!url.startsWith(ENDPOINT)) return response;
   const clone = response.clone();
@@ -85,7 +82,6 @@ const answer = document.getElementById("answer");
 if (answer) {
   const observer = new MutationObserver(() => {
     renderPartialNotice(answer);
-    if (lastPartial) answer.querySelectorAll(".kalp-gemini-interpretation").forEach((node) => node.remove());
   });
   observer.observe(answer, { childList: true, subtree: true });
 }
