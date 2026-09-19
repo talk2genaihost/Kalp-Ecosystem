@@ -14,20 +14,22 @@ const RELATIONAL_CLAIMS:{field:string;patterns:string[]}[]=[{field:"planetaryRel
 const PLANET_NAMES=["सूर्य","चंद्र","चन्द्र","मंगल","बुध","गुरु","बृहस्पति","शुक्र","शनि","राहु","केतु","sun","moon","mars","mercury","jupiter","venus","saturn","rahu","ketu"];
 const NEGATION_PATTERNS=["उपलब्ध नहीं","उपलब्ध नहीं है","प्रमाण उपलब्ध नहीं","प्रमाणित नहीं","साक्ष्य उपलब्ध नहीं","साक्ष्य नहीं है","डेटा उपलब्ध नहीं","डेटा में नहीं","नहीं दिया गया","नहीं दिए गए","नहीं है","नहीं हैं","नहीं मिलता","नहीं मिलती","नहीं मिलता है","नहीं मिलती है","नहीं","नहीं हैं","not aspect","no aspect","no aspects","not aspects","without aspects","not lordship","no lordship","without lordship","not evidenced","not supported","no evidence","no explicit evidence","not provided","not supplied","unsupported","cannot determine","cannot be determined","insufficient evidence","insufficient data","cannot infer","do not infer"];
 function isNegated(text:string,matchStart:number):boolean{const before=normalized(text.slice(Math.max(0,matchStart-120),matchStart));const after=normalized(text.slice(matchStart,Math.min(text.length,matchStart+120)));return NEGATION_PATTERNS.some((p)=>before.includes(normalized(p))||after.includes(normalized(p)))}
-function hasPositiveRelationalClaim(text:string,patterns:string[]):boolean{const lower=text.toLowerCase();return patterns.some((pattern)=>{let start=0;const needle=pattern.toLowerCase();while((start=lower.indexOf(needle,start))>=0){if(!isNegated(text,start))return true;start+=needle.length}return false})}
+function hasPositiveRelationalClaim(text:string,patterns:string[]):boolean{const lower=text.toLowerCase();return patterns.some((pattern)=>{let start=0;const needle=pattern.toLowerCase();while((start=lower.indexOf(needle,start))>=0){if(!isNegated(text,start)){const window=lower.slice(Math.max(0,start-120),Math.min(lower.length,start+needle.length+120));if(PLANET_NAMES.some((planet)=>window.includes(planet.toLowerCase())))return true}start+=needle.length}return false})}
 function hasPlanetPlacementClaim(text:string):boolean{
   const lower=text.toLowerCase();
+  const placementPatterns=[
+    /\\b(?:in|placed in|situated in|located in|occupies|occupying)\\s+(?:the\\s+)?(?:1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\\s+house\\b/i,
+    /\\b(?:in|placed in|situated in|स्थित|स्थित है|में)\\s*(?:भाव\\s*)?\\d{1,2}\\b/i,
+    /\\bभाव\\s*\\d{1,2}\\s*(?:में|स्थित|स्थित है)\\b/i,
+    /\\b(?:house|भाव)\\s*(?:number|no\\.?|#)?\\s*\\d{1,2}\\b/i
+  ];
   return PLANET_NAMES.some((planet)=>{
-    const p=planet.toLowerCase();
-    let ps=0;
+    const p=planet.toLowerCase(); let ps=0;
     while((ps=lower.indexOf(p,ps))>=0){
-      const windowStart=Math.max(0,ps-100),windowEnd=Math.min(lower.length,ps+p.length+100);
-      const window=lower.slice(windowStart,windowEnd);
-      const explicitHouse=/\b(?:house|भाव)\s*(?:number|no\.?|#)?\s*\d{1,2}\b/i.test(window)
-        || /\b(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\s+house\b/i.test(window)
-        || /\b\d{1,2}(?:st|nd|rd|th)\s+house\b/i.test(window)
-        || /भाव\s*\d{1,2}/i.test(window);
-      if(explicitHouse)return true;
+      const sentenceStart=Math.max(0,Math.max(lower.lastIndexOf(".",ps),lower.lastIndexOf("।",ps),lower.lastIndexOf("\\n",ps))+1);
+      const sentenceEnd=Math.min(lower.length,...[lower.indexOf(".",ps+p.length),lower.indexOf("।",ps+p.length),lower.indexOf("\\n",ps+p.length)].filter((v)=>v>=0));
+      const sentence=lower.slice(sentenceStart,sentenceEnd===Infinity?lower.length:sentenceEnd);
+      if(placementPatterns.some((pattern)=>pattern.test(sentence)))return true;
       ps+=p.length;
     }
     return false;
