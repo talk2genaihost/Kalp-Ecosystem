@@ -18,20 +18,20 @@ function hasPositiveRelationalClaim(text:string,patterns:string[]):boolean{const
 function hasPlanetPlacementClaim(text:string):boolean{
   const lower=text.toLowerCase();
   const placementPatterns=[
-    /\\b(?:in|placed in|situated in|located in|occupies|occupying)\\s+(?:the\\s+)?(?:1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\\s+house\\b/i,
-    /(?:में|स्थित|स्थित है)\\s*(?:\\bभाव\\s*)?\\d{1,2}\\b/i ,
-    /(?:प्रथम|द्वितीय|तृतीय|चतुर्थ|पंचम|पञ्चम|षष्ठ|सप्तम|अष्टम|नवम|दशम|एकादश|द्वादश|पहले|दूसरे|तीसरे|चौथे|पाँचवें|पांचवें|छठे|सातवें|आठवें|नौवें|दसवें|ग्यारहवें|बारहवें)\\s+भाव(?:\\s*(?:में|स्थित|स्थित है))?/i,
-    /\\bभाव\\s*(?:संख्या|नंबर|number|no\\.?|#)?\\s*\\d{1,2}\\s*(?:में|स्थित|स्थित है)\\b/i,
-    /\\b(?:house|भाव)\\s*(?:number|no\\.?|#)?\\s*\\d{1,2}\\b/i
+    /(?:in|placed in|situated in|located in|occupies|occupying)\s+(?:the\s+)?(?:1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\s+house\b/i,
+    /(?:प्रथम|द्वितीय|तृतीय|चतुर्थ|पंचम|पञ्चम|षष्ठ|सप्तम|अष्टम|नवम|दशम|एकादश|द्वादश|पहले|दूसरे|तीसरे|चौथे|पाँचवें|पांचवें|छठे|सातवें|आठवें|नौवें|दसवें|ग्यारहवें|बारहवें)\s+भाव(?:\s*(?:में|स्थित|स्थित है))?/i,
+    /(?:में|स्थित|स्थित है)\s*(?:भाव\s*)?\d{1,2}\b/i,
+    /\bभाव\s*(?:संख्या|नंबर|number|no\.?|#)?\s*\d{1,2}\s*(?:में|स्थित|स्थित है)\b/i
   ];
   return PLANET_NAMES.some((planet)=>{
-    const p=planet.toLowerCase(); let ps=0;
+    const p=planet.toLowerCase();
+    let ps=0;
     while((ps=lower.indexOf(p,ps))>=0){
-      const sentenceStart=Math.max(0,Math.max(lower.lastIndexOf(".",ps),lower.lastIndexOf("।",ps),lower.lastIndexOf("\\n",ps))+1);
-      const ends=[lower.indexOf(".",ps+p.length),lower.indexOf("।",ps+p.length),lower.indexOf("\\n",ps+p.length)].filter((v)=>v>=0);
+      const sentenceStart=Math.max(0,Math.max(lower.lastIndexOf(".",ps),lower.lastIndexOf("।",ps))+1);
+      const ends=[lower.indexOf(".",ps+p.length),lower.indexOf("।",ps+p.length)].filter((v)=>v>=0);
       const sentenceEnd=ends.length?Math.min(...ends):lower.length;
       const sentence=lower.slice(sentenceStart,sentenceEnd);
-      if(placementPatterns.some((pattern)=>pattern.test(sentence)) && !isNegated(sentence,0))return true;
+      if(placementPatterns.some((pattern)=>pattern.test(sentence))&&!isNegated(sentence,0))return true;
       ps+=p.length;
     }
     return false;
