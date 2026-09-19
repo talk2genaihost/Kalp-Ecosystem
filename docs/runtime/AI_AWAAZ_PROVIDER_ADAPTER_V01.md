@@ -52,8 +52,51 @@ AWAAZ-02 becomes PASS only after official AI Awaaz developer/API documentation o
 
 The controlled test must produce real audio and normalize it into the existing KALP VoiceAsset contract without downstream changes.
 
-### Next gate
+## AWAAZ-03 — Controlled Provider Connectivity Test
 
-**AWAAZ-03 — Controlled Provider Connectivity Test**
+**Status: BLOCKED / NO LIVE CONNECTIVITY CLAIM**
 
-AWAAZ-03 starts only after the official API contract and credentials are available.
+A live provider connectivity test cannot be executed safely yet because the official AI Awaaz REST/API endpoint, request contract, and credentials have not been validated. The official public site currently documents the product capabilities and browser/app workflow, but does not establish the first-party API contract required for a production HTTP adapter. citeturn0search2
+
+### AWAAZ-03 preflight implemented
+
+The KALP runtime now prevents an AI Awaaz provider selection from falling through to the existing Google TTS implementation. This closes the provider-provenance defect identified during PR review.
+
+Guard condition:
+
+`voice.provider === KALP-VOICE-AWAAZ-001`
+
+Result:
+
+- production is blocked
+- no Google TTS request is made
+- no AI Awaaz provenance is falsely attached to Google-generated audio
+- the block explicitly references AWAAZ-02 and AWAAZ-03
+- an automated regression test covers the fallback path
+
+### Live connectivity pass criteria
+
+AWAAZ-03 can become PASS only when all of the following are available:
+
+1. first-party API base URL
+2. authenticated credential supplied through runtime secret configuration
+3. documented TTS HTTP method and endpoint
+4. documented request schema
+5. documented voice/language identifiers
+6. documented output format/response contract
+7. controlled Hindi test request
+8. returned audio validated as MP3/audio-mpeg
+9. output normalized into the canonical KALP VoiceAsset
+10. provider provenance and latency captured
+11. provider errors mapped without fallback to another provider
+12. credential is never persisted in source control, logs, artifacts, or test fixtures
+
+### Current gate state
+
+**AWAAZ-03 = BLOCKED_PENDING_PROVIDER_API_ACCESS**
+
+No fake endpoint, browser automation, or undocumented network call is being used to manufacture a PASS.
+
+### Next action
+
+Obtain the official AI Awaaz API/developer contract and a test credential. Then implement the real controlled request behind the existing adapter boundary and execute AWAAZ-03 against the provider.
