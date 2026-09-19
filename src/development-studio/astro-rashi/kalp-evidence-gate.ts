@@ -19,7 +19,7 @@ function hasPlanetPlacementClaim(text:string):boolean{
   const lower=text.toLowerCase();
   const placementPatterns=[
     /\\b(?:in|placed in|situated in|located in|occupies|occupying)\\s+(?:the\\s+)?(?:1st|2nd|3rd|4th|5th|6th|7th|8th|9th|10th|11th|12th|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth)\\s+house\\b/i,
-    /(?:में|स्थित|स्थित है)\\s*(?:\\bभाव\\s*)?\\d{1,2}\\b/i,
+    /(?:में|स्थित|स्थित है)\\s*(?:\\bभाव\\s*)?\\d{1,2}\\b/i,\n    /(?:प्रथम|द्वितीय|तृतीय|चतुर्थ|पंचम|पञ्चम|षष्ठ|सप्तम|अष्टम|नवम|दशम|एकादश|द्वादश|पहले|दूसरे|तीसरे|चौथे|पाँचवें|पांचवें|छठे|सातवें|आठवें|नौवें|दसवें|ग्यारहवें|बारहवें)\\s+भाव(?:\\s*(?:में|स्थित|स्थित है))?/i,
     /\\bभाव\\s*(?:संख्या|नंबर|number|no\\.?|#)?\\s*\\d{1,2}\\s*(?:में|स्थित|स्थित है)\\b/i,
     /\\b(?:house|भाव)\\s*(?:number|no\\.?|#)?\\s*\\d{1,2}\\b/i
   ];
