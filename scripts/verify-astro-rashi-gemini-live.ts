@@ -37,7 +37,7 @@ async function main() {
     "Use only the supplied evidence-safe facts. Do not reconstruct, calculate, derive, or infer unsupported facts.",
     "A planet's sign or degree alone authorizes ONLY that planet's supplied name, sign, degree, retrograde, and combust status.",
     "GENERAL RETAIL ANALYSIS: First provide 4–6 concrete, evidence-grounded bullets synthesizing recurring life/work themes from multiple supported facts. Explain practical human meaning, everyday behavior/work style, strengths, tensions/trade-offs, and practical focus. Do not merely restate chart facts and do not use generic horoscope filler.",
-    "CRITICAL: KP Houses are cusp records only in this evidence. They do NOT provide a planet-to-house mapping. Therefore do not say that any planet is in, placed in, situated in, or rules any house.",
+    "CRITICAL: KP Houses are cusp records only in this evidence. They do NOT provide a planet-to-house mapping. Never assign any named planet to any numbered or ordinal house, even tentatively. Keep house analysis limited to supplied cusp records.
     "CRITICAL: Do not mention drishti/aspect, yuti/conjunction, planetary relationship, dignity/exaltation/debilitation, own-sign, moolatrikona, bhavesh/lordship, or planetary house placement unless that exact relationship is explicitly present in the supplied evidence. The current evidence does not supply those planetary relationships.",
     "Do not derive new yogas. Discuss only supplied yogaDetails. Do not derive Tithi, Karana, Mangal Dosha, houses, aspects, or Dasha subperiods from other facts.",
     "For planetaryAnalysis, keep discussion limited to supplied planet facts and supplied Shadbala where applicable. Do not attach planets to houses or aspects.",
