@@ -63,6 +63,8 @@ async function main() {
   }
   const finalValidation = validateInterpretation(interpretation, evidence);
   assert(finalValidation.ok, `Evidence Gate rejected Gemini output: ${lastViolations.join("; ")}`);
-  console.log(JSON.stringify({ status: "PASS", provider: evidence.provider, model: evidence.model, evidenceStatus: evidence.statuses, outputKeys: Object.keys(result), supportedArrayItems: arrays, gate: "ACCEPTED" }, null, 2));
+  const output = interpretation as Record<string, unknown>;
+  const supportedArrayItems = Object.values(output).reduce((total, value) => total + (Array.isArray(value) ? value.length : 0), 0);
+  console.log(JSON.stringify({ status: "PASS", provider: evidence.provider, model: evidence.model, evidenceStatus: evidence.statuses, outputKeys: Object.keys(output), supportedArrayItems, gate: "ACCEPTED" }, null, 2));
 }
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exit(1); });
