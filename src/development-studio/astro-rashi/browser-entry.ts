@@ -15,7 +15,30 @@ const locale: Locale = "hi-IN";
 void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
 let accessToken: string | null = null;
-let liveStatus = "Loading live daily horoscope…";
+let liveStatus = "हिंदी दैनिक संदेश लोड हो रहा है…";
+const hindiFallback: Record<string, string> = {
+  mesha: "आज पहल करने, काम को गति देने और स्पष्ट निर्णय लेने का दिन है। जल्दबाज़ी के बजाय एकाग्रता बनाए रखें।",
+  vrishabha: "आज स्थिरता और धैर्य से काम लेना लाभकारी रहेगा। जरूरी कामों को प्राथमिकता देकर धीरे-धीरे आगे बढ़ें।",
+  mithuna: "आज संवाद और सीखने की क्षमता मजबूत रहेगी। महत्वपूर्ण बातों को स्पष्ट शब्दों में रखें और अनावश्यक उलझन से बचें।",
+  karka: "आज भावनाओं के साथ व्यावहारिक सोच का संतुलन रखें। परिवार और काम दोनों में शांत संवाद मदद करेगा।",
+  simha: "आज आत्मविश्वास के साथ जिम्मेदारी निभाने का अवसर है। अपनी बात दृढ़ता से रखें, लेकिन दूसरों की राय भी सुनें।",
+  kanya: "आज योजना, अनुशासन और छोटे विवरणों पर ध्यान देना उपयोगी रहेगा। अधूरे काम पूरे करने पर विशेष ध्यान दें।",
+  tula: "आज सहयोग और संतुलन से काम आगे बढ़ेगा। किसी महत्वपूर्ण निर्णय में दोनों पक्षों को ध्यान से समझें।",
+  vrishchika: "आज गहराई से सोचने और जरूरी काम पर ध्यान केंद्रित करने का समय है। प्रतिक्रिया देने से पहले स्थिति को समझें।",
+  dhanu: "आज नई दिशा सीखने और आगे बढ़ने की प्रेरणा मिल सकती है। लक्ष्य स्पष्ट रखें और कदम व्यावहारिक रखें।",
+  makara: "आज अनुशासन और निरंतर प्रयास आपकी ताकत रहेंगे। प्राथमिकताओं पर टिके रहें और परिणाम के लिए धैर्य रखें।",
+  kumbha: "आज नए विचारों को व्यवस्थित करके उपयोगी दिशा देना बेहतर रहेगा। स्वतंत्र सोच के साथ जिम्मेदार निर्णय लें।",
+  meena: "आज संवेदनशीलता और कल्पनाशीलता को व्यावहारिक योजना से जोड़ें। आराम और जरूरी काम के बीच संतुलन बनाए रखें।"
+};
+function isHindiText(value: string): boolean {
+  const devanagari = (value.match(/[\u0900-\u097F]/g) ?? []).length;
+  const latin = (value.match(/[A-Za-z]/g) ?? []).length;
+  return devanagari >= 12 && devanagari >= latin;
+}
+function getHindiDailySummary(rashiId: string): string {
+  const candidate = runtime.weekly(rashiId as Rashi["id"], locale).summary?.trim() ?? "";
+  return isHindiText(candidate) ? candidate : hindiFallback[rashiId] ?? "आज धैर्य, स्पष्टता और संतुलित प्रयास पर ध्यान दें।";
+}
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 function escapeHtml(value: string): string {
@@ -60,15 +83,13 @@ function renderRashis(): void {
 }
 
 function renderDaily(): void {
-  const content = runtime.weekly(selectedRashi.id, locale);
-  const summary = content.summary?.trim() || "इस राशि के लिए दैनिक संदेश अभी उपलब्ध नहीं है। कृपया थोड़ी देर बाद पुनः प्रयास करें।";
+  const summary = getHindiDailySummary(selectedRashi.id);
   $("selectedName").textContent = selectedRashi.names[locale];
-  $("weeklyText").textContent = summary;
   $("selectedRashiLabel").textContent = `${selectedRashi.names[locale]} — चयनित राशि`;
-  $("selectedRashiHint").textContent = liveStatus;
+  $("selectedRashiHint").textContent = "हिंदी में दैनिक संदेश";
   $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
   $("dailyHeroText").textContent = summary;
-  $("dailyHeroStatus").textContent = liveStatus.includes("Live") ? "● लाइव हिंदी" : "हिंदी संदेश";
+  $("dailyHeroStatus").textContent = liveStatus.includes("लाइव") ? "● लाइव हिंदी" : "हिंदी संदेश";
 }
 
 async function loadLive(): Promise<void> {
@@ -78,10 +99,10 @@ async function loadLive(): Promise<void> {
       const value = result.values.get(SIGN_MAP[rashi.id]);
       if (value?.trim()) liveProvider.setSummary(rashi.id, value.trim());
     }
-    liveStatus = "Live daily horoscope · Powered by Sigastra";
+    liveStatus = "लाइव हिंदी दैनिक संदेश · Sigastra";
     renderDaily();
   } catch (error) {
-    liveStatus = "Live horoscope unavailable right now. Please retry later.";
+    liveStatus = "लाइव संदेश अभी उपलब्ध नहीं है; हिंदी संदेश दिखाया जा रहा है।";
     renderDaily();
     console.error(error);
   }
