@@ -109,6 +109,19 @@ function renderRashis(): void {
   });
 }
 
+function renderDailyGuidance(): void {
+  const g = dailyGuidance[selectedRashi.id];
+  $("luckyColor").textContent = g.luckyColor;
+  $("luckyNumber").textContent = g.luckyNumber;
+  $("luckyTime").textContent = g.luckyTime;
+  $("dailyFocus").textContent = g.focus;
+  $("workGuidance").textContent = g.work;
+  $("moneyGuidance").textContent = g.money;
+  $("relationshipGuidance").textContent = g.relationships;
+  $("dailyCaution").textContent = g.caution;
+  $("dailyMantra").textContent = g.mantra;
+}
+
 function renderDaily(): void {
   const summary = getHindiDailySummary(selectedRashi.id);
   $("selectedRashiLabel").textContent = `${selectedRashi.names[locale]} — चयनित राशि`;
@@ -116,6 +129,7 @@ function renderDaily(): void {
   $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
   $("dailyHeroText").textContent = summary;
   $("dailyHeroStatus").textContent = liveStatus.includes("लाइव") ? "● लाइव हिंदी" : "हिंदी संदेश";
+  renderDailyGuidance();
 }
 
 async function loadLive(): Promise<void> {
