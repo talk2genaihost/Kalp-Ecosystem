@@ -66,6 +66,9 @@ function renderDaily(): void {
   $("weeklyText").textContent = summary;
   $("selectedRashiLabel").textContent = `${selectedRashi.names[locale]} — चयनित राशि`;
   $("selectedRashiHint").textContent = liveStatus;
+  $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
+  $("dailyHeroText").textContent = summary;
+  $("dailyHeroStatus").textContent = liveStatus.includes("Live") ? "● लाइव हिंदी" : "हिंदी संदेश";
 }
 
 async function loadLive(): Promise<void> {
