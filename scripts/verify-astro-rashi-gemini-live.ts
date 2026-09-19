@@ -68,4 +68,5 @@ async function main() {
   const supportedArrayItems = Object.values(output).reduce((total, value) => total + (Array.isArray(value) ? value.length : 0), 0);
   console.log(JSON.stringify({ status: "PASS", provider: evidence.provider, model: evidence.model, evidenceStatus: evidence.statuses, outputKeys: Object.keys(output), supportedArrayItems, gate: "ACCEPTED" }, null, 2));
 }
+// Trigger CI validation after Gemini prompt syntax repair.
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exit(1); });
