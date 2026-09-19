@@ -161,8 +161,7 @@ export function deriveCanonicalEvidence(data:Obj):DerivedEvidence{
     const rh=rashiHouse(lagna,p.sign);
     const lon=longitude(p);
     const kh=lon===undefined?undefined:kpHouse(lon,cusps);
-    if(rh!==undefined)rashiHouseByPlanet.set(String(p.name),rh);
-    mappings.push({planet:p.name,sign:signName(p.sign),degree:p.degree,eclipticLongitude:lon,rashiHouse:rh,kpHouse:kh,provenance:"KALP · Calculated",rule:"D1 whole-sign house plus explicit KP cusp-boundary calculation",basis:kh===undefined?"Rashi house only":"Rashi house and supplied KP cusp boundaries"});
+    if(rh!==undefined)rashiHouseByPlanet.set(String(p.name),rh);if(rh!==undefined||kh!==undefined)mappings.push({planet:p.name,sign:signName(p.sign),degree:p.degree,eclipticLongitude:lon,rashiHouse:rh,kpHouse:kh,provenance:"KALP · Calculated",rule:"D1 whole-sign house plus explicit KP cusp-boundary calculation",basis:kh===undefined?"Rashi house only":"Rashi house and supplied KP cusp boundaries"});
   }
   const aspects:Array<Record<string,unknown>>=[];
   for(const p of planets){
