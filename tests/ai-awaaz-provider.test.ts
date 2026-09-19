@@ -37,3 +37,13 @@ test("blocks live execution until the AI Awaaz API contract is validated", async
   assert.match(result.error ?? "", /API contract is not yet validated/);
   assert.equal(result.provenance.provider, AI_AWAAZ_PROVIDER_ID);
 });
+
+
+test("does not allow AI Awaaz provenance to fall through to Google TTS", async () => {
+  const result = await createProduction(
+    { book:{ bookId:"b1", title:"Demo", language:"hi" }, topic:"Wisdom", durationMinutes:15, speakerStyleId:"modern-spiritual", voiceId:"kalp-hi-01" },
+    { voiceId:"kalp-hi-01", label:"AI Awaaz", kind:"kalp-original", language:"hi", rightsStatus:"internal", provider:AI_AWAAZ_PROVIDER_ID }
+  );
+  assert.equal(result.status, "blocked");
+  assert.match(result.qa.reasons.join(" "), /AWAAZ-02.*AWAAZ-03/);
+});
