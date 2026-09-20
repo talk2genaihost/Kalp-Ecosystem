@@ -1,0 +1,123 @@
+{
+  "schema_version":"KALP-CSD-033-PRODUCTION-QA-CROSS-SCENE-CONTINUITY-1.0",
+  "engine_id":"KALP-CSD-033",
+  "engine_name":"Production QA & Cross-Scene Continuity Director",
+  "status":"LOCKED",
+  "purpose":"Validate promoted production assets against adjacent and dependent scenes, persistent character/world state, timeline, spatial memory, narrative consequences and cross-scene asset lineage before universe-level reuse.",
+  "core_principle":"A scene can pass local QA and still break the story; CSD-033 validates continuity across scene boundaries.",
+  "inputs":["CSD-028","CSD-032","CSD-011","CSD-012","CSD-013","CSD-014","CSD-026","CSD-029"],
+  "continuity_domains":[
+    "CHARACTER_IDENTITY",
+    "CHARACTER_EMOTIONAL_MEMORY",
+    "CHARACTER_KNOWLEDGE_STATE",
+    "RELATIONSHIP_STATE",
+    "NARRATIVE_EVENT_STATE",
+    "TIMELINE",
+    "SPATIAL_GEOMETRY",
+    "WORLD_ENVIRONMENT",
+    "COSTUME_PROP_STATE",
+    "LIGHTING_ATMOSPHERE",
+    "CAMERA_LANGUAGE",
+    "AUDIO_MUSIC_STATE",
+    "VFX_STATE",
+    "ASSET_LINEAGE",
+    "NARRATIVE_CAUSALITY"
+  ],
+  "scene_window":{
+    "required":"TARGET_SCENE",
+    "recommended":["PREVIOUS_CANONICAL_SCENE","NEXT_CANONICAL_SCENE"],
+    "extended":["SAME_CHARACTER_REENTRY_SCENES","SAME_LOCATION_SCENES","DEPENDENT_BRANCH_SCENES"]
+  },
+  "validation_pipeline":[
+    "LOAD_TARGET_ASSET",
+    "RESOLVE_SCENE_NEIGHBORS",
+    "BIND_CANONICAL_SCENE_VERSIONS",
+    "COMPARE_CHARACTER_STATE",
+    "COMPARE_KNOWLEDGE_AND_EMOTIONAL_MEMORY",
+    "COMPARE_RELATIONSHIP_STATE",
+    "COMPARE_EVENT_CAUSALITY",
+    "COMPARE_TIMELINE",
+    "COMPARE_SPATIAL_WORLD_STATE",
+    "COMPARE_COSTUME_PROP_STATE",
+    "COMPARE_AUDIO_LIGHTING_VFX_STATE",
+    "VERIFY_ASSET_LINEAGE",
+    "CHECK_BRANCH_CONSISTENCY",
+    "CALCULATE_CONTINUITY_SCORE",
+    "ISSUE_CONTINUITY_DECISION"
+  ],
+  "decision_states":["CONTINUITY_PASS","PASS_WITH_WARNINGS","REWORK_REQUIRED","CONTINUITY_BLOCKED","QUARANTINED"],
+  "hard_gates":[
+    "Target asset must be a CSD-032 promoted immutable asset version.",
+    "All referenced scene versions must be canonical and non-superseded.",
+    "Character identity and immutable visual identity must remain stable.",
+    "Character emotional/behavioral state must be explainable from prior canonical events.",
+    "Character knowledge cannot contain information not legitimately acquired.",
+    "Relationship changes must have causal provenance.",
+    "Timeline must not move backward or introduce impossible overlap.",
+    "Spatial state must be reconstructable from canonical scene history.",
+    "Persistent world changes must agree with CSD-026 environmental memory.",
+    "Costume and prop transitions must have valid predecessor state.",
+    "Branch-dependent assets cannot leak across inactive narrative branches.",
+    "Asset lineage must resolve back to its CSD-030 master and CSD-031 execution attempt.",
+    "Cross-scene validation cannot mutate historical scene masters."
+  ],
+  "quality_dimensions":{
+    "character_continuity":15,
+    "knowledge_emotional_continuity":15,
+    "relationship_continuity":10,
+    "event_causality":10,
+    "timeline":10,
+    "spatial_world_continuity":10,
+    "costume_prop":10,
+    "audio_lighting_vfx":5,
+    "branch_consistency":5,
+    "asset_lineage":10
+  },
+  "thresholds":{"PASS":90,"PASS_WITH_WARNINGS":80,"REWORK_REQUIRED":70,"BLOCK":"Hard-gate failure or score below 70"},
+  "defect_classes":{
+    "BLOCKING":["IDENTITY_CONTINUITY_BREAK","KNOWLEDGE_TIME_LEAK","TIMELINE_CONFLICT","SPATIAL_STATE_CONFLICT","WORLD_MEMORY_CONFLICT","BRANCH_LEAK","LINEAGE_BREAK","CAUSALITY_BREAK"],
+    "MAJOR":["EMOTIONAL_STATE_DISCONTINUITY","RELATIONSHIP_STATE_DRIFT","COSTUME_TRANSITION_ERROR","PROP_STATE_ERROR","VFX_PERSISTENCE_ERROR","AUDIO_STATE_DISCONTINUITY"],
+    "MINOR":["ATMOSPHERE_VARIANCE","NON_CRITICAL_LIGHTING_VARIANCE","MICRO_PERFORMANCE_VARIANCE"]
+  },
+  "rework_routes":{
+    "character_state":"CSD-006",
+    "knowledge":"CSD-007",
+    "perception":"CSD-008",
+    "scene_state":"CSD-011",
+    "event_transition":"CSD-012",
+    "event_graph":"CSD-013",
+    "branching":"CSD-014",
+    "environment_memory":"CSD-026",
+    "asset_lineage":"CSD-028",
+    "local_result":"CSD-032"
+  },
+  "promotion_policy":{
+    "PASS":"Asset may be reused across eligible scenes.",
+    "PASS_WITH_WARNINGS":"Asset may proceed only with explicit warning annotations.",
+    "REWORK_REQUIRED":"Asset remains promoted but is blocked from dependent-scene reuse until revalidated.",
+    "CONTINUITY_BLOCKED":"Asset cannot enter downstream scene production.",
+    "QUARANTINED":"Asset lineage or canonical state must be reconciled before reuse."
+  },
+  "demo":{
+    "asset_version_id":"ASSET-F01-v1.1",
+    "target_scene":"RAMAYANA_MOUNT_KAILASH_CONFRONTATION",
+    "previous_scene":"RAMAYANA_APPROACH_TO_KAILASH",
+    "next_scene":"RAMAYANA_AFTER_CONFRONTATION",
+    "checks":{
+      "character_identity":"PASS",
+      "emotional_memory":"PASS",
+      "knowledge_state":"PASS",
+      "relationship_state":"PASS",
+      "event_causality":"PASS",
+      "timeline":"PASS",
+      "spatial_world_state":"PASS",
+      "costume_prop":"PASS",
+      "branch_consistency":"PASS",
+      "asset_lineage":"PASS"
+    },
+    "continuity_score":96,
+    "decision":"CONTINUITY_PASS",
+    "canonical_scene_masters_mutated":false
+  },
+  "downstream":["CSD-034-Cross-Scene-Continuity-Graph-and-Impact-Propagation","CMSE-002","CMSE-004","CMSE-011"]
+}
