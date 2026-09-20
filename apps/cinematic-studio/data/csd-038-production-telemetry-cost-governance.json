@@ -1,0 +1,96 @@
+{
+  "schema_version":"KALP-CSD-038-PRODUCTION-TELEMETRY-COST-GOVERNANCE-1.0",
+  "engine_id":"KALP-CSD-038",
+  "engine_name":"Production Telemetry & Cost Governance Director",
+  "status":"LOCKED",
+  "purpose":"Collect production telemetry, calculate execution economics from supplied provider pricing and usage evidence, enforce budgets and cost policies, and feed cost-aware controls back to CSD-037 and CMSE-015.",
+  "core_principle":"Cost governance must optimize measured production economics without changing canonical creative truth or bypassing quality and continuity gates.",
+  "inputs":["CSD-037","CSD-031","CSD-032","CSD-036","CMSE-014","CMSE-015"],
+  "telemetry_domains":["QUEUE","EXECUTION","PROVIDER","RESULT","QA","RETRY","ASSET","TOKEN","MEDIA","COST","BUDGET","EFFICIENCY"],
+  "provider_cost_model":{
+    "principle":"Never infer or invent provider pricing.",
+    "required_inputs":["provider_id","model_id","currency","pricing_version","usage_units","unit_rates"],
+    "usage_units":["REQUEST","IMAGE","VIDEO_SECOND","AUDIO_SECOND","TOKEN_INPUT","TOKEN_OUTPUT","COMPUTE_SECOND","STORAGE_GB_HOUR"],
+    "calculation":"total_cost = sum(usage_unit × supplied_unit_rate)",
+    "pricing_snapshot":"Every cost calculation is bound to an immutable pricing snapshot/version."
+  },
+  "metrics":[
+    "jobs_created",
+    "jobs_admitted",
+    "jobs_completed",
+    "jobs_failed",
+    "retry_count",
+    "queue_latency_ms",
+    "execution_latency_ms",
+    "provider_latency_ms",
+    "result_ingestion_latency_ms",
+    "qa_failure_rate",
+    "reconciliation_rate",
+    "success_rate",
+    "cost_per_job",
+    "cost_per_successful_asset",
+    "cost_per_frame",
+    "cost_per_scene",
+    "cost_per_provider",
+    "cost_per_model",
+    "wasted_retry_cost",
+    "budget_consumption_percent",
+    "throughput_per_cost_unit"
+  ],
+  "budget_scopes":["UNIVERSE","ARC","SCENE","FRAME","JOB","PROVIDER","MODEL","CAMPAIGN","TIME_WINDOW"],
+  "budget_states":["UNSET","HEALTHY","WARNING","SOFT_LIMIT","HARD_LIMIT","EXCEEDED","UNKNOWN"],
+  "cost_controls":{
+    "actions":["OBSERVE","WARN","THROTTLE","ROUTE_ALTERNATIVE","HOLD","BLOCK","ESCALATE"],
+    "policy":"Cost controls may reduce or pause execution but may never bypass continuity, identity, QA or authorization gates.",
+    "hard_limit":"No new discretionary work after budget hard limit unless explicitly authorized.",
+    "critical_path":"Critical-path jobs may be protected from ordinary throttling but remain subject to hard budget and safety constraints."
+  },
+  "efficiency_analysis":{
+    "provider_comparison":"Compare providers only using normalized measured telemetry and supplied pricing.",
+    "retry_economics":"Track failed-attempt cost separately from successful production cost.",
+    "waste_detection":["DUPLICATE_JOB","INVALIDATED_JOB_EXECUTED","RETRY_STORM","FAILED_OUTPUT_REPEATED","OVERSIZED_OUTPUT","UNUSED_GENERATION"],
+    "optimization_signals":["HIGH_FAILURE_COST","HIGH_LATENCY_COST","LOW_SUCCESS_YIELD","RETRY_CLUSTER","QUEUE_CONGESTION","PRICE_SPIKE","UNDERUTILIZED_CAPACITY"]
+  },
+  "governance_pipeline":[
+    "INGEST_TELEMETRY",
+    "BIND_PRICING_SNAPSHOT",
+    "NORMALIZE_USAGE",
+    "CALCULATE_COST",
+    "UPDATE_BUDGET_STATE",
+    "DETECT_WASTE_AND_ANOMALIES",
+    "ASSESS_COST_EFFICIENCY",
+    "ISSUE_CONTROL_DECISION",
+    "PUBLISH_TO_CSD-037",
+    "RETAIN_AUDIT_RECORD"
+  ],
+  "control_decisions":["COST_CLEAR","COST_WARNING","COST_THROTTLE","COST_HOLD","COST_BLOCK","COST_ESCALATION","COST_UNKNOWN"],
+  "audit_record":{
+    "required":["telemetry_id","job_id","provider_id","model_id","pricing_version","usage","calculated_cost","currency","budget_scope","budget_state","control_decision","timestamp"],
+    "immutability":"Telemetry and cost observations are append-only; corrections create new observations."
+  },
+  "safety_invariants":[
+    "No invented provider prices.",
+    "No silent currency conversion.",
+    "No cost calculation without a pricing snapshot.",
+    "Cost optimization cannot select an unapproved provider.",
+    "Cost optimization cannot bypass CSD-032 result QA.",
+    "Cost optimization cannot bypass CSD-033 continuity QA.",
+    "Canonical masters are never changed by cost governance.",
+    "Budget exhaustion never deletes valid assets or history.",
+    "Every throttle/block/escalation is auditable."
+  ],
+  "demo":{
+    "telemetry_id":"TEL-CSD38-RAMAYANA-F01-A3",
+    "job_id":"JOB-CSD31-RAMAYANA-F01",
+    "provider_id":"higgsfield",
+    "model_id":"cinematic_studio_2_5",
+    "pricing_version":"SUPPLIED-PRICING-SNAPSHOT",
+    "usage":{"REQUEST":1,"IMAGE":1},
+    "calculated_cost":"DERIVED_FROM_SUPPLIED_RATES",
+    "budget_scope":"FRAME",
+    "budget_state":"HEALTHY",
+    "control_decision":"COST_CLEAR",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-037-EXECUTION-GOVERNOR","CMSE-014-PROVIDER-ROUTING","CMSE-015-PRODUCTION-SCHEDULER","CSD-039-PRODUCTION-TELEMETRY-ANOMALY-AND-OPTIMIZATION-DIRECTOR"]
+}
