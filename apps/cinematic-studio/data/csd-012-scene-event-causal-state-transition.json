@@ -1,0 +1,124 @@
+{
+  "schema_version":"KALP-CSD-012-SCENE-EVENT-CAUSAL-STATE-TRANSITION-1.0",
+  "engine_id":"KALP-CSD-012",
+  "engine_name":"Scene Event & Causal State Transition Engine",
+  "status":"LOCKED",
+  "purpose":"Convert validated character/world actions into ordered causal events, explicit state deltas and the next canonical scene-state snapshot.",
+  "core_principle":"No meaningful scene-state change occurs without a causally valid event; every accepted event produces an auditable state delta.",
+  "transition_model":"validated_state(t) + validated_event(t+1) → delta(t+1) → canonical_state(t+1)",
+  "causal_chain":["TRIGGER","ACTOR_INTENT","ACTION","EVENT","OBSERVABLE_EFFECT","HIDDEN_CONSEQUENCE","STATE_DELTA","CHARACTER_RESPONSE","WORLD_RESPONSE","NEW_SNAPSHOT"],
+  "event_schema":{
+    "required":["event_id","scene_id","sequence","parent_state_version","actor","action","event_type","target","intent","preconditions","observable_effects","hidden_consequences","causal_effects","state_deltas","knowledge_implications","downstream_triggers"],
+    "event_types":["DIALOGUE","MOVEMENT","COMBAT","POWER_MANIFESTATION","POWER_SUPPRESSION","DISCOVERY","REVELATION","DECISION","ENVIRONMENTAL_CHANGE","OBJECT_CHANGE","RELATIONSHIP_CHANGE","WORLD_CHANGE","REACTION"],
+    "causal_effect_types":["CHARACTER_STATE","KNOWLEDGE_STATE","RELATIONSHIP_STATE","SPATIAL_STATE","TEMPORAL_STATE","OBJECT_STATE","ENVIRONMENT_STATE","WORLD_STATE","PRODUCTION_STATE"]
+  },
+  "causal_rules":[
+    "An event must have a valid parent scene-state version.",
+    "Actor must be active in the parent state unless the event explicitly introduces a governed entrant.",
+    "Preconditions must be satisfied before the event is accepted.",
+    "Observable effects describe what can physically or sensorially be detected; hidden consequences are not automatically observable.",
+    "Every state delta must identify its source event.",
+    "An event cannot directly grant knowledge without a valid acquisition path.",
+    "A reaction must reference the event that caused it.",
+    "Causal chains must be acyclic within a transition.",
+    "Events are ordered by scene sequence and narrative time.",
+    "Rejected events never mutate canonical state.",
+    "Accepted events create a new version; historical snapshots remain immutable.",
+    "Identity locks cannot be changed by events.",
+    "Maximum five active characters remains enforced.",
+    "Retcons require explicit revision/variant metadata."
+  ],
+  "state_delta_schema":{
+    "required":["delta_id","event_id","domain","path","before","after","causal_basis"],
+    "domains":["character","knowledge","relationship","spatial","temporal","object","environment","world","production"]
+  },
+  "validation_pipeline":[
+    "LOAD_PARENT_SNAPSHOT",
+    "VALIDATE_EVENT_SCHEMA",
+    "VALIDATE_ACTOR_AND_TARGET",
+    "VALIDATE_PRECONDITIONS",
+    "VALIDATE_TEMPORAL_ORDER",
+    "VALIDATE_SPATIAL_FEASIBILITY",
+    "RESOLVE_OBSERVABLE_EFFECTS",
+    "RESOLVE_HIDDEN_CONSEQUENCES",
+    "CALCULATE_STATE_DELTAS",
+    "VALIDATE_KNOWLEDGE_ACQUISITION",
+    "VALIDATE_CAUSAL_GRAPH",
+    "APPLY_DELTAS_TO_CANDIDATE_STATE",
+    "RUN_CSD011_CONTINUITY_CHECKS",
+    "PROMOTE_NEW_SNAPSHOT",
+    "EMIT_DOWNSTREAM_HANDOFF"
+  ],
+  "transaction_policy":{
+    "mode":"ATOMIC",
+    "rule":"All deltas from one accepted event commit together; any hard failure rejects the complete transition.",
+    "rejection":"Parent snapshot remains ACTIVE and unchanged.",
+    "promotion":"Accepted transition creates VALIDATED then ACTIVE child snapshot while parent becomes SUPERSEDED."
+  },
+  "hard_failures":[
+    "PARENT_SNAPSHOT_NOT_ACTIVE",
+    "INVALID_EVENT_SCHEMA",
+    "ACTOR_NOT_ACTIVE",
+    "PRECONDITION_FAILURE",
+    "EVENT_OUT_OF_ORDER",
+    "SPATIAL_IMPOSSIBILITY",
+    "KNOWLEDGE_ACQUISITION_VIOLATION",
+    "CAUSAL_CYCLE",
+    "UNSUPPORTED_STATE_MUTATION",
+    "IDENTITY_LOCK_MUTATION",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5",
+    "CSD011_CONTINUITY_FAILURE",
+    "SILENT_RETCON"
+  ],
+  "rework_policy":{
+    "principle":"Reject only the invalid transition; preserve the last valid canonical snapshot.",
+    "routes":{
+      "character_causality":"CSD-006",
+      "knowledge_causality":"CSD-007",
+      "perception_consequence":"CSD-008",
+      "scene_reality":"CSD-011",
+      "event_definition":"CSD-012"
+    }
+  },
+  "output_contract":{
+    "transition_id":"stable transition identifier",
+    "accepted_event":"validated event",
+    "state_deltas":"auditable mutations",
+    "causal_chain":"resolved chain",
+    "new_snapshot":"new canonical reality version",
+    "rejected_events":"events refused without mutation",
+    "continuity_validation":"CSD-011 result",
+    "downstream_handoff":["CSD-006","CSD-007","CSD-008","CSD-009","CSD-010","CSD-002"]
+  },
+  "demo_test":{
+    "transition_id":"CSD12-RAMAYANA-DEMO-001",
+    "scene_id":"CSD11-RAMAYANA-DEMO-001",
+    "parent_version":"1.0",
+    "event":{
+      "event_id":"E04",
+      "sequence":4,
+      "actor":"RAVAN_001",
+      "event_type":"DECISION",
+      "action":"chooses restraint after Rama's controlled challenge",
+      "intent":"demonstrate mastery without escalation",
+      "preconditions":["RAVAN_POWER_ACTIVE","RAMA_CHALLENGE_ACTIVE"],
+      "observable_effects":["power intensity remains contained","Ravana lowers aggressive posture"],
+      "hidden_consequences":["Ravana begins questioning whether restraint is a higher form of mastery"],
+      "causal_effects":["CHARACTER_STATE","RELATIONSHIP_STATE","ENVIRONMENT_STATE"],
+      "state_deltas":[
+        {"delta_id":"D01","event_id":"E04","domain":"character","path":"RAVAN_001.current_emotion","before":"high_controlled_intensity","after":"controlled_introspection","causal_basis":"E04"},
+        {"delta_id":"D02","event_id":"E04","domain":"relationship","path":"RAM_001↔RAVAN_001.tension","before":"high","after":"high_but_non_escalating","causal_basis":"E04"},
+        {"delta_id":"D03","event_id":"E04","domain":"environment","path":"power_field.intensity","before":"elevated","after":"contained","causal_basis":"E04"}
+      ]
+    },
+    "result":{
+      "status":"ACCEPTED",
+      "new_version":"1.1",
+      "parent_preserved_as":"SUPERSEDED",
+      "continuity_validation":"PASS",
+      "causal_graph":"ACYCLIC",
+      "downstream_ready":true
+    }
+  },
+  "downstream":["CSD-006-CHARACTER-STATE","CSD-007-KNOWLEDGE-STATE","CSD-008-PERSPECTIVE","CSD-009-PERCEPTION-VALIDATION","CSD-010-ORCHESTRATOR","CSD-002-8-FRAME-DIRECTOR","CMSE-002-CONTINUITY"]
+}
