@@ -1,0 +1,96 @@
+{
+  "schema_version":"KALP-CSD-041-ADAPTIVE-PRODUCTION-STRATEGY-RESOURCE-PLANNER-1.0",
+  "engine_id":"KALP-CSD-041",
+  "engine_name":"Adaptive Production Strategy & Resource Planner",
+  "status":"LOCKED",
+  "purpose":"Convert governed predictions, production dependencies, provider capabilities, budget constraints and critical-path requirements into an executable, resource-aware production plan with safe dynamic replanning.",
+  "core_principle":"Allocate production resources to maximize governed throughput and reliability while protecting canonical truth, continuity, quality, authorization, budget and critical-path integrity.",
+  "inputs":["CSD-040","CSD-039","CSD-038","CSD-037","CSD-034","CSD-035","CSD-036","CSD-031","CMSE-014","CMSE-015"],
+  "planning_domains":["JOB_PRIORITIZATION","DEPENDENCY_ORDERING","CRITICAL_PATH","PROVIDER_CAPACITY","CONCURRENCY","BUDGET_ALLOCATION","RETRY_RESERVE","QUEUE_BALANCING","RESOURCE_UTILIZATION","RISK_BUFFER","DEADLINE_PROTECTION","DYNAMIC_REPLANNING"],
+  "plan_objects":["PRODUCTION_PLAN","RESOURCE_ALLOCATION","EXECUTION_WAVE","CAPACITY_RESERVATION","BUDGET_RESERVATION","RETRY_RESERVE","RISK_BUFFER","PLAN_REVISION"],
+  "planning_pipeline":[
+    "INGEST_ELIGIBLE_JOB_SET",
+    "LOAD_CSD-040_PREDICTIONS",
+    "RESOLVE_DEPENDENCY_GRAPH",
+    "IDENTIFY_CRITICAL_PATH",
+    "LOAD_PROVIDER_CAPABILITY_AND_HEALTH",
+    "LOAD_BUDGET_AND_COST_CONSTRAINTS",
+    "CALCULATE_JOB_PRIORITY",
+    "ALLOCATE_PROVIDER_CAPACITY",
+    "ALLOCATE_CONCURRENCY",
+    "RESERVE_CRITICAL_PATH_RESOURCES",
+    "RESERVE_RETRY_AND_RISK_BUFFER",
+    "BUILD_EXECUTION_WAVES",
+    "SIMULATE_CONSTRAINT_CONFLICTS",
+    "VALIDATE_CSD-037_ADMISSION",
+    "ISSUE_VERSIONED_PRODUCTION_PLAN",
+    "MONITOR_PLAN_DRIFT",
+    "REPLAN_ON_GOVERNED_TRIGGER"
+  ],
+  "priority_factors":["CRITICAL_PATH","DEPENDENCY_READINESS","PREDICTED_FAILURE_RISK","PREDICTED_LATENCY","BUDGET_RISK","QA_RISK","JOB_AGE","SCENE_PRIORITY","PROVIDER_HEALTH","RESOURCE_EFFICIENCY"],
+  "resource_types":["PROVIDER_SLOT","MODEL_CAPACITY","COMPUTE_CAPACITY","RETRY_CAPACITY","BUDGET_ALLOCATION","QUEUE_CAPACITY"],
+  "allocation_policy":{
+    "critical_path":"Reserve sufficient capacity before discretionary work.",
+    "fairness":"Do not starve eligible non-critical work indefinitely.",
+    "risk":"High-risk work receives capacity appropriate to evidence and may require additional retry reserve.",
+    "budget":"Respect hard limits; preserve authorized critical-path budget where policy permits.",
+    "quality":"No resource optimization may bypass CSD-032 or CSD-033."
+  },
+  "execution_waves":{
+    "ordering":"Dependency-safe topological order with critical-path priority.",
+    "parallelism":"Only independent jobs with compatible resource and canonical dependencies may share a wave.",
+    "max_concurrency":"Bounded by CSD-037 and provider capabilities.",
+    "coalescing":"Identical fingerprints may share one logical execution lineage."
+  },
+  "dynamic_replanning_triggers":[
+    "CRITICAL_HEALTH_CHANGE",
+    "PROVIDER_CAPACITY_CHANGE",
+    "PREDICTION_CONFIDENCE_DROP",
+    "FAILURE_RATE_CHANGE",
+    "QUEUE_CONGESTION",
+    "BUDGET_THRESHOLD_CROSSED",
+    "DEPENDENCY_INVALIDATION",
+    "MASTER_FINGERPRINT_CHANGE",
+    "RECOVERY_STATE_CHANGE",
+    "NEW_CRITICAL_PATH"
+  ],
+  "replanning_policy":{
+    "preserve_completed_work":true,
+    "preserve_canonical_history":true,
+    "freeze_invalidated_derivatives":true,
+    "recalculate_only_affected_frontier":true,
+    "new_plan_version_required":true,
+    "no_silent_branch_change":true
+  },
+  "governance":{
+    "auto_actions":["REORDER_ELIGIBLE_JOBS","ADJUST_CONCURRENCY_WITHIN_LIMIT","DEFER_LOW_PRIORITY","RESERVE_RETRY_CAPACITY","REALLOCATE_WITHIN_AUTHORIZED_BUDGET"],
+    "governor_review":["RESERVE_PROVIDER_CAPACITY","ROUTE_APPROVED_PROVIDER_ALTERNATIVE","MOVE_BUDGET_ACROSS_AUTHORIZED_SCOPES"],
+    "operator_review":["CHANGE_CANONICAL_PRIORITY","ACTIVATE_BRANCH","CHANGE_IDENTITY_MASTER","REPLACE_CANONICAL_ASSET"],
+    "never_allowed":["BYPASS_CSD-037","BYPASS_CSD-032","BYPASS_CSD-033","MUTATE_IMMUTABLE_HISTORY","USE_UNAPPROVED_PROVIDER","EXCEED_PROVIDER_CAPABILITY","SILENT_BRANCH_SWITCH"]
+  },
+  "plan_record":{
+    "required":["plan_id","plan_version","target_scope","job_set","prediction_ids","resource_allocations","execution_waves","critical_path","budget_state","risk_state","authorization_class","created_at"],
+    "immutability":"Published plans are immutable; replanning creates a new version linked to its predecessor."
+  },
+  "demo":{
+    "plan_id":"PLAN-CSD41-RAMAYANA-F02-F08-001",
+    "plan_version":"v1.0",
+    "target_scope":"RAMAYANA_MOUNT_KAILASH_CONFRONTATION",
+    "critical_path":["JOB-F03","JOB-F04","JOB-F07"],
+    "resource_allocations":[
+      {"resource":"PROVIDER_SLOT","policy":"reserve_for_critical_path"},
+      {"resource":"RETRY_CAPACITY","policy":"reserve_for_high_risk_jobs"},
+      {"resource":"QUEUE_CAPACITY","policy":"defer_low_priority_jobs"}
+    ],
+    "execution_waves":[
+      ["JOB-F03"],
+      ["JOB-F04","JOB-F07"],
+      ["JOB-F02","JOB-F05","JOB-F06","JOB-F08"]
+    ],
+    "governance":"CSD-037 admission remains authoritative",
+    "plan_confidence":"MEDIUM",
+    "replan_trigger":"provider_capacity_change",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-037-EXECUTION-GOVERNOR","CMSE-014-PROVIDER-ROUTING","CMSE-015-PRODUCTION-SCHEDULER","CSD-042-PRODUCTION-RESOURCE-NEGOTIATION-AND-CAPACITY-MANAGER"]
+}
