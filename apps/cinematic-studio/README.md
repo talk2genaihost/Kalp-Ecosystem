@@ -36,3 +36,16 @@ CSD-003 compiles every CSD-002 storyboard frame into a deterministic, provider-n
 Each job contains a stable job ID, frame ID, perspective, aspect ratio, context fingerprint, visual specification, hard continuity constraints, negative constraints, and downstream routing to CMSE-012/013/014/015.
 
 CSD-003 is deliberately provider-neutral. Provider-specific prompt translation belongs to CMSE-013 and provider selection belongs to CMSE-014. Actual execution belongs to CMSE-010/015.
+
+
+## CSD-003.2 — Character Identity & Visual Lock Validation
+
+CSD-003.2 validates whether every canonical character present in a generated frame has a machine-addressable visual lock. Missing canonical locks block promotion of a generated frame to trusted continuity reference status.
+
+Runtime endpoint: `POST /api/identity`
+
+- `{ "frame_id": "F01" }` validates the selected frame's registry lock coverage.
+- A missing `visual_lock` returns `PASS_WITH_LOCK_COVERAGE_GAP` and blocks downstream propagation.
+- Visual presence is intentionally separate from canonical identity match.
+
+F01 real-visual evidence is recorded in `data/csd-003-2-f01-validation.json` with asset id `5234a294-ed5a-4dfc-a048-54fe84b6d537`.
