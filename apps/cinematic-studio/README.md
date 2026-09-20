@@ -84,3 +84,8 @@ F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F
 ## CMSE-010.4 — Provider Job Specification & Translation
 
 `api/job-spec.js` translates all eight KALP-PIR-1.0 records into `KALP-PROVIDER-JOB-SPECIFICATION-1.0` contracts. Each job carries provider candidates, F01 reference lineage, positive/negative prompt semantics, hard locks, output requirements, retry/fallback policy and adapter-defined parameters. Provider model names and unsupported parameters are intentionally unresolved until adapter health/capability resolution.
+
+
+## CMSE-010.5 — Provider Adapter Resolution & Execution Readiness
+
+`api/adapter.js` resolves the current Higgsfield Cinema Studio Image 2.5 adapter against live model capabilities. Verified: image generation, reference-image input, 16:9, cinematic stills and 4K output. Eight jobs are `READY_FOR_DISPATCH`. F01 remains the immutable reference anchor; F02-F08 retain `DERIVED_FROM_STORYBOARD` provenance until replaced by independent generation results.
