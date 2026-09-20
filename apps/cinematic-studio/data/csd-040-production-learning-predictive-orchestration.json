@@ -1,0 +1,81 @@
+{
+  "schema_version":"KALP-CSD-040-PRODUCTION-LEARNING-PREDICTIVE-ORCHESTRATION-1.0",
+  "engine_id":"KALP-CSD-040",
+  "engine_name":"Production Learning & Predictive Orchestration Director",
+  "status":"LOCKED",
+  "purpose":"Learn from governed production outcomes, maintain versioned production knowledge, forecast execution risk/cost/latency/yield, and generate pre-execution orchestration strategies under CSD-037 governance.",
+  "core_principle":"Prediction informs execution; it never becomes authority over canonical truth, quality, continuity or authorization.",
+  "inputs":["CSD-038","CSD-039","CSD-037","CSD-031","CSD-032","CSD-033","CMSE-014","CMSE-015"],
+  "learning_domains":["PROVIDER_BEHAVIOR","MODEL_BEHAVIOR","JOB_CLASS","SCENE_COMPLEXITY","FRAME_COMPLEXITY","FAILURE_PATTERNS","RETRY_PATTERNS","QA_YIELD","COST_PROFILE","LATENCY_PROFILE","CAPACITY_PROFILE"],
+  "knowledge_records":["PRODUCTION_OBSERVATION","OUTCOME_RECORD","PROVIDER_PROFILE","MODEL_PROFILE","JOB_PROFILE","ANOMALY_PATTERN","STRATEGY_OUTCOME","PREDICTION_RECORD"],
+  "learning_pipeline":[
+    "INGEST_GOVERNED_OUTCOMES",
+    "NORMALIZE_CONTEXT_FEATURES",
+    "LINK_OUTCOME_TO_EXECUTION_ATTEMPT",
+    "UPDATE_VERSIONED_PRODUCTION_KNOWLEDGE",
+    "DETECT_RECURRING_PATTERNS",
+    "CALIBRATE_PREDICTION_CONFIDENCE",
+    "FORECAST_RISK_COST_LATENCY_YIELD",
+    "GENERATE_CANDIDATE_EXECUTION_STRATEGIES",
+    "SIMULATE_STRATEGY_CONSEQUENCES",
+    "CHECK_CSD-037_AND_CMSE-014_CONSTRAINTS",
+    "ISSUE_PREDICTIVE_ORCHESTRATION_PLAN",
+    "MEASURE_ACTUAL_VS_PREDICTED",
+    "UPDATE_CALIBRATION"
+  ],
+  "feature_context":[
+    "provider_id","model_id","job_type","scene_complexity","frame_complexity",
+    "asset_dependency_count","retry_history","queue_state","time_window",
+    "historical_success_rate","historical_latency","historical_cost",
+    "qa_yield","provider_capacity","current_health_state","budget_state"
+  ],
+  "prediction_outputs":["FAILURE_RISK","EXPECTED_LATENCY","EXPECTED_COST","EXPECTED_SUCCESS_YIELD","RETRY_RISK","QUEUE_RISK","QA_RISK","BUDGET_RISK"],
+  "confidence_bands":["LOW","MEDIUM","HIGH"],
+  "strategy_actions":["NO_CHANGE","PREWARM_OR_RESERVE_CAPACITY","SEQUENCE_CRITICAL_PATH_FIRST","DEFER_LOW_PRIORITY","REDUCE_CONCURRENCY","INCREASE_CONCURRENCY_WITHIN_LIMIT","ROUTE_TO_APPROVED_ALTERNATIVE","ADJUST_RETRY_BUDGET","REQUEST_OPERATOR_REVIEW"],
+  "strategy_policy":{
+    "AUTO_EXECUTABLE":["SEQUENCE_CRITICAL_PATH_FIRST","DEFER_LOW_PRIORITY","REDUCE_CONCURRENCY","INCREASE_CONCURRENCY_WITHIN_LIMIT","ADJUST_RETRY_BUDGET"],
+    "GOVERNOR_REVIEW":["PREWARM_OR_RESERVE_CAPACITY","ROUTE_TO_APPROVED_ALTERNATIVE"],
+    "OPERATOR_REVIEW":["REQUEST_OPERATOR_REVIEW"]
+  },
+  "prediction_safety":[
+    "Predictions must include model/version, evidence window and confidence.",
+    "Historical observations are not treated as current provider truth without freshness metadata.",
+    "Insufficient evidence yields LOW confidence and cannot silently become execution authority.",
+    "Prediction never overrides CSD-037 admission gates.",
+    "Prediction never bypasses CSD-032 or CSD-033.",
+    "Predicted cost uses supplied current pricing evidence; historical cost is not silently reused as current price.",
+    "No strategy may select an unapproved provider.",
+    "No strategy may mutate canonical scene or asset masters.",
+    "No strategy may activate an inactive narrative branch.",
+    "Actual outcomes are retained separately from predictions for calibration."
+  ],
+  "calibration":{
+    "metrics":["failure_risk_brier_or_equivalent","latency_error","cost_error","yield_error","retry_prediction_error"],
+    "policy":"Prediction confidence is reduced when recent calibration error increases.",
+    "versioning":"Every prediction references the knowledge/model version used."
+  },
+  "orchestration_record":{
+    "required":["orchestration_id","target_job_set","prediction_record_ids","knowledge_version","strategy","confidence","authorization_class","created_at"],
+    "immutability":"Issued plans are immutable; revisions create new plans."
+  },
+  "demo":{
+    "orchestration_id":"ORCH-CSD40-RAMAYANA-F02-F08-001",
+    "target_job_set":["JOB-F02","JOB-F03","JOB-F04","JOB-F05","JOB-F06","JOB-F07","JOB-F08"],
+    "knowledge_version":"DEMO-KNOWLEDGE-v1.0",
+    "predictions":{
+      "provider_failure_risk":"MEDIUM",
+      "queue_risk":"HIGH",
+      "expected_retry_risk":"MEDIUM"
+    },
+    "strategy":[
+      {"action":"SEQUENCE_CRITICAL_PATH_FIRST","authorization_class":"AUTO_EXECUTABLE"},
+      {"action":"DEFER_LOW_PRIORITY","authorization_class":"AUTO_EXECUTABLE"},
+      {"action":"REDUCE_CONCURRENCY","authorization_class":"AUTO_EXECUTABLE"},
+      {"action":"ROUTE_TO_APPROVED_ALTERNATIVE","authorization_class":"GOVERNOR_REVIEW"}
+    ],
+    "prediction_confidence":"MEDIUM",
+    "actual_outcome_calibration":"REQUIRED_AFTER_EXECUTION",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-037-EXECUTION-GOVERNOR","CMSE-014-PROVIDER-ROUTING","CMSE-015-PRODUCTION-SCHEDULER","CSD-041-ADAPTIVE-PRODUCTION-STRATEGY-AND-RESOURCE-PLANNER"]
+}
