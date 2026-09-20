@@ -223,7 +223,7 @@ document.getElementById('identity').onclick=async()=>{
     const result=await api('/api/identity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_id:scene.frames[active].frame_id,scene})});
     document.getElementById('identityStatus').textContent=result.result.status;
     document.getElementById('identityMeta').textContent=(result.result.missing_visual_locks?.length?('Missing locks · '+result.result.missing_visual_locks.join(', ')):'All selected characters have canonical visual locks');
-    identityValidated[scene.frames[active].frame_id]=result.result.status==='PASS';
+    identityValidated[scene.frames[active].frame_id]=result.result.status==='READY_FOR_VISUAL_IDENTITY_MATCH'||result.result.status==='PASS';
     identityLocked[scene.frames[active].frame_id]=false;
     selectFrame(active);
     toast('CSD-003.2 '+result.result.status+'.');
