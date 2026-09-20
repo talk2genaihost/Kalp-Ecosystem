@@ -1,0 +1,71 @@
+{
+  "schema_version":"KALP-CSD-039-PRODUCTION-TELEMETRY-ANOMALY-OPTIMIZATION-1.0",
+  "engine_id":"KALP-CSD-039",
+  "engine_name":"Production Telemetry Anomaly & Optimization Director",
+  "status":"LOCKED",
+  "purpose":"Detect statistically or operationally meaningful production anomalies, distinguish transient noise from systemic patterns, identify evidence-backed root-cause candidates, and issue bounded optimization recommendations to the execution governor and routing/scheduling layers.",
+  "core_principle":"Optimize from measured evidence and causal signals; never trade away canonical truth, continuity, QA or authorization for efficiency.",
+  "inputs":["CSD-038","CSD-037","CSD-031","CSD-032","CSD-033","CMSE-014","CMSE-015"],
+  "analysis_domains":["PROVIDER_HEALTH","QUEUE_HEALTH","EXECUTION_LATENCY","FAILURE_PATTERN","RETRY_BEHAVIOR","COST_EFFICIENCY","QA_YIELD","ASSET_WASTE","CAPACITY_UTILIZATION","BUDGET_TRAJECTORY"],
+  "anomaly_types":["LATENCY_SPIKE","FAILURE_SPIKE","RETRY_STORM","COST_SPIKE","SUCCESS_YIELD_DROP","QUEUE_CONGESTION","DUPLICATE_EXECUTION","INVALIDATED_EXECUTION","PROVIDER_DEGRADATION","CAPACITY_UNDERUTILIZATION","BUDGET_BURN_ACCELERATION","QA_REJECTION_CLUSTER"],
+  "severity":["INFO","WARNING","HIGH","CRITICAL"],
+  "evidence_policy":{
+    "minimum_evidence":"An anomaly must include observed telemetry, comparison baseline/window and detection reason.",
+    "root_cause":"Root cause is a candidate unless independently proven by correlated evidence.",
+    "no_speculation":"The engine must not present an unverified causal hypothesis as fact."
+  },
+  "detection_pipeline":[
+    "INGEST_NORMALIZED_TELEMETRY",
+    "SELECT_BASELINE_AND_WINDOW",
+    "DETECT_DEVIATION",
+    "CORRELATE_PROVIDER_JOB_COST_QA_SIGNALS",
+    "CLASSIFY_ANOMALY",
+    "ASSESS_SEVERITY",
+    "GENERATE_ROOT_CAUSE_CANDIDATES",
+    "CALCULATE_CONFIDENCE",
+    "BUILD_OPTIMIZATION_OPTIONS",
+    "CHECK_GOVERNANCE_CONSTRAINTS",
+    "ISSUE_BOUNDED_RECOMMENDATION",
+    "PUBLISH_TO_CSD-037_CMSE-014_CMSE-015",
+    "RETAIN_ANALYSIS_RECORD"
+  ],
+  "optimization_actions":["NO_CHANGE","REDUCE_CONCURRENCY","INCREASE_CONCURRENCY_WITHIN_LIMIT","DELAY_LOW_PRIORITY","ROUTE_TO_APPROVED_ALTERNATIVE","COALESCE_DUPLICATES","CANCEL_INVALIDATED_WORK","ADJUST_RETRY_POLICY","ESCALATE_PROVIDER_HEALTH","REQUEST_OPERATOR_REVIEW"],
+  "optimization_constraints":[
+    "Never route to an unapproved provider.",
+    "Never bypass CSD-032 result validation.",
+    "Never bypass CSD-033 continuity validation.",
+    "Never mutate canonical masters.",
+    "Never silently change active narrative branch.",
+    "Never increase concurrency beyond provider capability or CSD-037 limits.",
+    "Never retry terminal failures without an authorized new attempt.",
+    "Never optimize away critical-path safety gates."
+  ],
+  "recommendation_policy":{
+    "AUTO_EXECUTABLE":["REDUCE_CONCURRENCY","INCREASE_CONCURRENCY_WITHIN_LIMIT","DELAY_LOW_PRIORITY","COALESCE_DUPLICATES","CANCEL_INVALIDATED_WORK","ADJUST_RETRY_POLICY"],
+    "GOVERNOR_REVIEW":["ROUTE_TO_APPROVED_ALTERNATIVE","ESCALATE_PROVIDER_HEALTH"],
+    "OPERATOR_REVIEW":["REQUEST_OPERATOR_REVIEW"]
+  },
+  "optimization_score":{
+    "dimensions":["SUCCESS_YIELD","LATENCY","COST","RETRY_WASTE","CAPACITY","QA_YIELD"],
+    "principle":"A recommendation is preferred only when it improves measured efficiency without degrading governed quality or readiness constraints."
+  },
+  "recommendation_record":{
+    "required":["analysis_id","telemetry_window","anomaly_type","severity","evidence","baseline","root_cause_candidates","confidence","recommendation","authorization_class","timestamp"],
+    "immutability":"Analysis records are append-only; revised analysis creates a new record."
+  },
+  "demo":{
+    "analysis_id":"ANALYSIS-CSD39-HIGGSFIELD-001",
+    "window":"DEMO-WINDOW",
+    "anomaly_type":"RETRY_STORM",
+    "severity":"HIGH",
+    "evidence":{"retry_rate":"ELEVATED","provider_latency":"ELEVATED","failure_cluster":"TRANSIENT"},
+    "root_cause_candidates":[
+      {"cause":"PROVIDER_CAPACITY_PRESSURE","confidence":0.78},
+      {"cause":"TRANSIENT_PROVIDER_DEGRADATION","confidence":0.71}
+    ],
+    "recommendation":"REDUCE_CONCURRENCY",
+    "authorization_class":"AUTO_EXECUTABLE",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-037-EXECUTION-GOVERNOR","CMSE-014-PROVIDER-ROUTING","CMSE-015-PRODUCTION-SCHEDULER","CSD-040-PRODUCTION-LEARNING-AND-PREDICTIVE-ORCHESTRATION"]
+}
