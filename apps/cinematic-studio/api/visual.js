@@ -67,13 +67,14 @@ function compilePrompt(scene,frame,registry){
 module.exports=async function handler(req,res){
   try{
     const registry=load("character-registry.json");
-    const scene=load("scene-contract.json");
+    const canonicalScene=load("scene-contract.json");
     if(req.method==="GET"){
       return json(res,200,{ok:true,contract:"KALP-CSD-VISUAL-1.0",engine:"KALP-CSD-003",status:"READY"});
     }
     if(req.method==="POST"){
       let body=req.body||{};
       if(typeof body==="string") body=JSON.parse(body||"{}");
+      const scene=body.scene && Array.isArray(body.scene.frames) ? body.scene : canonicalScene;
       const frameIds=Array.isArray(body.frame_ids)&&body.frame_ids.length
         ? body.frame_ids : scene.frames.map(f=>f.frame_id);
       const frames=frameIds.map(id=>scene.frames.find(f=>f.frame_id===id));
@@ -91,7 +92,9 @@ module.exports=async function handler(req,res){
           provider_neutral:true,
           context_fingerprint:"CSD3:"+scene.scene_id+":"+frame.frame_id,
           visual_spec:prompt,
-          downstream:["CMSE-012","CMSE-013","CMSE-014","CMSE-015"]
+          downstream:["CMSE-012","CMSE-013","CMSE-014","CMSE-015"],
+          identity_look:frame.identity_look||{character_ids:scene.selected_characters||[],canonical:true,visual_lock_required:true},
+          dialogue_contract:frame.dialogue_contract||{speaker:frame.dialogue?(frame.perspective==="SHARED"?"SHARED":frame.perspective):null,line:frame.dialogue||null,language:frame.dialogue?"Hindi":null,delivery:frame.delivery||"not required",voice_persona:frame.voice_persona||"not required"}
         };
       });
       return json(res,200,{ok:true,contract:"KALP-CSD-VISUAL-JOB-1.0",engine:"KALP-CSD-003",data:{scene_id:scene.scene_id,job_count:jobs.length,jobs}});
