@@ -1,0 +1,123 @@
+{
+  "schema_version": "KALP-CMSE-010.3-ROUTING-PLAN-1.0",
+  "engine_id": "KALP-CMSE-010.3",
+  "engine_name": "Provider Capability & Production Routing",
+  "scene_id": "CSD-DEMO-001",
+  "status": "ROUTING_PLAN_READY",
+  "requirements": {
+    "schema_version": "KALP-PRODUCTION-ROUTING-REQUIREMENTS-1.0",
+    "scene_id": "CSD-DEMO-001",
+    "modality": "IMAGE",
+    "output": {
+      "aspect_ratio": "16:9",
+      "resolution_profile": "CINEMATIC"
+    },
+    "required_capabilities": [
+      "image_generation",
+      "aspect_ratio_16_9",
+      "reference_image",
+      "multi_character",
+      "negative_constraints"
+    ],
+    "continuity_requirements": [
+      "F01_REFERENCE",
+      "CHARACTER_LOCKS",
+      "WORLD_LOCK",
+      "SPATIAL_LOCK",
+      "PERSPECTIVE_LOCK"
+    ],
+    "routing_profile": "QUALITY_FIRST",
+    "fallback_policy": "Prefer reference-aware provider with verified independent execution; if unavailable, hold job rather than silently weakening continuity."
+  },
+  "provider_registry": "KALP_PROVIDER_CAPABILITY_REGISTRY_1",
+  "routes": [
+    {
+      "frame_id": "F01",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F02",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F03",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F04",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F05",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F06",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F07",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    },
+    {
+      "frame_id": "F08",
+      "primary_candidate": "HIGGSFIELD",
+      "fallback_candidate": "CHATGPT_IMAGE_GENERATION",
+      "routing_status": "CANDIDATE_READY",
+      "execution_readiness": "REQUIRES_ADAPTER_HEALTH_CHECK",
+      "reference_required": "F01",
+      "quality_profile": "QUALITY_FIRST",
+      "reason": "Reference-aware image generation is required to preserve canonical identity and world continuity."
+    }
+  ],
+  "selection_rules": [
+    "Reject providers missing any hard capability.",
+    "Prefer reference-aware execution.",
+    "Prefer verified independent job execution for production assets.",
+    "Preserve F01 as immutable reference anchor.",
+    "Do not downgrade hard locks to satisfy provider limitations.",
+    "Re-evaluate provider health/cost/latency immediately before dispatch."
+  ]
+}
