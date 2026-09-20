@@ -54,3 +54,8 @@ F01 real-visual evidence is recorded in `data/csd-003-2-f01-validation.json` wit
 ### CSD-003.2A — Canonical Visual Lock Registration
 
 Registered existing canonical identity artifacts for `RAM_001` and `RAVAN_001` in `data/canonical-visual-locks.json` and attached the lock identifiers to `data/character-registry.json`. F01 CSD-003.2 validation now returns `PASS`, `trusted_reference: true`, and `downstream_propagation: ELIGIBLE` after lock coverage completion.
+
+
+### CSD-003.3 — Reference Propagation & F02–F08
+
+F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F02–F08 jobs that inherit F01 identity, world, spatial, and environment locks while preserving frame-specific perspective, emotion, action, camera, and VFX state.
