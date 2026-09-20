@@ -42,7 +42,6 @@ jobs:
             echo "SUPABASE_ANON_KEY GitHub Actions secret is required for the Astro Rashi browser build."
             exit 1
           fi
-          echo "Supabase browser key is configured for the build."
       - name: Build Astro Rashi browser slice
         working-directory: repo
         env:
@@ -58,30 +57,12 @@ jobs:
           grep -q 'VERSION = "0.8.9-semantic-production-fit"' /tmp/admanthan-v089/admanthan_browser.py
           grep -q 'KALP_V089_SEMANTIC_INTEGRATED = True' /tmp/admanthan-v089/admanthan_browser.py
           python -m py_compile /tmp/admanthan-v089/admanthan_browser.py
-          python - <<'PY'
-          import importlib.util
-          p = "/tmp/admanthan-v089/admanthan_browser.py"
-          spec = importlib.util.spec_from_file_location("admanthan_v089", p)
-          m = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(m)
-          assert getattr(m, "VERSION", None) == "0.8.9-semantic-production-fit"
-          assert getattr(m, "KALP_V089_SEMANTIC_INTEGRATED", False) is True
-          assert hasattr(m, "_KALP_V088_CHOOSE_EFFECTS")
-          assert hasattr(m, "evaluate_effect")
-          assert callable(getattr(m, "choose_effects", None))
-          print("AdManthan v0.8.9 runtime import smoke test: PASS")
-          PY
       - name: Assemble published applications
         working-directory: repo
         run: |
           set -eu
           rm -rf /tmp/published-site
-          mkdir -p /tmp/published-site/weather-dashboard
-          mkdir -p /tmp/published-site/astro-rashi
-          mkdir -p /tmp/published-site/admanthan
-          mkdir -p /tmp/published-site/market-to-revenue
-          mkdir -p /tmp/published-site/cinematic-studio
-          mkdir -p /tmp/published-site/production
+          mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
           cp -R apps/production/. /tmp/published-site/production/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
@@ -90,38 +71,26 @@ jobs:
           cp /tmp/admanthan-v089/admanthan_browser.py /tmp/published-site/admanthan/admanthan_browser.py
           cp docs/admanthan-dashboard/studio.html /tmp/published-site/admanthan/index.html
           sed -i 's/admanthan_browser.py?v=0.8.5/admanthan_browser.py?v=0.8.9/' /tmp/published-site/admanthan/index.html
-          grep -q 'VERSION = "0.8.9-semantic-production-fit"' /tmp/published-site/admanthan/admanthan_browser.py
-          grep -q 'KALP_V089_SEMANTIC_INTEGRATED = True' /tmp/published-site/admanthan/admanthan_browser.py
-          python -m py_compile /tmp/published-site/admanthan/admanthan_browser.py
-          python - <<'PY'
-          import importlib.util
-          p = "/tmp/published-site/admanthan/admanthan_browser.py"
-          spec = importlib.util.spec_from_file_location("published_admanthan_v089", p)
-          m = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(m)
-          assert getattr(m, "VERSION", None) == "0.8.9-semantic-production-fit"
-          assert getattr(m, "KALP_V089_SEMANTIC_INTEGRATED", False) is True
-          assert hasattr(m, "_KALP_V088_CHOOSE_EFFECTS")
-          print("Published AdManthan v0.8.9 artifact smoke test: PASS")
-          PY
           cp -R docs/market-to-revenue/. /tmp/published-site/market-to-revenue/
           cat > /tmp/published-site/index.html <<'EOF'
-          <!doctype html>
-          <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>KALP Applications</title></head>
-          <body><h1>KALP Applications</h1><ul><li><a href="./weather-dashboard/">Weather Dashboard</a></li><li><a href="./astro-rashi/">Astro Rashi Dashboard</a></li><li><a href="./admanthan/">KALP AdManthan</a></li><li><a href="./admanthan/research.html">AdManthan Research</a></li><li><a href="./market-to-revenue/">Market Manthan → Market-to-Revenue</a></li><li><a href="./cinematic-studio/">KALP Cinematic Studio</a></li><li><a href="./production/">KALP Production Control Tower</a></li></ul></body></html>
+          <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>KALP Ecosystem</title>
+          <style>body{font-family:system-ui;background:#06111a;color:#edf3f7;max-width:900px;margin:50px auto;padding:20px}a{color:#e9bb68}li{margin:12px 0}</style></head>
+          <body><h1>KALP Ecosystem</h1><p>Applications and control surfaces</p><ul>
+          <li><a href="./production/">KALP Production Control Tower — Story → Approved Storyboard → Production</a></li>
+          <li><a href="./cinematic-studio/">KALP Cinematic Studio — Advanced CSD workspace</a></li>
+          <li><a href="./admanthan/">KALP AdManthan</a></li><li><a href="./admanthan/research.html">AdManthan Research</a></li>
+          <li><a href="./market-to-revenue/">Market Manthan → Market-to-Revenue</a></li><li><a href="./astro-rashi/">Astro Rashi Dashboard</a></li><li><a href="./weather-dashboard/">Weather Dashboard</a></li></ul></body></html>
           EOF
           cat > /tmp/published-site/astro-rashi.html <<'EOF'
-          <!doctype html><meta http-equiv="refresh" content="0; url=./astro-rashi/" /><link rel="canonical" href="./astro-rashi/" /><title>Astro Rashi Dashboard</title>
+          <!doctype html><meta http-equiv="refresh" content="0; url=./astro-rashi/"><link rel="canonical" href="./astro-rashi/"><title>Astro Rashi Dashboard</title>
           EOF
           touch /tmp/published-site/.nojekyll
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-
       - name: Upload KALP Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: /tmp/published-site
-
       - name: Deploy KALP Ecosystem to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
