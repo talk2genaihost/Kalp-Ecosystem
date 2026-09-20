@@ -1,0 +1,45 @@
+{
+  "schema_version": "KALP-CSD-VISUAL-PROPAGATION-1.0",
+  "gate_id": "CSD-003.3",
+  "scene_id": "CSD-DEMO-001",
+  "source_reference": {
+    "frame_id": "F01",
+    "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+    "trusted": true
+  },
+  "generation_artifacts": [
+    {
+      "artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "type": "GENERATED_STORYBOARD_SHEET",
+      "covers": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08"
+      ],
+      "status": "GENERATED"
+    }
+  ],
+  "target_frames": [
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08"
+  ],
+  "result": "VISUAL_GENERATION_COMPLETE_AS_STORYBOARD_SHEET",
+  "note": "The available image-generation runtime returned a single coherent 8-frame storyboard sheet rather than seven independent image assets. CSD-003.3 therefore records the visual generation as complete at storyboard-sheet level; independent per-frame assets remain a downstream extraction/provider execution task and must not be falsely marked as separate generated assets.",
+  "validation": [
+    "F01 reference continuity retained",
+    "F02-F08 visual roles represented",
+    "Mount Kailash twilight retained",
+    "Shiva/Ram/Ravan identities visually represented",
+    "No standalone-frame claim"
+  ]
+}

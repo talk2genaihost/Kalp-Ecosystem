@@ -1,0 +1,111 @@
+{
+  "schema_version":"KALP-CSD-006-CHARACTER-STATE-EMOTIONAL-CONTINUITY-1.0",
+  "engine_id":"KALP-CSD-006",
+  "engine_name":"Character State & Emotional Continuity Director",
+  "status":"LOCKED",
+  "purpose":"Carry each character's consequential emotional and behavioral state from one scene into the next without mutating immutable identity DNA.",
+  "core_principle":"A character enters the next scene carrying the consequences of the previous scene; identity remains immutable while development state evolves.",
+  "inputs":{
+    "required":["character_ids","current_scene_state"],
+    "optional":["previous_scene_id","previous_scene_ending_snapshot","story_arc_id","narrative_intent","scene_id","time_gap","continuity_policy"]
+  },
+  "memory_model":{
+    "types":["FACTUAL","EMOTIONAL","INTERPRETIVE","RELATIONAL","BEHAVIORAL"],
+    "pipeline":"trigger → memory retrieval → emotional association → belief activation → internal conflict → intention → micro-expression → body → dialogue → action",
+    "priority":"Recent consequential memories outrank generic background memories; unresolved relational events remain active until resolved, transformed, or explicitly superseded."
+  },
+  "state_model":{
+    "immutable":["identity","visual_identity","voice_identity","core_personality_dna","canonical_relationship_facts"],
+    "mutable":["current_emotion","emotional_intensity","objective","fear_or_resistance","belief_activation","relationship_pressure","behavioral_tendency","intention","micro_expression","body_state","dialogue_tendency","action_readiness"],
+    "snapshot_rule":"Scene ending state becomes the candidate entry state for the next scene."
+  },
+  "continuity_rules":[
+    "Never rewrite immutable character identity to explain a new emotion.",
+    "Every significant scene-ending event must leave a trace in the affected character state.",
+    "Do not force an old emotion to persist after its causal trigger has been resolved.",
+    "A time gap may attenuate intensity but must not erase consequential memory without an explicit narrative reason.",
+    "Emotional continuity is not identical to emotional repetition; the same event may transform into a different emotion or intention.",
+    "Relationship changes propagate only to characters causally affected by the event.",
+    "Performance changes must be explainable from retrieved memory and current objective.",
+    "Dialogue tone may change while voice identity remains locked.",
+    "Physical injury, fatigue, possession, costume damage and environmental effects are separate continuity dimensions from emotion.",
+    "A character may conceal an emotion; concealed state must remain distinct from visible performance state.",
+    "Conflicting memory records require source timestamp and confidence reconciliation before promotion.",
+    "CSD-002 receives the resolved state; it does not independently invent emotional backstory."
+  ],
+  "resolution_pipeline":[
+    "IDENTITY_LOCK_CHECK",
+    "SCENE_END_SNAPSHOT_LOAD",
+    "CONSEQUENTIAL_EVENT_EXTRACTION",
+    "MEMORY_RETRIEVAL",
+    "EMOTIONAL_ASSOCIATION",
+    "BELIEF_ACTIVATION",
+    "INTERNAL_CONFLICT",
+    "CURRENT_OBJECTIVE_RECONCILIATION",
+    "RELATIONSHIP_STATE_PROPAGATION",
+    "EMOTIONAL_STATE_TRANSITION",
+    "VISIBLE_VS_INTERNAL_PERFORMANCE_SPLIT",
+    "MICRO_EXPRESSION_AND_BODY_STATE",
+    "INTENTION_RECALCULATION",
+    "NEXT_SCENE_ENTRY_SNAPSHOT",
+    "CONTINUITY_VALIDATION",
+    "CSD-002_HANDOFF"
+  ],
+  "output_schema":{
+    "scene_id":"resolved next-scene ID",
+    "character_states":"per-character immutable identity + mutable entry state",
+    "retrieved_memories":"ranked consequential memory records",
+    "state_transitions":"before → trigger → after",
+    "performance_state":"internal emotion vs visible expression/body/dialogue/action",
+    "relationship_updates":"affected relationship pressures and unresolved threads",
+    "continuity_constraints":"what must remain visually, emotionally and causally consistent",
+    "next_scene_intentions":"per-character intention entering scene",
+    "csd002_handoff":"perspective/emotion/action state for 8-frame director"
+  },
+  "validation":{
+    "hard_failures":[
+      "missing_character_identity_lock",
+      "scene_end_snapshot_without_source",
+      "state_transition_without_trigger",
+      "relationship_change_without_causal_event",
+      "next_scene_state contradicts immutable identity",
+      "active_character_count_above_5"
+    ],
+    "pass_conditions":[
+      "identity locks preserved",
+      "every consequential affected character has a state transition or explicit no-change decision",
+      "memory provenance available",
+      "visible performance is derivable from internal state",
+      "next-scene intention is defined",
+      "CSD-002 handoff is complete"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD6-RAMAYANA-DEMO-001",
+    "previous_scene_id":"CSD5-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "trigger_event":"Ravana voluntarily suppresses his rising power instead of escalating the confrontation.",
+    "memory_records":[
+      {"character_id":"RAVAN_001","type":"EMOTIONAL","content":"His expected dominance was interrupted by a choice to restrain himself.","salience":"HIGH"},
+      {"character_id":"RAVAN_001","type":"INTERPRETIVE","content":"Restraint may be a form of mastery rather than weakness.","salience":"HIGH"},
+      {"character_id":"RAM_001","type":"RELATIONAL","content":"Rama's controlled challenge altered Ravana's perception of the encounter.","salience":"MEDIUM"},
+      {"character_id":"HANUMAN_001","type":"BEHAVIORAL","content":"Hanuman remained ready to intervene but accepted Rama's deliberate restraint.","salience":"MEDIUM"}
+    ],
+    "state_transitions":[
+      {"character_id":"RAVAN_001","before":"confidence under pressure","trigger":"self-imposed restraint","after":"controlled intensity with unresolved self-questioning","visible_performance":"quieter gaze, contained jaw tension, reduced gesture amplitude","next_intention":"determine whether restraint increases or diminishes his authority"},
+      {"character_id":"RAM_001","before":"calm vigilance","trigger":"Ravana chooses restraint","after":"calm confirmation","visible_performance":"relaxed shoulders, steady gaze, minimal expression change","next_intention":"allow Ravana to confront the meaning of his own choice"},
+      {"character_id":"HANUMAN_001","before":"alert devotion","trigger":"threat subsides without intervention","after":"watchful trust","visible_performance":"lowered intervention posture, focused attention","next_intention":"observe Ravana while remaining ready to protect Rama"}
+    ],
+    "continuity_constraints":[
+      "Ravana must not revert immediately to an unqualified triumphant state.",
+      "Rama's composure must remain consistent with his established performance DNA.",
+      "Hanuman's readiness remains available even though visible threat posture decreases.",
+      "No character identity, costume or voice lock is altered by the emotional transition."
+    ],
+    "csd002_handoff":{
+      "status":"READY",
+      "rule":"Frame perspective and performance must use these resolved entry states; CSD-002 must not invent contradictory emotional motivation."
+    }
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-VISUAL-GENERATION","CMSE-004-CHARACTER-ARC-EMOTIONAL-MEMORY","CMSE-009-QUALITY-VALIDATION"]
+}

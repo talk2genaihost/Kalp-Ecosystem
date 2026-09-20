@@ -1,0 +1,80 @@
+{
+  "schema_version":"KALP-CSD-037-PRODUCTION-READINESS-AUTOPILOT-EXECUTION-GOVERNOR-1.0",
+  "engine_id":"KALP-CSD-037",
+  "engine_name":"Production Readiness Autopilot & Execution Governor",
+  "status":"LOCKED",
+  "purpose":"Convert CSD-036 health and readiness evidence into controlled production execution authority, admission decisions, ordering, concurrency limits, pause/resume behavior and escalation.",
+  "core_principle":"No production job executes merely because it exists; execution is admitted only when its dependencies, health scope and master authority are valid.",
+  "inputs":["CSD-036","CSD-035","CSD-034","CSD-031","CSD-030","CMSE-015"],
+  "governor_states":["STANDBY","READY","ADMITTING","EXECUTING","DEGRADED_EXECUTION","PAUSED","DRAINING","BLOCKED","ESCALATION_REQUIRED","LOCKED"],
+  "readiness_policy":{
+    "READY_FOR_PRODUCTION":"Eligible jobs may be admitted.",
+    "CONDITIONAL_READY":"Only explicitly whitelisted jobs may be admitted.",
+    "NOT_READY":"No new dependent jobs may be admitted.",
+    "PRODUCTION_LOCKED":"Only jobs bound to the frozen authorization snapshot may execute."
+  },
+  "admission_gates":[
+    "HEALTH_SNAPSHOT_VALID",
+    "READINESS_AUTHORIZATION_VALID",
+    "MASTER_FINGERPRINT_MATCH",
+    "SCENE_VERSION_CANONICAL",
+    "DEPENDENCY_FRONTIER_RECONCILED",
+    "NO_BLOCKING_CONTINUITY_ISSUE",
+    "ASSET_LINEAGE_VALID",
+    "JOB_CONTRACT_VALID",
+    "ACTIVE_BRANCH_EXPLICIT",
+    "ACTIVE_CHARACTER_COUNT_MAX_FIVE"
+  ],
+  "execution_controls":{
+    "priority_classes":["CRITICAL_PATH","HIGH","NORMAL","LOW"],
+    "ordering":"Dependency-safe topological order with critical-path priority.",
+    "concurrency":"Bound by provider capability, job dependencies and current health state.",
+    "deduplication":"Identical job fingerprints are coalesced; duplicate execution is blocked.",
+    "backpressure":"Admission slows or stops when provider queues, failure rates or health degrade.",
+    "fairness":"No eligible job is starved indefinitely by repeated retries of another job."
+  },
+  "health_response":{
+    "HEALTHY":"Normal admission.",
+    "DEGRADED":"Reduce concurrency and admit only safe eligible work.",
+    "RECOVERING":"Pause dependent work; allow recovery and explicitly safe jobs.",
+    "BLOCKED":"Stop new dependent admissions.",
+    "UNKNOWN":"Fail closed for production admission."
+  },
+  "pause_resume":{
+    "pause_triggers":["CRITICAL_HEALTH_ALERT","MASTER_FINGERPRINT_MISMATCH","ACTIVE_BRANCH_AMBIGUITY","PROVIDER_FAILURE_SPIKE","ORPHAN_JOB_DETECTED","CONTINUITY_BLOCK"],
+    "resume_conditions":["HEALTHY_OR_APPROVED_CONDITIONAL_STATE","FRESH_AUTHORIZATION_SNAPSHOT","DEPENDENCIES_RECONCILED","NO_BLOCKING_ALERT"],
+    "resume_policy":"Resume only jobs whose admission fingerprints still match."
+  },
+  "escalation":{
+    "levels":["INFO","WARNING","OPERATOR_REVIEW","AUTHORIZATION_REQUIRED","EMERGENCY_STOP"],
+    "automatic_escalation":["MASTER_FINGERPRINT_MISMATCH","CANONICAL_GRAPH_CORRUPTION","SILENT_BRANCH_CHANGE","REPEATED_TERMINAL_FAILURE"],
+    "operator_only":["IDENTITY_CHANGE","CANONICAL_SCENE_CHANGE","BRANCH_PROMOTION","HISTORICAL_REVISION","MASTER_ASSET_REPLACEMENT"]
+  },
+  "execution_ledger":{
+    "required":["governor_decision_id","health_snapshot_id","authorization_id","job_id","master_revision","master_fingerprint","admission_state","decision_reason","timestamp"],
+    "immutability":"Every admission, pause, resume, block and escalation decision is append-only."
+  },
+  "decision_states":["ADMITTED","CONDITIONALLY_ADMITTED","HELD","PAUSED","BLOCKED","REJECTED","ESCALATED","COMPLETED"],
+  "demo":{
+    "health_snapshot_id":"HEALTH-CSD36-RAMAYANA-001",
+    "authorization_id":"AUTH-CSD37-RAMAYANA-001",
+    "health_state":"HEALTHY",
+    "readiness_state":"READY_FOR_PRODUCTION",
+    "eligible_jobs":3,
+    "admitted_jobs":3,
+    "concurrency_limit":"PROVIDER_CAPABILITY_BOUND",
+    "governor_state":"EXECUTING",
+    "demo_pause_event":{
+      "trigger":"MASTER_FINGERPRINT_MISMATCH",
+      "state":"PAUSED",
+      "new_admissions":0,
+      "existing_jobs":"DRAIN_OR_RECONCILE"
+    },
+    "resume":{
+      "fresh_authorization":true,
+      "dependencies_reconciled":true,
+      "state":"READY"
+    }
+  },
+  "downstream":["CMSE-015-PRODUCTION-SCHEDULER","CMSE-010-PRODUCTION-ORCHESTRATOR","CSD-038-PRODUCTION-TELEMETRY-AND-COST-GOVERNOR"]
+}

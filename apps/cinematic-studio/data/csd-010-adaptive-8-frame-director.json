@@ -1,0 +1,153 @@
+{
+  "schema_version":"KALP-CSD-010-ADAPTIVE-8-FRAME-DIRECTOR-1.0",
+  "engine_id":"KALP-CSD-010",
+  "engine_name":"Adaptive 8-Frame Scene Director",
+  "status":"LOCKED",
+  "purpose":"Orchestrate a validated scene into eight purposeful cinematic perceptions, adapting frame purpose and POV to narrative state while preserving the canonical eight-frame production contract.",
+  "core_principle":"Eight frames are a controlled cinematic sequence, not a fixed shot template. The director adapts perception, information release, emotional progression, and visual emphasis to the scene's causal structure.",
+  "inputs":{
+    "required":["scene_intelligence","emotional_state","knowledge_state","perception_state","validation_result"],
+    "optional":["narrative_intent","audience_objective","requested_duration","style_profile","previous_frame_sequence"]
+  },
+  "hard_contract":{
+    "frame_count":8,
+    "active_character_limit":5,
+    "canonical_reality":"ONE",
+    "validation_required":true,
+    "frame_ids":["F01","F02","F03","F04","F05","F06","F07","F08"]
+  },
+  "adaptive_director_model":{
+    "default_template":[
+      "ESTABLISH",
+      "INTRODUCE",
+      "PERCEIVE",
+      "COUNTER_PERCEIVE",
+      "INTERACT",
+      "ESCALATE",
+      "TURNING_POINT",
+      "RESOLUTION_OR_HOOK"
+    ],
+    "adaptation_axes":[
+      "narrative_purpose",
+      "dominant_character",
+      "perspective_priority",
+      "information_reveal",
+      "emotional_progression",
+      "relationship_pressure",
+      "action_causality",
+      "audience_attention",
+      "spatial_continuity",
+      "tempo"
+    ],
+    "deviation_policy":"The director may replace or reorder default frame purposes only when a causal narrative reason exists and the deviation is recorded.",
+    "deviation_limit":"No more than three frame-purpose deviations without explicit scene-level override.",
+    "nonnegotiables":[
+      "F01 establishes sufficient canonical reality for audience orientation unless a justified cold-open deviation is recorded.",
+      "At least one frame must expose the dominant character's perception.",
+      "At least one frame must expose a meaningful counter-perception when multiple active characters have conflicting interpretations.",
+      "Turning point must be represented by a distinct frame.",
+      "F08 must establish a stable ending state or a deliberate narrative hook.",
+      "No frame may introduce information unavailable to its assigned perspective.",
+      "All frame transitions must have a causal or perceptual reason."
+    ]
+  },
+  "frame_director_schema":{
+    "frame_id":"F01-F08",
+    "purpose":"adaptive narrative function",
+    "perspective":"AUDIENCE or canonical character ID or SHARED",
+    "attention_target":"primary visual attention",
+    "information_revealed":"new audience/character information",
+    "information_withheld":"deliberately withheld information",
+    "emotional_state":"entry → visible state",
+    "action":"observable action",
+    "reaction":"causal reaction",
+    "transition_reason":"why this frame follows the previous frame",
+    "audience_effect":"know/suspect/expect/feel",
+    "camera_intent":"cinematic camera objective",
+    "continuity_constraints":"identity, spatial, emotional, temporal",
+    "adaptation_reason":"why this frame differs from default template, if applicable"
+  },
+  "director_rules":[
+    "Use CSD-009 only after a PASS or approved PASS_WITH_ADVISORIES.",
+    "Never invent a frame to fill the eight-slot contract.",
+    "Frame purpose must derive from scene causality or perception progression.",
+    "POV assignment must derive from CSD-008 and CSD-007.",
+    "Emotional progression must derive from CSD-006.",
+    "Character participation must derive from CSD-005.",
+    "Do not duplicate adjacent frames unless repetition is deliberately used for escalation, emphasis or contrast.",
+    "A frame may be visually quiet when the narrative state requires internal processing.",
+    "A frame may use shared perspective when no single character has exclusive perceptual priority.",
+    "Camera variation must support perception; camera variation alone is not adaptation.",
+    "If a scene is action-dominant, temporal compression may replace exposition while preserving causal clarity.",
+    "If a scene is introspection-dominant, visual micro-performance may replace overt action.",
+    "If information is withheld, the frame should encode absence or ambiguity rather than fabricate certainty."
+  ],
+  "resolution_pipeline":[
+    "VALIDATION_GATE_CHECK",
+    "LOAD_SCENE_CAUSALITY",
+    "LOAD_EMOTIONAL_CONTINUITY",
+    "LOAD_KNOWLEDGE_BOUNDARIES",
+    "LOAD_CHARACTER_PERCEPTIONS",
+    "IDENTIFY_DOMINANT_CHARACTER",
+    "IDENTIFY_COUNTERFORCE_OR_COUNTER_PERCEPTION",
+    "MAP_INFORMATION_REVEAL_SEQUENCE",
+    "MAP_EMOTIONAL_PROGRESSION",
+    "SELECT_FRAME_PURPOSES",
+    "ASSIGN_PERSPECTIVES",
+    "ASSIGN_TRANSITIONS",
+    "CHECK_CAUSAL_COVERAGE",
+    "CHECK_FRAME_DIFFERENTIATION",
+    "CHECK_CONTINUITY",
+    "EMIT_8_FRAME_DIRECTORIAL_PLAN"
+  ],
+  "validation":{
+    "hard_failures":[
+      "UPSTREAM_VALIDATION_NOT_PASSED",
+      "FRAME_COUNT_NOT_8",
+      "MISSING_TURNING_POINT",
+      "MISSING_ENDING_STATE",
+      "PERSPECTIVE_WITHOUT_VALID_STATE",
+      "INFORMATION_LEAK",
+      "CAUSAL_TRANSITION_MISSING",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "pass_conditions":[
+      "eight purposeful frames",
+      "all frames causally connected",
+      "perspective assignments valid",
+      "information release controlled",
+      "emotional progression coherent",
+      "turning point represented",
+      "ending state or hook represented",
+      "CSD-003-ready frame directives"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD10-RAMAYANA-DEMO-001",
+    "title":"The Meaning of Restraint",
+    "dominant_character":"RAVAN_001",
+    "counter_perception":"RAM_001",
+    "witness_perception":"HANUMAN_001",
+    "adaptive_reason":"The scene is introspection-dominant after an external power escalation is deliberately suppressed; therefore the director reduces overt action and increases micro-performance, perception contrast and information withholding.",
+    "frame_plan":[
+      {"frame_id":"F01","purpose":"ESTABLISH_REALITY","perspective":"AUDIENCE","attention_target":"three-character relationship geometry and contained energy","information_revealed":"Ravana has restrained his power; no physical escalation is occurring","information_withheld":"Ravana's private conclusion","emotional_state":"tension → controlled stillness","action":"power settles","reaction":"all three remain composed","transition_reason":"establish shared canonical reality before entering subjective perception","audience_effect":"know tension has changed but not why it matters yet","camera_intent":"wide environmental orientation","continuity_constraints":"preserve canonical positions and identity","adaptation_reason":null},
+      {"frame_id":"F02","purpose":"RAVAN_PERCEPTION","perspective":"RAVAN_001","attention_target":"Rama's unbroken composure","information_revealed":"Rama is not visibly intimidated","information_withheld":"Rama's full internal reasoning","emotional_state":"contained intensity → challenged curiosity","action":"Ravana studies Rama","reaction":"Rama remains steady","transition_reason":"move from objective reality into the dominant character's interpretation","audience_effect":"suspect the contest has become psychological","camera_intent":"Ravana-subjective medium close perspective","continuity_constraints":"Ravana's restrained power remains visible","adaptation_reason":"replaces generic introduction with subjective reading because character state is already established"},
+      {"frame_id":"F03","purpose":"COUNTER_PERCEPTION","perspective":"HANUMAN_001","attention_target":"hands, posture and latent threat","information_revealed":"Hanuman confirms no immediate intervention is required","information_withheld":"Ravana's private motive","emotional_state":"alert devotion → watchful trust","action":"Hanuman lowers intervention posture","reaction":"Rama gives no escalation cue","transition_reason":"counter-perception verifies the threat from a protector's information state","audience_effect":"feel safety without losing latent danger","camera_intent":"protective observational angle","continuity_constraints":"Hanuman remains spatially ready","adaptation_reason":"uses witness POV instead of a second generic character introduction"},
+      {"frame_id":"F04","purpose":"INTERNAL_CONFLICT","perspective":"RAVAN_001","attention_target":"his own contained power","information_revealed":"restraint was a conscious choice","information_withheld":"whether restraint represents strength","emotional_state":"curiosity → internal conflict","action":"Ravana relaxes one controlled gesture","reaction":"no external reward or fear appears","transition_reason":"turns external power into internal question","audience_effect":"feel uncertainty inside the dominant character","camera_intent":"tight micro-performance framing","continuity_constraints":"no sudden emotional reset","adaptation_reason":"replaces action escalation with micro-performance because CSD-006 identifies introspective state"},
+      {"frame_id":"F05","purpose":"MULTI_PERCEPTION_CONTRAST","perspective":"SHARED","attention_target":"same restrained moment, three interpretations","information_revealed":"all three read the same physical event differently","information_withheld":"Ravana's final decision","emotional_state":"parallel controlled states","action":"silence holds","reaction":"three distinct attention patterns","transition_reason":"synchronize the competing perceptions without changing reality","audience_effect":"understand the scene's thematic conflict","camera_intent":"balanced three-character composition","continuity_constraints":"single physical event","adaptation_reason":"shared perspective is necessary to compare interpretations without privileging one"},
+      {"frame_id":"F06","purpose":"BELIEF_REVISION_PRESSURE","perspective":"RAVAN_001","attention_target":"Rama's calm as evidence against Ravana's old belief","information_revealed":"visible dominance has not produced the expected reaction","information_withheld":"whether Ravana accepts the implication","emotional_state":"internal conflict → belief pressure","action":"Ravana's gaze shifts","reaction":"Rama remains unchanged","transition_reason":"objective evidence now presses against the established misbelief","audience_effect":"expect a decision","camera_intent":"slow inward push","continuity_constraints":"preserve gaze geometry","adaptation_reason":"compresses conventional escalation into psychological escalation"},
+      {"frame_id":"F07","purpose":"TURNING_POINT","perspective":"RAM_001","attention_target":"Ravana's choice to remain restrained","information_revealed":"Rama recognizes the state change without humiliating him","information_withheld":"Ravana's final private interpretation","emotional_state":"calm confirmation","action":"Rama allows silence to remain","reaction":"Ravana is left with his own choice","transition_reason":"the protagonist's controlled non-action becomes the causal turning point","audience_effect":"feel the power shift from force to mastery","camera_intent":"measured counter-close","continuity_constraints":"Rama's performance DNA remains restrained","adaptation_reason":"turning point is expressed through deliberate non-action rather than combat"},
+      {"frame_id":"F08","purpose":"RESOLUTION_WITH_HOOK","perspective":"AUDIENCE","attention_target":"Ravana's unresolved expression after restraint","information_revealed":"the encounter has changed Ravana's internal state","information_withheld":"what he will ultimately do with that insight","emotional_state":"unresolved intensity → reflective uncertainty","action":"Ravana holds position","reaction":"Rama and Hanuman remain composed","transition_reason":"end on changed state rather than external spectacle","audience_effect":"feel closure of the encounter and curiosity about Ravana's next choice","camera_intent":"controlled closing portrait with environmental scale","continuity_constraints":"carry state into next scene","adaptation_reason":"uses a hook because CSD-006 identifies unresolved emotional continuity"}
+    ],
+    "validation":{
+      "status":"PASS",
+      "frame_count":8,
+      "turning_point":"F07",
+      "ending_state":"F08",
+      "information_leakage":"NONE",
+      "canonical_reality":"SINGLE",
+      "next_stage":"CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION"
+    }
+  },
+  "downstream":["CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-006-ADAPTIVE-STORY-DIRECTOR","CMSE-008-CINEMATIC-PERCEPTION-AUDIENCE-EXPERIENCE"]
+}

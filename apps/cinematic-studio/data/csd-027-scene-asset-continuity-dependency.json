@@ -1,0 +1,154 @@
+{
+  "schema_version":"KALP-CSD-027-SCENE-ASSET-CONTINUITY-DEPENDENCY-1.0",
+  "engine_id":"KALP-CSD-027",
+  "engine_name":"Scene Asset & Continuity Dependency Director",
+  "status":"LOCKED",
+  "purpose":"Build and validate an explicit dependency graph connecting scene entities, canonical state, continuity memories, production assets and downstream jobs so assets can be reused, invalidated or regenerated deterministically.",
+  "core_principle":"Every production asset has provenance and dependencies; an asset may be reused only while all continuity-critical dependencies remain valid.",
+  "dependency_model":"canonical_scene_state + character_state + world_memory + shot_plan + visual_language + audio_language + motion_state + vfx_state → dependency_graph → asset_resolution → reuse_or_regenerate → production_manifest",
+  "asset_domains":{
+    "CHARACTER":["identity_reference","face_reference","body_reference","costume_reference","performance_reference","voice_reference"],
+    "ENVIRONMENT":["location_reference","terrain_reference","architecture_reference","weather_reference","atmosphere_reference","world_state_reference"],
+    "OBJECT":["prop_reference","weapon_reference","artifact_reference","vehicle_reference","continuity_object_state"],
+    "CINEMATIC":["camera_reference","shot_reference","lighting_reference","composition_reference","blocking_reference"],
+    "VFX":["energy_reference","aura_reference","particle_reference","shockwave_reference","magical_effect_reference"],
+    "AUDIO":["voice_reference","dialogue_reference","ambience_reference","sfx_reference","music_reference"],
+    "WORLD_MEMORY":["location_state_reference","damage_state_reference","recovery_state_reference","historical_state_reference"]
+  },
+  "dependency_schema":{
+    "required":["dependency_id","source_type","source_id","target_type","target_id","dependency_type","strength","version","validation_status","invalidation_policy"],
+    "dependency_types":["REQUIRES","DERIVED_FROM","REFERENCE_OF","SPATIAL_DEPENDENCY","TEMPORAL_DEPENDENCY","IDENTITY_DEPENDENCY","STATE_DEPENDENCY","PERFORMANCE_DEPENDENCY","VISUAL_DEPENDENCY","AUDIO_DEPENDENCY","VFX_DEPENDENCY","WORLD_MEMORY_DEPENDENCY","SHOT_DEPENDENCY","ASSET_REUSE_DEPENDENCY"],
+    "strength":["HARD","SOFT","ADVISORY"]
+  },
+  "asset_record":{
+    "required":["asset_id","asset_type","asset_version","source_engine","source_scene","source_dependencies","canonicality","status","reuse_policy","continuity_fingerprint"],
+    "canonicality":["CANONICAL","PROVIDER_PROXY","DERIVED","TEMPORARY","REFERENCE_ONLY"],
+    "status":["DRAFT","VALIDATED","MASTER","SUPERSEDED","INVALIDATED","ARCHIVED"],
+    "reuse_policy":["REUSE_IF_VALID","REUSE_WITH_REVALIDATION","REGENERATE_ON_CHANGE","NEVER_REUSE"]
+  },
+  "continuity_fingerprint":{
+    "required":["identity","location","time","spatial_state","character_state","world_state","camera_state","lighting_state","vfx_state","audio_state","version_chain"],
+    "rule":"Fingerprint changes when any hard continuity dependency changes."
+  },
+  "invalidation_model":{
+    "required":["trigger_type","changed_dependency","affected_assets","propagation_mode","regeneration_scope"],
+    "trigger_types":["IDENTITY_CHANGE","COSTUME_CHANGE","LOCATION_CHANGE","TIME_CHANGE","SPATIAL_CHANGE","CHARACTER_STATE_CHANGE","WORLD_STATE_CHANGE","CAMERA_CHANGE","LIGHTING_CHANGE","VFX_CHANGE","AUDIO_CHANGE","SHOT_CHANGE","SOURCE_ASSET_SUPERSEDED"],
+    "propagation_mode":["DIRECT","DOWNSTREAM","TRANSITIVE"],
+    "regeneration_scope":["REFERENCE_ONLY","FRAME","SHOT","SCENE","MULTI_SCENE"]
+  },
+  "reuse_resolution":{
+    "states":["REUSE","REVALIDATE_THEN_REUSE","REGENERATE","BLOCKED"],
+    "decision_order":["CHECK_ASSET_STATUS","CHECK_CANONICALITY","CHECK_HARD_DEPENDENCIES","CHECK_CONTINUITY_FINGERPRINT","CHECK_VERSION_CHAIN","CHECK_PROVIDER_COMPATIBILITY","EMIT_DECISION"],
+    "rule":"No asset is reused solely because it visually resembles the requested output."
+  },
+  "dependency_graph":{
+    "node_types":["SCENE","CHARACTER","CHARACTER_STATE","LOCATION","WORLD_STATE","OBJECT","EVENT","SHOT","FRAME","VFX_STATE","AUDIO_STATE","CAMERA_STATE","LIGHTING_STATE","ASSET","PRODUCTION_JOB"],
+    "edge_rules":[
+      "Every production job must resolve its upstream dependencies.",
+      "Every canonical asset must trace to a validated source state.",
+      "Hard dependency changes invalidate downstream assets transitively.",
+      "Soft dependency changes require revalidation.",
+      "Advisory dependencies do not block production.",
+      "Circular asset dependency is forbidden.",
+      "Historical assets remain auditable after invalidation.",
+      "A provider proxy cannot silently become canonical.",
+      "F01 immutable trusted reference remains immutable.",
+      "Maximum five active characters remains enforced."
+    ]
+  },
+  "production_manifest":{
+    "required":["scene_id","scene_version","required_assets","reusable_assets","regeneration_queue","blocked_assets","dependency_graph_version","continuity_fingerprint"],
+    "rule":"Production cannot start until every required hard dependency is resolved or explicitly approved as an allowed provider/reference substitution."
+  },
+  "pipeline":[
+    "LOAD_CSD011_CANONICAL_REALITY",
+    "LOAD_CSD026_WORLD_MEMORY",
+    "LOAD_CSD006_CHARACTER_STATE",
+    "LOAD_CSD007_KNOWLEDGE_STATE",
+    "LOAD_CSD017_CAMERA",
+    "LOAD_CSD018_VISUAL_LANGUAGE",
+    "LOAD_CSD019_AUDIO_LANGUAGE",
+    "LOAD_CSD020_MOTION",
+    "LOAD_CSD024_VFX",
+    "LOAD_CSD025_ENVIRONMENT_REACTION",
+    "LOAD_CSD026_ENVIRONMENT_MEMORY",
+    "LOAD_EXISTING_ASSET_REGISTRY",
+    "BUILD_DEPENDENCY_GRAPH",
+    "CALCULATE_CONTINUITY_FINGERPRINT",
+    "RESOLVE_ASSET_REUSE",
+    "PROPAGATE_INVALIDATION",
+    "BUILD_REGENERATION_QUEUE",
+    "BUILD_PRODUCTION_MANIFEST",
+    "VALIDATE_DEPENDENCY_GRAPH",
+    "EMIT_CSD003_AND_CMSE010_HANDOFF"
+  ],
+  "validation":{
+    "hard_failures":[
+      "MISSING_HARD_DEPENDENCY",
+      "UNRESOLVED_ASSET_SOURCE",
+      "INVALID_CONTINUITY_FINGERPRINT",
+      "STALE_ASSET_REUSED",
+      "INVALIDATED_ASSET_REUSED",
+      "CANONICALITY_AMBIGUOUS",
+      "PROVIDER_PROXY_TREATED_AS_CANONICAL",
+      "DEPENDENCY_CYCLE",
+      "VERSION_CHAIN_BREAK",
+      "WORLD_MEMORY_MISMATCH",
+      "CHARACTER_IDENTITY_MISMATCH",
+      "LOCATION_STATE_MISMATCH",
+      "SHOT_STATE_MISMATCH",
+      "PRODUCTION_JOB_WITH_UNRESOLVED_DEPENDENCY",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "HIGH_REGENERATION_FANOUT",
+      "MULTIPLE_ASSET_VERSIONS",
+      "PROVIDER_REVALIDATION_REQUIRED",
+      "SOFT_DEPENDENCY_DRIFT",
+      "LARGE_REUSE_GRAPH"
+    ]
+  },
+  "output_contract":{
+    "dependency_graph":"resolved scene-to-asset dependency graph",
+    "asset_resolution":"reuse/revalidate/regenerate decisions",
+    "invalidation_map":"affected assets and propagation",
+    "regeneration_queue":"ordered regeneration requirements",
+    "production_manifest":"CMSE-010-ready asset manifest",
+    "continuity_fingerprint":"scene production fingerprint"
+  },
+  "demo_test":{
+    "scene_id":"CSD27-RAMAYANA-DEMO-001",
+    "scene_version":"v1.2",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "hard_dependencies":[
+      "RAM_001_IDENTITY",
+      "RAVAN_001_IDENTITY",
+      "HANUMAN_001_IDENTITY",
+      "LANKA_CONFRONTATION_GROUND_v1.1",
+      "TWILIGHT_LIGHTING_v1",
+      "CAMERA_AXIS_RAM_RAVAN_v1",
+      "RAVAN_POWER_STATE_v1.1"
+    ],
+    "reusable_assets":[
+      {"asset_id":"F01_CANONICAL","decision":"REUSE","reason":"immutable trusted reference"},
+      {"asset_id":"HF_F01_PROXY","decision":"REUSE_WITH_REVALIDATION","reason":"provider proxy references canonical F01"}
+    ],
+    "regeneration_queue":[
+      {"asset_id":"F02_FRAME","decision":"REGENERATE","reason":"previous generation failed and no validated asset exists"},
+      {"asset_id":"F05_FRAME","decision":"REGENERATE","reason":"previous generation failed and no validated asset exists"},
+      {"asset_id":"F06_FRAME","decision":"REGENERATE","reason":"previous generation failed and no validated asset exists"},
+      {"asset_id":"F08_FRAME","decision":"GENERATE","reason":"no prior production asset exists"}
+    ],
+    "invalidation_test":{
+      "changed_dependency":"RAVAN_001_COSTUME",
+      "affected_assets":["F02_FRAME","F04_FRAME","F05_FRAME","F06_FRAME","F07_FRAME","F08_FRAME"],
+      "propagation_mode":"TRANSITIVE",
+      "regeneration_scope":"FRAME",
+      "result":"REGENERATE"
+    },
+    "continuity_fingerprint":"CSD27-DEMO-FINGERPRINT-v1.2",
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-010-PRODUCTION-ORCHESTRATOR","CMSE-011-ASSET-MEMORY","CMSE-012-PRODUCTION-RETRIEVAL","CMSE-013-PROMPT-COMPILER","CMSE-014-PROVIDER-ROUTING","CMSE-015-SCHEDULER"]
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version":"KALP-CMSE-014-MULTI-PROVIDER-ROUTING-1.0",
+  "engine_id":"CMSE-014",
+  "engine_name":"Multi-Provider Capability, Routing & Optimization Engine",
+  "status":"LOCKED",
+  "purpose":"Select an executable provider/model route for each compiled cinematic production job using hard capability constraints, runtime provider state and deterministic optimization without modifying cinematic intent.",
+  "core_principle":"Routing chooses the execution path, never the creative meaning.",
+  "inputs":{
+    "required":["CMSE-013 provider-native jobs","provider_capability_registry","provider_runtime_state"],
+    "optional":["routing_policy","cost_budget","latency_budget","quality_target","reference_requirements","queue_state"]
+  },
+  "hard_constraints":[
+    "Provider must support requested modality.",
+    "Provider/model must support required aspect ratio or an explicitly approved equivalent.",
+    "Required reference support must exist.",
+    "Required resolution must be supported or explicitly downgraded by policy.",
+    "Required camera/control features must be supported.",
+    "Provider must be operational and available for the requested job.",
+    "Concurrency and queue limits must be respected.",
+    "Unsupported capability cannot be silently substituted.",
+    "Routing cannot alter prompt semantics, identity, continuity or negative constraints.",
+    "A route decision must be reproducible from its inputs and policy."
+  ],
+  "optimization_dimensions":[
+    "CAPABILITY_FIT",
+    "REFERENCE_COMPATIBILITY",
+    "QUALITY_TARGET",
+    "RUNTIME_HEALTH",
+    "CONCURRENCY_AVAILABILITY",
+    "QUEUE_PRESSURE",
+    "LATENCY",
+    "COST",
+    "RESOLUTION_FIT"
+  ],
+  "decision_model":{
+    "phase_1":"HARD_FILTER",
+    "phase_2":"CAPABILITY_MATCH",
+    "phase_3":"RUNTIME_AVAILABILITY",
+    "phase_4":"POLICY_SCORING",
+    "phase_5":"DETERMINISTIC_TIE_BREAK",
+    "phase_6":"ROUTE_LOCK",
+    "phase_7":"CMSE015_HANDOFF",
+    "rule":"Optimization occurs only among candidates that pass every hard constraint."
+  },
+  "tie_break_order":[
+    "capability_fit",
+    "reference_compatibility",
+    "quality_fit",
+    "runtime_health",
+    "available_concurrency",
+    "queue_pressure",
+    "latency",
+    "cost",
+    "provider_id",
+    "model_id"
+  ],
+  "route_contract":{
+    "required":["job_id","frame_id","provider_id","model_id","route_status","capability_evidence","runtime_evidence","routing_policy","source_translation_fingerprint","route_fingerprint"],
+    "creative_fields":"READ_ONLY_FROM_CMSE-013"
+  },
+  "failure_modes":{
+    "NO_CAPABLE_PROVIDER":"BLOCK",
+    "PROVIDER_UNAVAILABLE":"DEFER_OR_RETRY",
+    "CONCURRENCY_EXCEEDED":"QUEUE",
+    "QUEUE_OVER_POLICY_LIMIT":"DEFER",
+    "REFERENCE_INCOMPATIBLE":"BLOCK",
+    "UNSUPPORTED_REQUIRED_FEATURE":"BLOCK",
+    "BUDGET_EXCEEDED":"DEFER_OR_POLICY_OVERRIDE",
+    "STALE_RUNTIME_STATE":"REFRESH_REQUIRED"
+  },
+  "routing_policy_defaults":{
+    "required_modality":"image",
+    "aspect_ratio":"16:9",
+    "minimum_resolution":"1k",
+    "reference_required":true,
+    "camera_control_required":false,
+    "quality_target":"cinematic",
+    "max_queue_depth":20,
+    "allow_deferred_execution":true
+  },
+  "validation":{
+    "hard_failures":[
+      "CMSE013_JOB_MISSING",
+      "CAPABILITY_REGISTRY_MISSING",
+      "RUNTIME_STATE_MISSING",
+      "NO_ELIGIBLE_ROUTE",
+      "REQUIRED_CAPABILITY_UNSUPPORTED",
+      "REFERENCE_INCOMPATIBLE",
+      "CREATIVE_SEMANTICS_MUTATED",
+      "ROUTE_EVIDENCE_MISSING",
+      "ROUTE_FINGERPRINT_MISSING",
+      "FRAME_COUNT_NOT_8"
+    ],
+    "pass_conditions":[
+      "all eight jobs evaluated",
+      "each route is eligible or explicitly deferred",
+      "hard constraints evaluated",
+      "runtime state incorporated",
+      "route evidence recorded",
+      "creative payload remains read-only",
+      "deterministic route fingerprints generated"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CMSE14-RAMAYANA-DEMO-001",
+    "candidate_profiles":[
+      {
+        "provider_id":"HIGGSFIELD",
+        "model_id":"cinematic_studio_2_5",
+        "modalities":["image"],
+        "aspect_ratios":["16:9","9:16","1:1"],
+        "reference_support":true,
+        "camera_control":true,
+        "resolution":["1k","2k","4k"],
+        "max_concurrency":1,
+        "health":"OPERATIONAL"
+      }
+    ],
+    "runtime_state":{
+      "HIGGSFIELD/cinematic_studio_2_5":{"available":true,"active_jobs":0,"queue_depth":0,"credits_available":true}
+    },
+    "result":"ELIGIBLE_ROUTE",
+    "route":{
+      "provider_id":"HIGGSFIELD",
+      "model_id":"cinematic_studio_2_5",
+      "route_status":"READY",
+      "reason":"All hard capabilities and runtime conditions satisfied."
+    }
+  },
+  "downstream":["CMSE-015-SCHEDULING","CMSE-010-PRODUCTION-EXECUTION"]
+}

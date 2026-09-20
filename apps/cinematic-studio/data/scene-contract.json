@@ -1,0 +1,120 @@
+{
+  "schema_version": "KALP-CSD-SCENE-1.0",
+  "scene_id": "CSD-DEMO-001",
+  "scene_title": "The Test of Power",
+  "objective": "Ravan challenges the meaning of true power before Shiva, while Ram observes.",
+  "world": {
+    "location_id": "KAILASH_WORLD_001",
+    "location": "Mount Kailash",
+    "time_of_day": "TWILIGHT",
+    "environment_lock": true
+  },
+  "selected_characters": [
+    "SHIVA_001",
+    "RAM_001",
+    "RAVAN_001"
+  ],
+  "storyboard": {
+    "frame_count": 8,
+    "perspective_mode": "CHARACTER_AWARE",
+    "aspect_ratio": "16:9",
+    "duration_seconds": 60
+  },
+  "frames": [
+    {
+      "frame_id": "F01",
+      "title": "The Test Begins",
+      "perspective": "AUDIENCE",
+      "purpose": "Establish the three-character relationship.",
+      "emotion": "Anticipation",
+      "action": "Ravan approaches Shiva.",
+      "dialogue": null,
+      "camera": "Extreme wide, slow push-in, 35mm"
+    },
+    {
+      "frame_id": "F02",
+      "title": "Shiva Sees the Intention",
+      "perspective": "SHIVA_001",
+      "purpose": "Reveal Shiva's perception of Ravan.",
+      "emotion": "Stillness → Awareness",
+      "action": "Shiva opens his eyes.",
+      "dialogue": null,
+      "camera": "85mm close-up, subtle push-in"
+    },
+    {
+      "frame_id": "F03",
+      "title": "Ram Understands",
+      "perspective": "RAM_001",
+      "purpose": "Give Ram's interpretation of the encounter.",
+      "emotion": "Calm observation",
+      "action": "Ram watches Shiva and Ravan.",
+      "dialogue": "शक्ति का मूल्य उसके प्रयोग में नहीं… उसके संयम में है।",
+      "camera": "50mm over-shoulder"
+    },
+    {
+      "frame_id": "F04",
+      "title": "Ravan's Question",
+      "perspective": "RAVAN_001",
+      "purpose": "Enter Ravan's internal conflict.",
+      "emotion": "Confidence → Uncertainty",
+      "action": "Ravan questions Shiva.",
+      "dialogue": "यदि शक्ति को साधना है… तो स्वयं को कैसे जीतूँ?",
+      "camera": "85mm Ravan OTS"
+    },
+    {
+      "frame_id": "F05",
+      "title": "Three Minds, One Moment",
+      "perspective": "SHARED",
+      "purpose": "Expose relationship geometry.",
+      "emotion": "Conflict",
+      "action": "All three confront the idea of power.",
+      "dialogue": "Shared dialogue",
+      "camera": "50mm lateral dolly"
+    },
+    {
+      "frame_id": "F06",
+      "title": "Power Rises",
+      "perspective": "RAVAN_001",
+      "purpose": "Force Ravan to make the choice.",
+      "emotion": "Temptation",
+      "action": "Ravan's energy begins to manifest.",
+      "dialogue": null,
+      "camera": "Low angle, 35mm push-in"
+    },
+    {
+      "frame_id": "F07",
+      "title": "Shiva's Test",
+      "perspective": "SHIVA_001",
+      "purpose": "Create the decisive test.",
+      "emotion": "Absolute control",
+      "action": "Shiva stops Ravan's power.",
+      "dialogue": "शक्ति को रोकना सरल है, रावण…",
+      "camera": "50mm low angle"
+    },
+    {
+      "frame_id": "F08",
+      "title": "The Choice",
+      "perspective": "AUDIENCE",
+      "purpose": "Pay off restraint and transformation.",
+      "emotion": "Recognition → Restraint",
+      "action": "Ravan lowers his hand.",
+      "dialogue": "मैं समझ गया, महादेव।",
+      "camera": "35mm wide, slow pull-back"
+    }
+  ],
+  "validation_rules": [
+    "IDENTITY_LOCK",
+    "VISUAL_CONTINUITY",
+    "PERSPECTIVE_LOGIC",
+    "EMOTIONAL_PROGRESSION",
+    "DIALOGUE_ALIGNMENT",
+    "WORLD_CONTINUITY",
+    "GENERATION_READINESS"
+  ],
+  "downstream": [
+    "CMSE-012",
+    "CMSE-013",
+    "CMSE-014",
+    "CMSE-015"
+  ]
+}

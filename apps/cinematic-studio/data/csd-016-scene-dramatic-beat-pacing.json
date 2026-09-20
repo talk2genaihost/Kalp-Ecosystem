@@ -1,0 +1,130 @@
+{
+  "schema_version":"KALP-CSD-016-SCENE-DRAMATIC-BEAT-PACING-1.0",
+  "engine_id":"KALP-CSD-016",
+  "engine_name":"Scene Dramatic Beat & Pacing Director",
+  "status":"LOCKED",
+  "purpose":"Convert the resolved narrative objective into an ordered, timed dramatic rhythm of beats, escalation, release, reveals, pauses, reversals and turning-point timing.",
+  "core_principle":"Pacing is causal timing: every beat changes pressure, information, emotion, intention or consequence; silence and release are deliberate beats.",
+  "pacing_model":"scene_objective + emotional_trajectory + event_graph + selected_branch + audience_objective → beat_map + tension_curve + timing_contract → CSD002 frame timing",
+  "beat_schema":{
+    "required":["beat_id","sequence","beat_type","purpose","source_event","characters","duration_seconds","pressure_before","pressure_after","audience_information","transition"],
+    "beat_types":["ESTABLISH","ORIENT","OBJECTIVE_REVEAL","PERCEPTION","PRESSURE","ESCALATION","PAUSE","REVEAL","REVERSAL","DECISION","CONSEQUENCE","RELEASE","HOOK"],
+    "pressure_scale":"0-100"
+  },
+  "timing_contract":{
+    "scene_duration_seconds":"positive number",
+    "minimum_beat_seconds":0.5,
+    "maximum_beat_seconds":30,
+    "rule":"Beat duration is subordinate to narrative function; no fixed duration may override causal requirements.",
+    "frame_binding":"Each CSD-002 frame receives one primary beat or an explicitly declared beat pair."
+  },
+  "pacing_dimensions":[
+    "narrative_pressure",
+    "emotional_intensity",
+    "information_density",
+    "action_density",
+    "dialogue_density",
+    "silence_duration",
+    "reveal_frequency",
+    "decision_proximity",
+    "audience_breathing_room"
+  ],
+  "pacing_rules":[
+    "Every beat must serve the CSD-015 scene objective or its causal consequence.",
+    "Pressure must not rise continuously without a deliberate release, pause or turning point.",
+    "A turning point must receive sufficient temporal space to register.",
+    "Reveals require an information source and must respect CSD-007 boundaries.",
+    "Pauses are active dramatic units, not empty time.",
+    "Escalation must have a causal trigger.",
+    "Release must be caused by an event, decision, realization or state change.",
+    "Beat order must remain compatible with CSD-013 dependency order.",
+    "The selected CSD-014 branch determines the canonical pacing path; latent branches do not enter the active timing plan.",
+    "Frame timing cannot contradict CSD-011 canonical reality.",
+    "The final beat must establish the resolved end state and/or next-scene hook.",
+    "Maximum five active characters remains enforced."
+  ],
+  "tension_curve_model":{
+    "points":["ENTRY","BUILD","PRESSURE","PEAK_OR_TURN","RELEASE","EXIT"],
+    "shape":"scene-specific; must be causally justified rather than mechanically symmetric",
+    "rule":"The curve is descriptive control metadata, not a quality score or ranking."
+  },
+  "pacing_pipeline":[
+    "LOAD_CSD015_OBJECTIVE_CONTRACT",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "LOAD_CSD014_SELECTED_BRANCH",
+    "LOAD_CSD006_EMOTIONAL_STATE",
+    "LOAD_CSD007_KNOWLEDGE_BOUNDARY",
+    "RESOLVE_SCENE_DURATION",
+    "EXTRACT_DRAMATIC_BEATS",
+    "ORDER_BEATS_BY_CAUSAL_DEPENDENCY",
+    "ASSIGN_PRESSURE_TRANSITIONS",
+    "ASSIGN_INFORMATION_REVEALS",
+    "INSERT_REQUIRED_PAUSES_OR_RELEASES",
+    "PLACE_TURNING_POINT",
+    "CALCULATE_BEAT_TIMING",
+    "BUILD_TENSION_CURVE",
+    "BIND_BEATS_TO_CSD002_FRAMES",
+    "VALIDATE_PACING",
+    "EMIT_CSD010_PRODUCTION_HANDOFF"
+  ],
+  "validation":{
+    "hard_failures":[
+      "BEAT_WITHOUT_NARRATIVE_PURPOSE",
+      "BEAT_WITHOUT_CAUSAL_SOURCE",
+      "INVALID_EVENT_ORDER",
+      "TURNING_POINT_MISSING",
+      "TURNING_POINT_UNDERSPECIFIED",
+      "UNAUTHORIZED_INFORMATION_REVEAL",
+      "CONTINUOUS_ESCALATION_WITHOUT_JUSTIFICATION",
+      "FRAME_WITHOUT_BEAT_BINDING",
+      "LATENT_BRANCH_IN_ACTIVE_PACING",
+      "SCENE_DURATION_INVALID",
+      "CSD011_STATE_MISMATCH",
+      "CSD013_GRAPH_MISMATCH",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "LOW_RELEASE_SPACE",
+      "HIGH_INFORMATION_DENSITY",
+      "LONG_BEAT_BEFORE_TURNING_POINT",
+      "RAPID_BEAT_TRANSITIONS"
+    ]
+  },
+  "output_contract":{
+    "pacing_contract":"scene duration and pacing dimensions",
+    "beat_map":"ordered dramatic beats",
+    "tension_curve":"causally supported pressure progression",
+    "turning_point_timing":"timing and beat around the turning point",
+    "frame_timing_map":"CSD-002 binding",
+    "pause_release_map":"intentional silence and release units",
+    "validation":"gate result",
+    "orchestration_handoff":"CSD-010-ready package"
+  },
+  "demo_test":{
+    "scene_id":"CSD16-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "beats":[
+      {"beat_id":"B01","sequence":1,"beat_type":"ESTABLISH","purpose":"Establish the controlled confrontation and stakes","source_event":"E01","characters":["RAM_001","RAVAN_001","HANUMAN_001"],"duration_seconds":8,"pressure_before":20,"pressure_after":30,"audience_information":"Understand the power imbalance and controlled setting","transition":"B02"},
+      {"beat_id":"B02","sequence":2,"beat_type":"OBJECTIVE_REVEAL","purpose":"Reveal Ravan's intention to demonstrate superiority","source_event":"E01","characters":["RAVAN_001"],"duration_seconds":10,"pressure_before":30,"pressure_after":45,"audience_information":"Ravan is testing rather than immediately attacking","transition":"B03"},
+      {"beat_id":"B03","sequence":3,"beat_type":"PRESSURE","purpose":"Show Rama refusing intimidation","source_event":"E02","characters":["RAM_001","RAVAN_001"],"duration_seconds":12,"pressure_before":45,"pressure_after":60,"audience_information":"Rama's composure is deliberate","transition":"B04"},
+      {"beat_id":"B04","sequence":4,"beat_type":"PAUSE","purpose":"Give the power display room to breathe before the choice","source_event":"E02","characters":["RAM_001","RAVAN_001","HANUMAN_001"],"duration_seconds":6,"pressure_before":60,"pressure_after":58,"audience_information":"The confrontation can still escalate","transition":"B05"},
+      {"beat_id":"B05","sequence":5,"beat_type":"DECISION","purpose":"Ravan reaches the escalation-versus-restraint choice","source_event":"E03","characters":["RAVAN_001"],"duration_seconds":12,"pressure_before":58,"pressure_after":72,"audience_information":"The choice is now explicit","transition":"B06"},
+      {"beat_id":"B06","sequence":6,"beat_type":"REVERSAL","purpose":"Ravan selects restraint rather than releasing power","source_event":"E04","characters":["RAVAN_001"],"duration_seconds":10,"pressure_before":72,"pressure_after":48,"audience_information":"Restraint becomes the unexpected turn","transition":"B07"},
+      {"beat_id":"B07","sequence":7,"beat_type":"CONSEQUENCE","purpose":"Show Rama and Hanuman register the reduced threat while Ravan turns inward","source_event":"E04","characters":["RAM_001","RAVAN_001","HANUMAN_001"],"duration_seconds":12,"pressure_before":48,"pressure_after":38,"audience_information":"The conflict has changed from force to mastery","transition":"B08"},
+      {"beat_id":"B08","sequence":8,"beat_type":"HOOK","purpose":"Leave the mastery question unresolved","source_event":"E04","characters":["RAVAN_001"],"duration_seconds":10,"pressure_before":38,"pressure_after":42,"audience_information":"The next scene will inherit Ravan's unresolved question","transition":"END"}
+    ],
+    "tension_curve":[
+      {"stage":"ENTRY","pressure":20},
+      {"stage":"BUILD","pressure":45},
+      {"stage":"PRESSURE","pressure":60},
+      {"stage":"PEAK_OR_TURN","pressure":72},
+      {"stage":"RELEASE","pressure":38},
+      {"stage":"EXIT","pressure":42}
+    ],
+    "turning_point_timing":{"beat_id":"B06","event_id":"E04","window":"58-68s","registration_space_seconds":10},
+    "frame_timing_map":{"F01":"B01","F02":"B02","F03":"B03","F04":"B03","F05":"B04","F06":"B05","F07":"B06","F08":"B08"},
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CSD-010-ADAPTIVE-ORCHESTRATOR","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-015-PRODUCTION-SCHEDULER"]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version":"KALP-CSD-043-PRODUCTION-CAPACITY-EXECUTION-ADAPTER-1.0",
+  "engine_id":"KALP-CSD-043",
+  "engine_name":"Production Capacity Execution Adapter",
+  "status":"LOCKED",
+  "purpose":"Bind an authorized production job to a verified CSD-042 capacity lease, perform final admission validation, dispatch through an approved provider adapter, and reconcile provider execution identity into CSD-031.",
+  "core_principle":"A capacity reservation is not execution authority; every dispatch requires a fresh, auditable admission decision bound to the exact job, master fingerprint, plan version, capacity lease and approved provider capability.",
+  "inputs":["CSD-042","CSD-041","CSD-037","CSD-031","CMSE-014","CMSE-015"],
+  "execution_domains":["LEASE_BINDING","FINAL_ADMISSION","PROVIDER_ADAPTER_SELECTION","REQUEST_TRANSLATION","DISPATCH","PROVIDER_ACCEPTANCE","EXECUTION_IDENTITY","CAPACITY_RECONCILIATION","LIFECYCLE_HANDOFF"],
+  "adapter_contract":["provider_id","model_id","adapter_version","supported_job_types","supported_media","request_schema_version","capability_snapshot_id"],
+  "execution_pipeline":[
+    "INGEST_ADMITTED_JOB",
+    "VERIFY_PLAN_VERSION",
+    "VERIFY_MASTER_FINGERPRINT",
+    "VERIFY_CAPACITY_LEASE",
+    "VERIFY_PROVIDER_CAPABILITY",
+    "VERIFY_CSD-037_ADMISSION",
+    "RESOLVE_APPROVED_PROVIDER_ADAPTER",
+    "TRANSLATE_JOB_REQUEST",
+    "CREATE_DISPATCH_ENVELOPE",
+    "DISPATCH_PROVIDER_JOB",
+    "RECORD_PROVIDER_ACCEPTANCE",
+    "BIND_PROVIDER_JOB_ID",
+    "HANDOFF_TO_CSD-031_LIFECYCLE",
+    "RECONCILE_CAPACITY_USAGE",
+    "RELEASE_OR_RETain_LEASE"
+  ],
+  "dispatch_envelope":{
+    "required":["dispatch_id","job_id","attempt_id","plan_id","plan_version","lease_id","provider_id","model_id","master_revision","master_fingerprint","input_fingerprint","adapter_version","capability_snapshot_id","created_at"],
+    "immutability":"Dispatch envelopes are immutable; a new attempt creates a new envelope."
+  },
+  "admission_gates":[
+    "CSD-037 authorization is current.",
+    "CSD-042 lease is ACTIVE/RESERVED and unexpired.",
+    "Plan version matches the active lease.",
+    "Provider/model is approved by CMSE-014.",
+    "Capability snapshot is valid and supports the job.",
+    "Master revision and fingerprint match the job.",
+    "Input fingerprint matches the admitted job contract.",
+    "Provider concurrency limit is not exceeded.",
+    "No active critical health or continuity blocker.",
+    "No inactive narrative branch is being dispatched."
+  ],
+  "provider_response_states":["ACCEPTED","QUEUED","RUNNING","REJECTED","TIMEOUT","UNKNOWN"],
+  "handoff_mapping":{
+    "ACCEPTED":"CSD-031_PROVIDER_ACCEPTED",
+    "QUEUED":"CSD-031_QUEUED",
+    "RUNNING":"CSD-031_RUNNING",
+    "REJECTED":"CSD-031_FAILED_TERMINAL_OR_RETRYABLE",
+    "TIMEOUT":"CSD-031_RECONCILIATION_REQUIRED",
+    "UNKNOWN":"CSD-031_RECONCILIATION_REQUIRED"
+  },
+  "failure_policy":{
+    "ADMISSION_FAILURE":"DO_NOT_DISPATCH",
+    "LEASE_EXPIRED":"RETURN_TO_CSD-042",
+    "PLAN_MISMATCH":"RETURN_TO_CSD-041",
+    "CAPABILITY_MISMATCH":"RETURN_TO_CMSE-014",
+    "MASTER_MISMATCH":"BLOCK_AND_RECONCILE",
+    "PROVIDER_REJECTION":"CLASSIFY_VIA_CSD-031",
+    "PROVIDER_TIMEOUT":"RECONCILIATION_REQUIRED",
+    "UNKNOWN_PROVIDER_STATE":"RECONCILIATION_REQUIRED"
+  },
+  "capacity_policy":{
+    "on_dispatch":"consume_or_mark_in_use",
+    "on_rejection":"release_or_reconcile_unused_capacity",
+    "on_terminal_completion":"release_remaining_capacity",
+    "on_timeout":"hold_until_reconciled",
+    "on_unknown":"hold_until_provider_state_resolved"
+  },
+  "governance":{
+    "auto_actions":["VALIDATE_ADMISSION","BIND_VALID_LEASE","DISPATCH_WITHIN_AUTHORIZATION","RELEASE_CONFIRMED_UNUSED_CAPACITY","HANDOFF_LIFECYCLE_EVENTS"],
+    "governor_review":["RETRY_AFTER_PROVIDER_REJECTION","EXTEND_LEASE","CHANGE_PROVIDER","INCREASE_CAPACITY"],
+    "operator_review":["CHANGE_CANONICAL_MASTER","CHANGE_IDENTITY","ACTIVATE_NARRATIVE_BRANCH"],
+    "never_allowed":["BYPASS_CSD-037","DISPATCH_WITHOUT_LEASE","USE_UNAPPROVED_PROVIDER","DISPATCH_STALE_MASTER","EXCEED_PROVIDER_CAPABILITY","SILENT_PROVIDER_SWITCH","MUTATE_CANONICAL_HISTORY"]
+  },
+  "execution_record":{
+    "required":["dispatch_id","job_id","attempt_id","lease_id","provider_id","model_id","provider_job_id","provider_state","capacity_state","admission_state","master_fingerprint","created_at"],
+    "immutability":"Execution records are append-only; corrections create new reconciliation records."
+  },
+  "demo":{
+    "dispatch_id":"DISPATCH-CSD43-RAMAYANA-F03-001",
+    "job_id":"JOB-F03",
+    "attempt_id":"ATTEMPT-1",
+    "lease_id":"LEASE-CSD42-001",
+    "provider_id":"HIGGSFIELD",
+    "model_id":"cinematic_studio_2_5",
+    "master_fingerprint":"MASTER-F01-DEMO",
+    "provider_state":"ACCEPTED",
+    "capacity_state":"IN_USE",
+    "admission_state":"ADMITTED",
+    "handoff":"CSD-031_PROVIDER_ACCEPTED",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-031-EXECUTION-LIFECYCLE","CSD-032-RESULT-VALIDATION","CSD-042-CAPACITY-MANAGER","CMSE-014-PROVIDER-ADAPTERS","CMSE-015-PRODUCTION-SCHEDULER","CSD-044-PRODUCTION-EXECUTION-RECONCILIATION-AND-RESILIENCE"]
+}

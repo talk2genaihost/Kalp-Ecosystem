@@ -1,0 +1,158 @@
+{
+  "schema_version":"KALP-CSD-023-SCENE-ACTION-COMBAT-PHYSICAL-DYNAMICS-1.0",
+  "engine_id":"KALP-CSD-023",
+  "engine_name":"Scene Action, Combat & Physical Dynamics Director",
+  "status":"LOCKED",
+  "purpose":"Translate authorized interaction choreography into physically coherent action, combat, force, impact, weapon, power-effect, recovery and environmental-response dynamics.",
+  "core_principle":"Physical action is causal mechanics expressed through character intent, force, timing, contact, reaction and recovery; spectacle never overrides spatial or causal truth.",
+  "dynamics_model":"interaction_exchange + canonical_geometry + temporal_state + physical_properties + action_intent → action_sequence → impact → reaction → recovery → state_delta",
+  "action_schema":{
+    "required":["action_id","sequence","beat_id","actor","action_type","target","intent","start_state","trajectory","duration_seconds","impact_or_result","recovery_state","causal_source"],
+    "action_types":["STRIKE","THRUST","SWING","BLOCK","PARRY","DODGE","GRAPPLE","THROW","LIFT","PUSH","PULL","LEAP","LAND","RUN","CHARGE","POWER_RELEASE","POWER_CONTAINMENT","WEAPON_ACTION","ENVIRONMENT_INTERACTION","REACTION","RECOVERY"]
+  },
+  "combat_exchange_schema":{
+    "required":["exchange_id","sequence","attacker","defender","attack","defense","counter","impact","recovery","initiative","spatial_state"],
+    "initiative":["ATTACKER_INITIATIVE","DEFENDER_INITIATIVE","COUNTER_INITIATIVE","SHARED_INITIATIVE"],
+    "rule":"Every exchange must resolve in temporal order: initiation → defense/opportunity → contact or evasion → result → recovery."
+  },
+  "force_model":{
+    "required":["source","force_class","direction","magnitude_band","contact_area","target_response","energy_transfer","environmental_effect"],
+    "force_classes":["PHYSICAL","KINETIC","WEAPON","ENERGY","DIVINE","SUPERNATURAL","ENVIRONMENTAL"],
+    "magnitude_bands":["LOW","MEDIUM","HIGH","EXTREME"],
+    "rule":"Force magnitude is descriptive physical-control metadata; effects must remain proportional to canonical world rules."
+  },
+  "weapon_dynamics":{
+    "required":["weapon_id","owner","weapon_type","start_position","trajectory","target","impact_or_miss","recovery_position","continuity_lock"],
+    "rules":[
+      "Weapon motion requires a causal action.",
+      "Trajectory must be spatially feasible.",
+      "Impact and miss are mutually explicit outcomes.",
+      "Weapon ownership cannot silently change.",
+      "Weapon state persists across frames until changed by an authorized event."
+    ]
+  },
+  "power_dynamics":{
+    "required":["power_id","source_character","power_type","activation_event","build_phase","peak_phase","release_or_containment","target_effect","environment_effect","recovery"],
+    "phases":["DORMANT","CHARGING","BUILDING","PEAK","RELEASING","CONTAINED","DISSIPATING","RECOVERED"],
+    "rule":"Supernatural or divine power must have an established character/world basis and explicit event authorization."
+  },
+  "impact_model":{
+    "required":["impact_id","source_action","contact_or_proximity","impact_point","magnitude","visible_effect","internal_effect","environmental_effect","recovery_trigger"],
+    "rule":"Impact cannot occur without a source action; visible effect and internal consequence must be separately represented."
+  },
+  "recovery_model":{
+    "required":["recovery_id","source_action","character","body_state","position","orientation","emotional_state_reference","next_action_readiness"],
+    "rule":"Every high-energy action resolves into a valid recovery state before the next incompatible action."
+  },
+  "environmental_response":{
+    "required":["response_id","source_action_or_event","affected_environment","effect","propagation","persistence","continuity"],
+    "effects":["DUST","DEBRIS","GROUND_DAMAGE","VEGETATION_RESPONSE","WATER_RESPONSE","FIRE_RESPONSE","LIGHT_RESPONSE","AIR_DISPLACEMENT","STRUCTURAL_DAMAGE","PARTICLE_RESPONSE"],
+    "rule":"Environmental effects persist according to CSD-011 state and cannot disappear between frames without causal resolution."
+  },
+  "action_readability":{
+    "required":["action_id","primary_action","primary_subject","camera_visibility","screen_direction","impact_readability","reaction_readability","occlusion_risk"],
+    "rule":"Every important physical action must remain readable from the CSD-017 camera contract without violating spatial continuity."
+  },
+  "physical_rules":[
+    "Action requires a causal source.",
+    "Attack cannot precede its initiation.",
+    "Defense requires perceptual and temporal opportunity.",
+    "Counter cannot precede the triggering attack.",
+    "Impact requires contact or an explicitly defined proximity effect.",
+    "Recovery follows high-energy action before incompatible subsequent action.",
+    "Force direction must agree with geometry.",
+    "Environmental response follows action magnitude and world rules.",
+    "Power effects require canonical character/world authorization.",
+    "Weapon ownership and state remain continuous.",
+    "Physical action cannot mutate immutable identity.",
+    "Maximum five active characters remains enforced."
+  ],
+  "physics_pipeline":[
+    "LOAD_CSD022_INTERACTION_CHOREOGRAPHY",
+    "LOAD_CSD011_CANONICAL_GEOMETRY",
+    "LOAD_CSD012_CAUSAL_EVENTS",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "LOAD_CSD014_SELECTED_BRANCH",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_GRAMMAR",
+    "LOAD_CSD018_VISUAL_STATE",
+    "LOAD_CSD020_TEMPORAL_MOTION",
+    "LOAD_CSD021_PERFORMANCE_BLOCKING",
+    "RESOLVE_ACTION_INTENT",
+    "RESOLVE_INITIATIVE",
+    "RESOLVE_TRAJECTORIES",
+    "RESOLVE_FORCE_AND_CONTACT",
+    "RESOLVE_IMPACT",
+    "RESOLVE_CHARACTER_REACTION",
+    "RESOLVE_RECOVERY",
+    "RESOLVE_WEAPON_DYNAMICS",
+    "RESOLVE_POWER_DYNAMICS",
+    "RESOLVE_ENVIRONMENTAL_RESPONSE",
+    "VALIDATE_ACTION_READABILITY",
+    "VALIDATE_PHYSICAL_CONTINUITY",
+    "EMIT_CSD002_ACTION_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "ACTION_WITHOUT_CAUSAL_SOURCE",
+      "ATTACK_BEFORE_INITIATION",
+      "DEFENSE_WITHOUT_PERCEPTUAL_OPPORTUNITY",
+      "COUNTER_BEFORE_ATTACK",
+      "IMPACT_WITHOUT_CONTACT_OR_VALID_PROXIMITY_EFFECT",
+      "FORCE_DIRECTION_CONTRADICTION",
+      "TRAJECTORY_SPATIAL_IMPOSSIBILITY",
+      "RECOVERY_MISSING_AFTER_HIGH_ENERGY_ACTION",
+      "WEAPON_STATE_DISCONTINUITY",
+      "POWER_WITHOUT_CANONICAL_AUTHORIZATION",
+      "ENVIRONMENTAL_RESPONSE_WITHOUT_SOURCE",
+      "ACTION_NOT_READABLE_FROM_CAMERA",
+      "TEMPORAL_CONTINUITY_FAILURE",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "ACTION_DENSITY_HIGH",
+      "RECOVERY_WINDOW_SHORT",
+      "OCCLUSION_RISK_HIGH",
+      "IMPACT_READABILITY_LOW",
+      "ENVIRONMENTAL_EFFECT_DENSITY_HIGH",
+      "POWER_EFFECT_COMPLEXITY_HIGH"
+    ]
+  },
+  "output_contract":{
+    "action_contract":"ordered physical actions",
+    "combat_exchange_map":"attack-defense-counter sequences",
+    "force_map":"force and energy transfer",
+    "impact_map":"contact and consequences",
+    "recovery_map":"post-action states",
+    "weapon_dynamics_map":"weapon trajectories and continuity",
+    "power_dynamics_map":"power phase timelines",
+    "environmental_response_map":"world response to action",
+    "action_readability_map":"camera-compatible action clarity",
+    "frame_action_package":"CSD-002-ready action package",
+    "production_handoff":"CMSE-010-ready physical dynamics package"
+  },
+  "demo_test":{
+    "scene_id":"CSD23-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "action_contract":[
+      {"action_id":"A01","sequence":1,"beat_id":"B02","actor":"RAVAN_001","action_type":"POWER_RELEASE","target":"SELF","intent":"demonstrate controlled superiority","start_state":"contained_power","trajectory":"energy rises inward around body","duration_seconds":4,"impact_or_result":"visible energy field","recovery_state":"controlled_hold","causal_source":"E01"},
+      {"action_id":"A02","sequence":2,"beat_id":"B03","actor":"RAM_001","action_type":"HOLD","target":"SELF","intent":"maintain boundary","start_state":"grounded_stance","trajectory":"no displacement","duration_seconds":12,"impact_or_result":"pressure absorbed through stillness","recovery_state":"grounded_stance","causal_source":"E02"},
+      {"action_id":"A03","sequence":3,"beat_id":"B05","actor":"RAVAN_001","action_type":"POWER_CONTAINMENT","target":"SELF","intent":"choose restraint","start_state":"building_power","trajectory":"energy contracts toward core","duration_seconds":10,"impact_or_result":"power field collapses inward","recovery_state":"controlled_introspection","causal_source":"E04"},
+      {"action_id":"A04","sequence":4,"beat_id":"B06","actor":"HANUMAN_001","action_type":"REACTION","target":"RAM_001","intent":"remain protective without intervention","start_state":"alert","trajectory":"shoulders release slightly","duration_seconds":3,"impact_or_result":"reduced protective tension","recovery_state":"watchful_stillness","causal_source":"E04"}
+    ],
+    "power_dynamics":[
+      {"power_id":"P01","source_character":"RAVAN_001","power_type":"CONTROLLED_ENERGY","activation_event":"E01","build_phase":"BUILDING","peak_phase":"PEAK","release_or_containment":"CONTAINED","target_effect":"demonstration pressure","environment_effect":"subtle air displacement","recovery":"DISSIPATING"}
+    ],
+    "environmental_response":[
+      {"response_id":"ENV01","source_action_or_event":"A01","affected_environment":"mountain_air","effect":"AIR_DISPLACEMENT","propagation":"local_radius","persistence":"until E04 containment","continuity":"persistent_until_resolved"}
+    ],
+    "action_readability":[
+      {"action_id":"A01","primary_action":"Ravan controlled power rise","primary_subject":"RAVAN_001","camera_visibility":"S02","screen_direction":"Ravan screen-left","impact_readability":"HIGH","reaction_readability":"HIGH","occlusion_risk":"LOW"},
+      {"action_id":"A03","primary_action":"Power contracts inward","primary_subject":"RAVAN_001","camera_visibility":"S07","screen_direction":"centered","impact_readability":"HIGH","reaction_readability":"HIGH","occlusion_risk":"LOW"}
+    ],
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-020-TEMPORAL-MOTION","CSD-022-INTERACTION-CHOREOGRAPHY","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-010-PRODUCTION-ORCHESTRATOR"]
+}

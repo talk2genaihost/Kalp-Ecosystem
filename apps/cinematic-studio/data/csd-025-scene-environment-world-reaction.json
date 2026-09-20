@@ -1,0 +1,221 @@
+{
+  "schema_version":"KALP-CSD-025-SCENE-ENVIRONMENT-WORLD-REACTION-1.0",
+  "engine_id":"KALP-CSD-025",
+  "engine_name":"Scene Environment & World Reaction Director",
+  "status":"LOCKED",
+  "purpose":"Translate authorized character action, physical dynamics and VFX into deterministic environmental and world-state reactions while preserving canonical geography, temporal continuity and persistent consequences.",
+  "core_principle":"The world is part of the causal system; every meaningful environmental change has a source, propagation behavior, persistence rule and recovery or resolution state.",
+  "world_reaction_model":"canonical_world_state + causal_event + physical_dynamics + vfx_state + environment_conditions → reaction_sequence → persistent_world_delta → next_world_snapshot",
+  "environment_domains":{
+    "terrain":["GROUND","ROCK","MOUNTAIN","SAND","SOIL","VEGETATION","WATER","SNOW","ICE"],
+    "atmosphere":["AIR","WIND","DUST","FOG","SMOKE","HUMIDITY","VISIBILITY","PRESSURE"],
+    "weather":["CLEAR","CLOUD","RAIN","STORM","LIGHTNING","WIND_EVENT","HEAT","COLD"],
+    "structures":["WALL","PILLAR","BRIDGE","BUILDING","GATE","ROAD","BATTLEFIELD_STRUCTURE"],
+    "world_conditions":["BATTLE_STATE","DAMAGE_STATE","ACCESS_STATE","FIRE_STATE","WATER_STATE","VEGETATION_STATE","POPULATION_STATE"],
+    "ambient_life":["BIRDS","ANIMALS","INSECTS","DISTANT_ACTIVITY"]
+  },
+  "reaction_schema":{
+    "required":["reaction_id","source_event","source_type","target_domain","target_id","pre_state","reaction_type","magnitude","start_time","peak_time","end_time","spatial_extent","observable_effect","persistence","recovery_state","continuity_state"],
+    "reaction_types":["DISPLACEMENT","DAMAGE","DEFORMATION","VIBRATION","DUST_RISE","DEBRIS","WIND_RESPONSE","AIR_PRESSURE","VEGETATION_MOVEMENT","WATER_RIPPLE","WATER_DISPLACEMENT","FIRE_SPREAD","SMOKE_RESPONSE","LIGHTNING_RESPONSE","SHADOW_RESPONSE","STRUCTURAL_RESPONSE","WEATHER_RESPONSE","ANIMAL_RESPONSE","AMBIENT_ACTIVITY_CHANGE","RESTORATION"]
+  },
+  "causal_authority":{
+    "allowed_sources":["CSD-012","CSD-023","CSD-024","CSD-020","EXPLICIT_WORLD_EVENT"],
+    "rule":"No environmental reaction may be introduced without an authorized causal source."
+  },
+  "propagation_model":{
+    "required":["propagation_id","source_reaction","path","speed_band","radius_or_extent","affected_domains","attenuation","termination_condition"],
+    "rule":"Environmental effects propagate through explicit spatial and physical rules; propagation cannot exceed canonical geography."
+  },
+  "persistence_model":{
+    "states":["INSTANT","TRANSIENT","PERSISTENT","ACCUMULATING","PERMANENT_UNTIL_REPAIRED","RECOVERING","RESOLVED"],
+    "required":["reaction_id","persistence_state","start_state","continuation_trigger","recovery_trigger","resolution_condition"],
+    "rule":"A reaction remains present across frames and later snapshots until a validated transition changes or resolves it."
+  },
+  "world_delta_schema":{
+    "required":["delta_id","source_reaction","domain","target_id","before_state","after_state","causal_event","snapshot_version"],
+    "rule":"Every persistent world change must be represented as an auditable state delta."
+  },
+  "environment_continuity":{
+    "required":["scene_id","active_environment_state","active_reactions","persistent_damage","weather_state","atmospheric_state","world_condition_state"],
+    "handoff_rule":"Every subsequent frame inherits the latest validated environment state.",
+    "hard_rule":"No frame may silently restore, relocate, erase or materially alter a world condition."
+  },
+  "reaction_rules":[
+    "Every reaction requires an authorized causal source.",
+    "Reaction timing must agree with CSD-020.",
+    "Physical cause must agree with CSD-023.",
+    "VFX cause must agree with CSD-024.",
+    "Spatial extent must agree with CSD-011 canonical geometry.",
+    "Environmental appearance must agree with CSD-018.",
+    "A reaction cannot create information unavailable to characters under CSD-007.",
+    "Persistent damage must survive later frames until explicitly repaired or resolved.",
+    "Weather and atmosphere cannot silently change without a world or environmental cause.",
+    "Propagation cannot cross impossible geography.",
+    "Recovery requires an explicit trigger or natural recovery rule.",
+    "World reactions cannot mutate character identity, anatomy or costume.",
+    "Maximum five active characters remains enforced."
+  ],
+  "world_reaction_pipeline":[
+    "LOAD_CSD011_CANONICAL_REALITY",
+    "LOAD_CSD012_CAUSAL_EVENTS",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD018_VISUAL_LANGUAGE",
+    "LOAD_CSD020_TEMPORAL_MOTION",
+    "LOAD_CSD023_PHYSICAL_DYNAMICS",
+    "LOAD_CSD024_VFX_ENERGY_DYNAMICS",
+    "IDENTIFY_REACTION_SOURCE",
+    "RESOLVE_TARGET_DOMAIN",
+    "CALCULATE_PROPAGATION",
+    "CALCULATE_MAGNITUDE",
+    "CALCULATE_TEMPORAL_LIFECYCLE",
+    "CALCULATE_PERSISTENCE",
+    "BUILD_WORLD_STATE_DELTA",
+    "APPLY_ENVIRONMENT_CONTINUITY",
+    "BIND_REACTIONS_TO_FRAMES",
+    "VALIDATE_WORLD_REACTION",
+    "EMIT_CSD002_ENVIRONMENT_PACKAGE",
+    "EMIT_CMSE010_WORLD_STATE_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "REACTION_WITHOUT_CAUSAL_SOURCE",
+      "TARGET_DOMAIN_UNRESOLVED",
+      "SPATIAL_PROPAGATION_INVALID",
+      "ENVIRONMENT_STATE_CONTRADICTION",
+      "TEMPORAL_REACTION_CONTRADICTION",
+      "PERSISTENT_EFFECT_SILENTLY_ERASED",
+      "RECOVERY_WITHOUT_TRIGGER",
+      "WEATHER_CHANGE_WITHOUT_AUTHORIZATION",
+      "WORLD_DELTA_WITHOUT_SOURCE",
+      "CSD011_SNAPSHOT_MISMATCH",
+      "CSD023_PHYSICAL_MISMATCH",
+      "CSD024_VFX_MISMATCH",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "HIGH_ENVIRONMENTAL_DAMAGE",
+      "LARGE_PROPAGATION_RADIUS",
+      "MULTIPLE_PERSISTENT_REACTIONS",
+      "HIGH_ATMOSPHERIC_DENSITY",
+      "RAPID_WEATHER_CHANGE",
+      "ENVIRONMENTAL_RECOVERY_REQUIRED"
+    ]
+  },
+  "output_contract":{
+    "environment_contract":"scene-wide environment behavior",
+    "reaction_map":"causal environmental reactions",
+    "propagation_map":"spatial propagation",
+    "persistence_map":"lifecycle and recovery",
+    "world_delta_map":"auditable world-state changes",
+    "frame_environment_package":"CSD-002-ready environment package",
+    "production_handoff":"CMSE-010-ready world-state package"
+  },
+  "demo_test":{
+    "scene_id":"CSD25-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "reactions":[
+      {
+        "reaction_id":"ENV-RAVAN-01",
+        "source_event":"E01",
+        "source_type":"CSD-023",
+        "target_domain":"atmosphere",
+        "target_id":"LANKA_CONFRONTATION_AIR",
+        "pre_state":"still_twilight_air",
+        "reaction_type":"AIR_PRESSURE",
+        "magnitude":"moderate_localized",
+        "start_time":20,
+        "peak_time":48,
+        "end_time":58,
+        "spatial_extent":"2.5m radius around Ravan",
+        "observable_effect":"subtle inward air movement and dust lift",
+        "persistence":"TRANSIENT",
+        "recovery_state":"returns_to_baseline_after_E04",
+        "continuity_state":"active_until_58s"
+      },
+      {
+        "reaction_id":"ENV-RAVAN-02",
+        "source_event":"E04",
+        "source_type":"CSD-024",
+        "target_domain":"terrain",
+        "target_id":"GROUND_AROUND_RAVAN",
+        "pre_state":"intact_ground",
+        "reaction_type":"VIBRATION",
+        "magnitude":"low",
+        "start_time":58,
+        "peak_time":60,
+        "end_time":64,
+        "spatial_extent":"1.5m radius",
+        "observable_effect":"fine dust settles and shallow vibration marks appear",
+        "persistence":"PERSISTENT",
+        "recovery_state":"no automatic recovery",
+        "continuity_state":"persists_to_scene_end"
+      },
+      {
+        "reaction_id":"ENV-RAVAN-03",
+        "source_event":"E04",
+        "source_type":"CSD-024",
+        "target_domain":"atmosphere",
+        "target_id":"LANKA_CONFRONTATION_AIR",
+        "pre_state":"elevated_local_pressure",
+        "reaction_type":"RESTORATION",
+        "magnitude":"controlled",
+        "start_time":64,
+        "peak_time":68,
+        "end_time":72,
+        "spatial_extent":"localized confrontation zone",
+        "observable_effect":"air returns gradually to natural twilight movement",
+        "persistence":"RECOVERING",
+        "recovery_state":"resolved_at_72s",
+        "continuity_state":"resolved"
+      }
+    ],
+    "propagation_map":[
+      {
+        "propagation_id":"PROP-01",
+        "source_reaction":"ENV-RAVAN-01",
+        "path":"Ravan_body_center → local_air → fine_dust",
+        "speed_band":"immediate",
+        "radius_or_extent":"2.5m",
+        "affected_domains":["AIR","DUST"],
+        "attenuation":"rapid",
+        "termination_condition":"E04_containment"
+      }
+    ],
+    "persistence_map":[
+      {
+        "reaction_id":"ENV-RAVAN-02",
+        "persistence_state":"PERSISTENT",
+        "start_state":"intact_ground",
+        "continuation_trigger":"E04",
+        "recovery_trigger":"future_repair_or_world_event",
+        "resolution_condition":"explicit_repair_or_scene_reset"
+      }
+    ],
+    "world_delta_map":[
+      {
+        "delta_id":"WD-001",
+        "source_reaction":"ENV-RAVAN-02",
+        "domain":"terrain",
+        "target_id":"GROUND_AROUND_RAVAN",
+        "before_state":"intact_ground",
+        "after_state":"subtle_vibration_marks_and_disturbed_dust",
+        "causal_event":"E04",
+        "snapshot_version":"v1.2"
+      }
+    ],
+    "frame_environment_package":{
+      "F01":"still twilight baseline with latent localized atmospheric response",
+      "F02":"localized inward air movement around Ravan",
+      "F03":"Rama observes stable terrain and controlled air",
+      "F04":"dust begins lifting within authorized radius",
+      "F05":"shared confrontation zone shows coherent atmospheric tension",
+      "F06":"localized pressure and dust reach controlled peak",
+      "F07":"air pressure collapses as power is contained",
+      "F08":"subtle persistent ground marks remain; air returns toward baseline"
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-007-WORLD-INTELLIGENCE","CMSE-010-PRODUCTION-ORCHESTRATOR","CMSE-011-ASSET-MEMORY"]
+}

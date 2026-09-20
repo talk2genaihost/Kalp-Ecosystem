@@ -1,0 +1,96 @@
+{
+  "schema_version":"KALP-CSD-045-PRODUCTION-RETRY-FAILURE-RESOLUTION-1.0",
+  "engine_id":"KALP-CSD-045",
+  "engine_name":"Production Retry & Failure Resolution Director",
+  "status":"LOCKED",
+  "purpose":"Convert reconciled production failures into evidence-based, governed recovery decisions, selecting safe retry strategies, enforcing retry budgets and backoff, preventing retry storms, and escalating failures that should not be retried.",
+  "core_principle":"Retry is a new controlled production attempt, not repetition; every retry must address an identified failure condition or explicitly justified transient risk.",
+  "inputs":["CSD-044","CSD-039","CSD-040","CSD-041","CSD-042","CSD-037","CSD-031","CSD-032","CSD-035","CMSE-014","CMSE-015"],
+  "failure_domains":["PROVIDER_TRANSIENT","RATE_LIMIT","TIMEOUT","NETWORK","CAPABILITY","INVALID_REQUEST","IDENTITY","MASTER","POLICY","MEDIA_INTEGRITY","QA_REJECTION","CONTINUITY","BUDGET","CAPACITY","UNKNOWN"],
+  "resolution_classes":["RETRY_SAME_CONFIGURATION","RETRY_WITH_BACKOFF","RETRY_WITH_ADJUSTED_CONFIGURATION","RETRY_APPROVED_ALTERNATIVE","REASSEMBLE_AND_RETRY","ROUTE_TO_RECOVERY","QUARANTINE","TERMINATE_AND_ESCALATE","NO_ACTION"],
+  "retry_pipeline":[
+    "INGEST_RECONCILED_FAILURE",
+    "VERIFY_FAILURE_EVIDENCE",
+    "CLASSIFY_FAILURE",
+    "CHECK_RETRY_ELIGIBILITY",
+    "CHECK_RETRY_HISTORY_AND_BUDGET",
+    "CHECK_PROVIDER_HEALTH_AND_CAPACITY",
+    "SELECT_BACKOFF_AND_JITTER",
+    "SELECT_SAFE_CONFIGURATION_CHANGE",
+    "SIMULATE_RETRY_CONSEQUENCES",
+    "VERIFY_FRESH_MASTER_AND_INPUT_FINGERPRINTS",
+    "REQUEST_CSD-037_AUTHORIZATION",
+    "CREATE_NEW_ATTEMPT",
+    "RETURN_TO_CSD-042_CAPACITY",
+    "DISPATCH_VIA_CSD-043",
+    "MEASURE_RETRY_OUTCOME",
+    "UPDATE_CSD-040_LEARNING"
+  ],
+  "retry_eligibility":{
+    "required":["reconciliation_complete","failure_is_retryable","no_valid_result_exists","retry_budget_available","current_master_valid","current_input_valid","provider_or_alternative_approved","CSD-037_authorization"],
+    "blocked":["provider_state_unknown","identity_conflict","master_conflict","policy_block","budget_hard_limit","canonical_continuity_block","terminal_failure_without_new_authorization"]
+  },
+  "failure_resolution_map":{
+    "PROVIDER_TRANSIENT":"RETRY_WITH_BACKOFF",
+    "RATE_LIMIT":"RETRY_WITH_BACKOFF",
+    "TIMEOUT":"RETRY_WITH_BACKOFF",
+    "NETWORK":"RETRY_WITH_BACKOFF",
+    "CAPABILITY":"ROUTE_TO_RECOVERY",
+    "INVALID_REQUEST":"REASSEMBLE_AND_RETRY",
+    "IDENTITY":"QUARANTINE",
+    "MASTER":"QUARANTINE",
+    "POLICY":"TERMINATE_AND_ESCALATE",
+    "MEDIA_INTEGRITY":"RETRY_WITH_ADJUSTED_CONFIGURATION",
+    "QA_REJECTION":"REASSEMBLE_AND_RETRY",
+    "CONTINUITY":"ROUTE_TO_RECOVERY",
+    "BUDGET":"TERMINATE_AND_ESCALATE",
+    "CAPACITY":"RETRY_WITH_BACKOFF",
+    "UNKNOWN":"QUARANTINE"
+  },
+  "retry_controls":{
+    "max_attempts":"Must be supplied by governing policy; never invented by the engine.",
+    "backoff":"Use bounded exponential or provider-recommended backoff with jitter where supported.",
+    "storm_detection":"Escalate when repeated failures cluster without meaningful configuration or provider-state change.",
+    "same_configuration":"Allowed only when evidence indicates a transient condition and retry history remains within policy.",
+    "configuration_change":"Must be traceable to the failure evidence and remain within approved capability.",
+    "new_attempt":"Every retry receives a new attempt_id and immutable dispatch lineage.",
+    "idempotency":"Never reuse a completed/unknown provider job identity for a new attempt."
+  },
+  "retry_budget":{
+    "scopes":["JOB","FRAME","SCENE","ARC","UNIVERSE","PROVIDER","MODEL","CAMPAIGN","TIME_WINDOW"],
+    "counters":["attempts","retry_attempts","retry_cost","retry_time","consecutive_failures"],
+    "policy":"Budget limits come from governance; CSD-045 may consume but never silently increase them."
+  },
+  "backoff_policy":{
+    "states":["IMMEDIATE","SHORT","MEDIUM","LONG","OPERATOR_HOLD"],
+    "selection":"Based on failure class, provider health, retry history, queue pressure and supplied provider guidance.",
+    "jitter":"Required for clustered retry risk where supported.",
+    "no_retry_loop":"A failed retry must re-enter failure classification; it cannot automatically recurse indefinitely."
+  },
+  "governance":{
+    "auto_actions":["CLASSIFY_FAILURE","APPLY_POLICY_BACKOFF","CREATE_RETRY_PROPOSAL","STOP_RETRY_STORM","REASSEMBLE_WITHIN_EXISTING_CONTRACT","UPDATE_LEARNING"],
+    "governor_review":["AUTHORIZE_RETRY","APPROVED_ALTERNATIVE_PROVIDER","INCREASE_RETRY_BUDGET","EXTEND_CAPACITY"],
+    "operator_review":["IDENTITY_FIX","MASTER_REPLACEMENT","CANONICAL_CONTINUITY_CHANGE","POLICY_EXCEPTION"],
+    "never_allowed":["BLIND_RETRY","INFINITE_RETRY","BYPASS_CSD-037","BYPASS_CSD-032","BYPASS_CSD-033","USE_UNAPPROVED_PROVIDER","REUSE_ATTEMPT_ID","SILENT_MASTER_CHANGE","SILENT_BRANCH_CHANGE"]
+  },
+  "resolution_record":{
+    "required":["resolution_id","logical_job_id","failed_attempt_id","failure_class","evidence_refs","retry_eligibility","resolution_class","backoff_state","retry_budget_state","authorization_class","created_at"],
+    "immutability":"Resolution decisions are append-only; each new attempt creates a new resolution lineage record."
+  },
+  "demo":{
+    "resolution_id":"RESOLVE-CSD45-RAMAYANA-F04-001",
+    "logical_job_id":"JOB-F04",
+    "failed_attempt_id":"ATTEMPT-1",
+    "failure_class":"PROVIDER_TRANSIENT",
+    "retry_eligibility":"ELIGIBLE",
+    "resolution_class":"RETRY_WITH_BACKOFF",
+    "backoff_state":"MEDIUM",
+    "retry_budget_state":"WITHIN_LIMIT",
+    "new_attempt_id":"ATTEMPT-2",
+    "authorization_class":"GOVERNOR_REVIEW",
+    "next":"CSD-042_CAPACITY_THEN_CSD-043_DISPATCH",
+    "learning_update":"CSD-040",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-042-CAPACITY-MANAGER","CSD-043-CAPACITY-EXECUTION-ADAPTER","CSD-037-EXECUTION-GOVERNOR","CSD-040-PREDICTIVE-ORCHESTRATION","CSD-035-AUTONOMOUS-RECOVERY","CSD-046-PRODUCTION-FAILURE-PATTERN-AND-ROOT-CAUSE-INTELLIGENCE"]
+}

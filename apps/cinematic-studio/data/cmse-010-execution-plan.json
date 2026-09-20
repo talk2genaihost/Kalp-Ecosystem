@@ -1,0 +1,95 @@
+{
+  "schema_version": "KALP-CMSE-010-EXECUTION-PLAN-1.0",
+  "scene_id": "CSD-DEMO-001",
+  "state": "PLANNED",
+  "execution_profile": "QUALITY_FIRST",
+  "shots": [
+    {
+      "job_id": "SHOT-F01",
+      "frame_id": "F01",
+      "order": 1,
+      "source_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "status": "READY",
+      "provenance": "INDEPENDENT"
+    },
+    {
+      "job_id": "SHOT-F02",
+      "frame_id": "F02",
+      "order": 2,
+      "source_asset": "KALP-DERIVED-F02-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F03",
+      "frame_id": "F03",
+      "order": 3,
+      "source_asset": "KALP-DERIVED-F03-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F04",
+      "frame_id": "F04",
+      "order": 4,
+      "source_asset": "KALP-DERIVED-F04-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F05",
+      "frame_id": "F05",
+      "order": 5,
+      "source_asset": "KALP-DERIVED-F05-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F06",
+      "frame_id": "F06",
+      "order": 6,
+      "source_asset": "KALP-DERIVED-F06-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F07",
+      "frame_id": "F07",
+      "order": 7,
+      "source_asset": "KALP-DERIVED-F07-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    },
+    {
+      "job_id": "SHOT-F08",
+      "frame_id": "F08",
+      "order": 8,
+      "source_asset": "KALP-DERIVED-F08-CSD003",
+      "status": "READY",
+      "provenance": "DERIVED_FROM_STORYBOARD"
+    }
+  ],
+  "dependencies": {
+    "context": [
+      "CMSE-012"
+    ],
+    "prompt": [
+      "CMSE-013"
+    ],
+    "routing": [
+      "CMSE-014"
+    ],
+    "scheduler": [
+      "CMSE-015"
+    ]
+  },
+  "qa_gates": [
+    "IDENTITY",
+    "CONTINUITY",
+    "PERSPECTIVE",
+    "WORLD",
+    "ASSET_LINEAGE",
+    "OUTPUT_FORMAT"
+  ],
+  "handoff": "CMSE-010 execution queue ready; provisional assets explicitly tagged."
+}

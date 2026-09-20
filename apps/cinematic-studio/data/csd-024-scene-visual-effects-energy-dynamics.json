@@ -1,0 +1,146 @@
+{
+  "schema_version":"KALP-CSD-024-SCENE-VFX-ENERGY-DYNAMICS-1.0",
+  "engine_id":"KALP-CSD-024",
+  "engine_name":"Scene Visual Effects & Energy Dynamics Director",
+  "status":"LOCKED",
+  "purpose":"Translate authorized physical and supernatural action into deterministic visual-effects behavior covering energy states, aura, particles, shockwaves, magical fields, power interactions, light response and temporal dissipation.",
+  "core_principle":"Every visual effect has a source, state, spatial behavior, temporal lifecycle and consequence; spectacle cannot exist without causal authorization.",
+  "vfx_model":"physical_action + power_state + canonical_environment + camera_state + temporal_state → VFX_state → visual_consequence → continuity_update",
+  "effect_schema":{
+    "required":["effect_id","source","source_event","effect_type","state","start_time","peak_time","end_time","position","scale","intensity","trajectory","environment_interaction","light_interaction","continuity_state"],
+    "effect_types":["AURA","ENERGY_FIELD","ENERGY_BEAM","SHOCKWAVE","PARTICLE","SPARK","FLAME","SMOKE","DUST","MAGICAL_FIELD","DIVINE_MANIFESTATION","POWER_COLLISION","LIGHT_BURST","ENERGY_TRAIL","DISSIPATION"],
+    "states":["DORMANT","IGNITING","BUILDING","STABLE","PEAK","IMPACTING","CONTRACTING","DISSIPATING","RESOLVED"]
+  },
+  "energy_state":{
+    "required":["energy_id","source_character","energy_type","phase","intensity","color_language","shape_language","behavior","target","environment_effect","recovery_state"],
+    "phases":["DORMANT","AWAKENING","CHARGING","BUILDING","PEAK","RELEASING","CONTAINED","COLLIDING","DISSIPATING","RECOVERED"],
+    "rule":"Energy phases must map to CSD-023 power/action state and cannot bypass causal events."
+  },
+  "aura_schema":{
+    "required":["aura_id","character_id","aura_type","activation_basis","radius","intensity","motion","interaction_with_costume","interaction_with_environment","visibility_rule"],
+    "rule":"Aura is an expression of authorized character/world state, not an arbitrary decoration."
+  },
+  "particle_schema":{
+    "required":["particle_id","source_event","particle_type","emission_rate","direction","velocity_profile","lifetime","gravity_or_force","collision_behavior","fade_behavior"],
+    "rule":"Particle motion must follow CSD-020 temporal motion and CSD-023 force/environment constraints."
+  },
+  "shockwave_schema":{
+    "required":["shockwave_id","source_event","origin","propagation_shape","speed_band","radius","intensity_curve","affected_entities","environmental_response","dissipation"],
+    "rule":"Shockwaves require an explicit energy/impact source and cannot exceed established world rules."
+  },
+  "power_collision_schema":{
+    "required":["collision_id","source_a","source_b","collision_event","interaction_type","contact_region","energy_balance","visual_result","environmental_result","resolution"],
+    "interaction_types":["MEET","DEFLECT","ABSORB","OVERPOWER","CANCEL","REFLECT","CONTAIN"],
+    "rule":"Power collision outcomes must be determined by authorized narrative/world rules, not visual spectacle alone."
+  },
+  "light_interaction":{
+    "required":["effect_id","emission_color","illumination_radius","surface_response","shadow_response","atmospheric_scatter","camera_exposure_response"],
+    "rule":"VFX light must remain compatible with CSD-018 lighting direction, palette and atmosphere."
+  },
+  "dissipation_model":{
+    "required":["effect_id","trigger","start_state","decay_curve","end_state","residual_trace","environment_cleanup"],
+    "rule":"Effects remain persistent until their lifecycle reaches RESOLVED; no frame may silently erase active effects."
+  },
+  "vfx_continuity":{
+    "state":["active_effects","energy_phase","aura_state","particle_density","shockwave_state","light_emission","atmospheric_interaction"],
+    "handoff_rule":"Every frame inherits active VFX state unless a validated event changes the lifecycle.",
+    "hard_rule":"VFX cannot silently change source, scale, color family, location or phase."
+  },
+  "vfx_rules":[
+    "Every effect requires a causal source.",
+    "Energy state must agree with CSD-023 power dynamics.",
+    "VFX timing must agree with CSD-020.",
+    "Spatial origin must agree with CSD-011.",
+    "Lighting interaction must agree with CSD-018.",
+    "Camera visibility must agree with CSD-017.",
+    "Particle motion must obey temporal and physical constraints.",
+    "Shockwaves require explicit propagation and dissipation.",
+    "Power collisions require explicit resolution.",
+    "VFX cannot mutate identity, anatomy or costume.",
+    "Effects cannot reveal unavailable information.",
+    "Maximum five active characters remains enforced."
+  ],
+  "vfx_pipeline":[
+    "LOAD_CSD011_CANONICAL_REALITY",
+    "LOAD_CSD012_CAUSAL_EVENTS",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_GRAMMAR",
+    "LOAD_CSD018_VISUAL_LANGUAGE",
+    "LOAD_CSD020_TEMPORAL_MOTION",
+    "LOAD_CSD023_PHYSICAL_DYNAMICS",
+    "RESOLVE_EFFECT_SOURCE",
+    "RESOLVE_ENERGY_PHASE",
+    "RESOLVE_AURA",
+    "RESOLVE_PARTICLES",
+    "RESOLVE_SHOCKWAVE",
+    "RESOLVE_POWER_COLLISION",
+    "RESOLVE_LIGHT_INTERACTION",
+    "RESOLVE_DISSIPATION",
+    "BIND_VFX_TO_FRAMES",
+    "VALIDATE_VFX_CAUSALITY_AND_CONTINUITY",
+    "EMIT_CSD002_VFX_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "VFX_WITHOUT_CAUSAL_SOURCE",
+      "ENERGY_PHASE_CONTRADICTION",
+      "VFX_SPATIAL_ORIGIN_INVALID",
+      "VFX_TIMELINE_CONTRADICTION",
+      "PARTICLE_PHYSICS_CONTRADICTION",
+      "SHOCKWAVE_WITHOUT_SOURCE",
+      "POWER_COLLISION_WITHOUT_AUTHORIZATION",
+      "LIGHT_INTERACTION_CONTRADICTION",
+      "DISSIPATION_WITHOUT_TRIGGER",
+      "ACTIVE_EFFECT_SILENTLY_ERASED",
+      "CAMERA_VISIBILITY_CONTRADICTION",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "VFX_DENSITY_HIGH",
+      "ENERGY_INTENSITY_HIGH",
+      "PARTICLE_LIFETIME_SHORT",
+      "SHOCKWAVE_RADIUS_LARGE",
+      "LIGHT_EXPOSURE_HIGH",
+      "MULTIPLE_ACTIVE_EFFECTS"
+    ]
+  },
+  "output_contract":{
+    "vfx_contract":"scene-wide effect grammar",
+    "energy_state_map":"energy lifecycle and phases",
+    "aura_map":"character aura states",
+    "particle_map":"particle behavior",
+    "shockwave_map":"propagation and dissipation",
+    "power_collision_map":"power interaction outcomes",
+    "light_interaction_map":"VFX-to-light behavior",
+    "dissipation_map":"effect lifecycle closure",
+    "frame_vfx_package":"CSD-002-ready VFX package",
+    "production_handoff":"CMSE-010-ready VFX package"
+  },
+  "demo_test":{
+    "scene_id":"CSD24-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "effects":[
+      {"effect_id":"VFX01","source":"RAVAN_001","source_event":"E01","effect_type":"ENERGY_FIELD","state":"BUILDING","start_time":20,"peak_time":48,"end_time":58,"position":"Ravan_body_center","scale":"character_bound","intensity":55,"trajectory":"inward_circulation","environment_interaction":"localized_air_displacement","light_interaction":"warm_bronze emission compatible with CSD018","continuity_state":"active_until_E04"},
+      {"effect_id":"VFX02","source":"RAVAN_001","source_event":"E04","effect_type":"DISSIPATION","state":"CONTRACTING","start_time":58,"peak_time":64,"end_time":68,"position":"Ravan_body_center","scale":"character_bound","intensity":45,"trajectory":"inward_collapse","environment_interaction":"air_displacement decreases","light_interaction":"emission falls with containment","continuity_state":"resolved_at_68s"}
+    ],
+    "energy_state_map":[
+      {"energy_id":"E-RAVAN-01","source_character":"RAVAN_001","energy_type":"CONTROLLED_POWER","phase":"BUILDING","start_time":20,"peak_time":48,"release_or_containment":"CONTAINED_AT_58","recovery":"DISSIPATING"}
+    ],
+    "aura_map":[
+      {"aura_id":"A-RAVAN-01","character_id":"RAVAN_001","aura_type":"CONTROLLED_POWER_AURA","activation_basis":"E01","radius":"body_bound","intensity":45,"motion":"slow inward circulation","visibility_rule":"visible only during authorized power state"}
+    ],
+    "particle_map":[
+      {"particle_id":"P-RAVAN-01","source_event":"E01","particle_type":"fine_energy_dust","emission_rate":"low","direction":"inward","velocity_profile":"slow","lifetime":"medium","gravity_or_force":"localized energy field","collision_behavior":"none","fade_behavior":"dissipate with E04"}
+    ],
+    "light_interaction_map":[
+      {"effect_id":"VFX01","emission_color":"warm bronze","illumination_radius":"local","surface_response":"subtle highlight","shadow_response":"slight edge strengthening","atmospheric_scatter":"low","camera_exposure_response":"controlled"}
+    ],
+    "dissipation_map":[
+      {"effect_id":"VFX01","trigger":"E04","start_state":"BUILDING","decay_curve":"controlled inward exponential","end_state":"RESOLVED","residual_trace":"faint bronze shimmer until 80s","environment_cleanup":"air displacement returns to baseline"}
+    ],
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-007-WORLD-INTELLIGENCE","CMSE-013-PROMPT-COMPILER"]
+}

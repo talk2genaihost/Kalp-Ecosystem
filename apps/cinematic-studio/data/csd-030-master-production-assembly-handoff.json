@@ -1,0 +1,141 @@
+{
+  "schema_version":"KALP-CSD-030-MASTER-PRODUCTION-ASSEMBLY-HANDOFF-1.0",
+  "engine_id":"KALP-CSD-030",
+  "engine_name":"Scene Master Production Assembly & Handoff Director",
+  "status":"LOCKED",
+  "purpose":"Assemble all validated scene intelligence, canonical state, character continuity, perception, frame direction, visual/audio/VFX/environment decisions, asset lineage and provider-neutral production contracts into one immutable scene master package ready for production execution.",
+  "core_principle":"Production begins only from one validated, lineage-complete, internally consistent scene master.",
+  "upstream_contracts":[
+    "CSD-005","CSD-006","CSD-007","CSD-008","CSD-009",
+    "CSD-010","CSD-011","CSD-012","CSD-013","CSD-014",
+    "CSD-017","CSD-018","CSD-019","CSD-020","CSD-021",
+    "CSD-022","CSD-023","CSD-024","CSD-025","CSD-026",
+    "CSD-027","CSD-028","CSD-029"
+  ],
+  "assembly_layers":[
+    "SCENE_IDENTITY",
+    "CANONICAL_REALITY",
+    "TEMPORAL_STATE",
+    "CHARACTER_STATE",
+    "KNOWLEDGE_BELIEF_STATE",
+    "PERSPECTIVE_PERCEPTION",
+    "EVENT_CAUSAL_GRAPH",
+    "BRANCH_DECISION_STATE",
+    "FRAME_DIRECTIVE",
+    "CAMERA_COMPOSITION",
+    "PERFORMANCE_BLOCKING",
+    "INTERACTION_CHOREOGRAPHY",
+    "ACTION_PHYSICS",
+    "LIGHTING_ATMOSPHERE",
+    "SOUND_DIALOGUE",
+    "VFX_ENERGY",
+    "ENVIRONMENT_WORLD_STATE",
+    "ASSET_DEPENDENCIES",
+    "ASSET_MASTER_LINEAGE",
+    "RETRIEVED_CONTEXT",
+    "PROVIDER_NEUTRAL_PRODUCTION_SPECS",
+    "NEGATIVE_CONSTRAINTS",
+    "OUTPUT_CONTRACT"
+  ],
+  "assembly_pipeline":[
+    "LOAD_SCENE_MANIFEST",
+    "VERIFY_UPSTREAM_GATES",
+    "BIND_CANONICAL_SCENE_VERSION",
+    "BIND_CHARACTER_AND_WORLD_STATE",
+    "BIND_EVENT_GRAPH_AND_ACTIVE_BRANCH",
+    "BIND_8_FRAME_DIRECTIVE",
+    "BIND_PERFORMANCE_CAMERA_AUDIO_VFX_ENVIRONMENT",
+    "RESOLVE_ASSET_DEPENDENCIES",
+    "VERIFY_MASTER_ASSET_LINEAGE",
+    "ASSEMBLE_RETRIEVED_CONTEXT",
+    "VERIFY_PROVIDER_NEUTRALITY",
+    "CHECK_CROSS_LAYER_CONSISTENCY",
+    "CALCULATE_MASTER_FINGERPRINT",
+    "FREEZE_PRODUCTION_SNAPSHOT",
+    "ISSUE_EXECUTION_HANDOFF"
+  ],
+  "hard_gates":[
+    "All required upstream validation gates must be PASS or explicitly approved PASS_WITH_WARNINGS.",
+    "Exactly one ACTIVE canonical scene version may be bound.",
+    "No unresolved BLOCKER or ERROR may enter the master.",
+    "All active characters must remain within the five-character limit.",
+    "Every production reference must have lineage and trust status.",
+    "Superseded or rejected assets cannot be silently promoted.",
+    "Frame specifications must resolve to the same canonical scene version.",
+    "Identity, costume, prop and world continuity fingerprints must agree.",
+    "Provider-specific syntax must not contaminate the provider-neutral master.",
+    "Every output artifact must have an explicit lineage origin.",
+    "Master snapshot becomes immutable after handoff; changes require a new revision."
+  ],
+  "master_package":{
+    "required_sections":[
+      "manifest",
+      "scene_state",
+      "character_state",
+      "knowledge_state",
+      "perception_state",
+      "event_graph",
+      "decision_state",
+      "frame_plan",
+      "performance_plan",
+      "camera_plan",
+      "audio_plan",
+      "vfx_plan",
+      "environment_plan",
+      "asset_manifest",
+      "retrieval_context",
+      "production_specs",
+      "negative_constraints",
+      "continuity_constraints",
+      "validation_record",
+      "lineage_record",
+      "execution_contract"
+    ],
+    "revision_format":"CSD30-MASTER-{scene_id}-v{major}.{minor}",
+    "fingerprint":"SHA-256 over canonicalized package content"
+  },
+  "handoff_states":[
+    "ASSEMBLY_BLOCKED",
+    "READY_FOR_EXECUTION",
+    "EXECUTION_IN_PROGRESS",
+    "EXECUTION_COMPLETE",
+    "MASTERED"
+  ],
+  "change_policy":{
+    "minor_change":"Non-canonical metadata or execution annotation; requires fingerprint refresh.",
+    "major_change":"Any canonical state, identity, continuity, frame, asset or narrative change; creates a new master revision and invalidates dependent execution jobs.",
+    "provider_change":"Does not alter the master; creates a provider-specific execution derivative."
+  },
+  "demo_test":{
+    "scene_id":"CSD30-RAMAYANA-DEMO-001",
+    "canonical_scene":"RAMAYANA_MOUNT_KAILASH_CONFRONTATION",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "selected_branch":"RAVAN_RESTRAINT",
+    "frames":8,
+    "master_revision":"CSD30-MASTER-RAMAYANA-DEMO-001-v1.0",
+    "required_asset_examples":[
+      "F01_CANONICAL_TRUSTED_MASTER",
+      "HF_F01_PROVIDER_PROXY",
+      "RAVAN_COSTUME_MASTER"
+    ],
+    "validation":{
+      "character_limit":"PASS",
+      "canonical_reality":"PASS",
+      "identity_continuity":"PASS",
+      "event_branch":"PASS",
+      "frame_consistency":"PASS",
+      "asset_lineage":"PASS",
+      "provider_neutrality":"PASS",
+      "production_contract":"PASS"
+    },
+    "master_fingerprint":"DEMO-CSD30-FINGERPRINT",
+    "handoff":"READY_FOR_EXECUTION"
+  },
+  "downstream":[
+    "CMSE-013-PRODUCTION-PROMPT-COMPILER",
+    "CMSE-014-MULTI-PROVIDER-ROUTING",
+    "CMSE-015-PRODUCTION-SCHEDULER",
+    "CMSE-010-PRODUCTION-ORCHESTRATOR",
+    "CSD-031-EXECUTION-OBSERVABILITY-AND-JOB-LIFECYCLE"
+  ]
+}

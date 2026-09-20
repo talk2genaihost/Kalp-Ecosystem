@@ -1,0 +1,55 @@
+{
+  "schema_version":"KALP-CSD-031-EXECUTION-OBSERVABILITY-JOB-LIFECYCLE-1.0",
+  "engine_id":"KALP-CSD-031",
+  "engine_name":"Execution Observability & Job Lifecycle Director",
+  "status":"LOCKED",
+  "purpose":"Turn a frozen CSD-030 production master into auditable execution jobs and maintain deterministic lifecycle state from dispatch through completion, failure, retry, reconciliation and archival.",
+  "core_principle":"Every production job is a state machine with immutable evidence; execution state never mutates the canonical scene master.",
+  "inputs":["CSD-030","CMSE-013","CMSE-014","CMSE-015","CMSE-010"],
+  "lifecycle":["CREATED","VALIDATED","QUEUED","DISPATCHED","PROVIDER_ACCEPTED","RUNNING","PROVIDER_COMPLETED","RESULT_INGESTED","QA_PENDING","QA_PASSED","COMPLETED","RETRY_PENDING","FAILED_RETRYABLE","FAILED_TERMINAL","CANCEL_REQUESTED","CANCELLED","RECONCILIATION_REQUIRED","RECONCILED","ARCHIVED"],
+  "terminal_states":["COMPLETED","FAILED_TERMINAL","CANCELLED","ARCHIVED"],
+  "transition_rules":[
+    "Transitions are explicit and append-only in the event ledger.",
+    "A job cannot skip required lifecycle states without an explicit system transition reason.",
+    "Provider callbacks are evidence, not authority; they must be reconciled against the job contract.",
+    "A provider result cannot become COMPLETED until result ingestion and QA gates pass.",
+    "Retry creates a new execution attempt under the same logical job lineage.",
+    "Retryable failure must preserve the failed attempt and its evidence.",
+    "Terminal failure cannot be silently retried; a new authorized attempt/revision is required.",
+    "Cancellation after provider acceptance is provider-dependent and must be reconciled.",
+    "Execution state may never mutate CSD-030 canonical master content.",
+    "Asset promotion occurs only after QA and registry acceptance."
+  ],
+  "failure_taxonomy":{
+    "RETRYABLE":["PROVIDER_TIMEOUT","RATE_LIMIT","TRANSIENT_NETWORK","TEMPORARY_PROVIDER_UNAVAILABLE","QUEUE_EXPIRED","WORKER_INTERRUPTION"],
+    "RECONCILIATION_REQUIRED":["CALLBACK_MISSING","PROVIDER_STATE_UNKNOWN","RESULT_METADATA_MISMATCH","DUPLICATE_CALLBACK","PARTIAL_RESULT"],
+    "TERMINAL":["INVALID_REQUEST","IDENTITY_MISMATCH","MASTER_FINGERPRINT_MISMATCH","POLICY_BLOCK","UNSUPPORTED_CAPABILITY","CORRUPT_RESULT","QA_REJECTED"]
+  },
+  "observability":{
+    "required_event_fields":["event_id","job_id","attempt_id","timestamp","from_state","to_state","event_type","source","reason","correlation_id"],
+    "correlation_keys":["master_revision","scene_id","frame_id","asset_id","provider","provider_job_id","attempt_id"],
+    "metrics":["jobs_created","jobs_running","jobs_completed","jobs_failed","retry_count","provider_latency_ms","queue_latency_ms","result_ingestion_latency_ms","qa_failure_rate","reconciliation_count"],
+    "health_states":["HEALTHY","DEGRADED","BLOCKED","UNKNOWN"]
+  },
+  "job_contract":{
+    "required":["job_id","scene_id","master_revision","master_fingerprint","job_type","frame_id","provider","model","attempt_id","input_fingerprint","created_at"],
+    "immutables":["job_id","scene_id","master_revision","master_fingerprint","frame_id","attempt_id","input_fingerprint"],
+    "attempt_policy":"attempt_id increments monotonically per logical job"
+  },
+  "reconciliation":{
+    "checks":["local_state_vs_provider_state","provider_job_id","input_fingerprint","result_fingerprint","asset_lineage","callback_sequence"],
+    "outcomes":["RECONCILED","RECONCILIATION_REQUIRED","TERMINAL_MISMATCH"]
+  },
+  "demo":{
+    "logical_job_id":"JOB-CSD31-RAMAYANA-F01",
+    "attempts":[
+      {"attempt_id":1,"provider":"higgsfield","provider_job_id":"DEMO-HF-001","outcome":"PROVIDER_COMPLETED","next":"RESULT_INGESTED"},
+      {"attempt_id":2,"provider":"higgsfield","provider_job_id":"DEMO-HF-002","outcome":"PROVIDER_TIMEOUT","classification":"RETRYABLE","next":"RETRY_PENDING"},
+      {"attempt_id":3,"provider":"higgsfield","provider_job_id":"DEMO-HF-003","outcome":"PROVIDER_COMPLETED","next":"QA_PASSED"},
+      {"attempt_id":3,"final_state":"COMPLETED"}
+    ],
+    "canonical_master_unchanged":true,
+    "asset_promotion":"AFTER_QA_AND_REGISTRY_ACCEPTANCE"
+  },
+  "downstream":["CSD-032-Production-Result-Validation-and-Asset-Promotion","CMSE-015","CMSE-010"]
+}

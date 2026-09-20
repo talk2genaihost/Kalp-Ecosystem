@@ -1,0 +1,131 @@
+{
+  "schema_version":"KALP-CSD-009-SCENE-PERCEPTION-QUALITY-VALIDATION-1.0",
+  "engine_id":"KALP-CSD-009",
+  "engine_name":"Scene Perception Quality & Validation Director",
+  "status":"LOCKED",
+  "purpose":"Validate that character perceptions and the eight-frame perspective plan are causally justified, information-safe, physically coherent, emotionally continuous and faithful to one canonical scene reality before visual generation.",
+  "core_principle":"Perception may differ; reality may not.",
+  "quality_dimensions":[
+    "CANONICAL_REALITY_INTEGRITY",
+    "SENSORY_ACCESS_VALIDITY",
+    "KNOWLEDGE_BOUNDARY",
+    "CHRONOLOGY_INTEGRITY",
+    "EMOTIONAL_CONTINUITY",
+    "OBJECTIVE_INTERPRETATION_ALIGNMENT",
+    "OBSERVATION_INTERPRETATION_SEPARATION",
+    "CHARACTER_DIFFERENTIATION",
+    "BLIND_SPOT_VALIDITY",
+    "OTHER_CHARACTER_INTENT_CALIBRATION",
+    "AUDIENCE_INFORMATION_BOUNDARY",
+    "FRAME_PERSPECTIVE_COVERAGE",
+    "CINEMATIC_CONTINUITY"
+  ],
+  "severity_levels":["BLOCKER","ERROR","WARNING","INFO"],
+  "validation_pipeline":[
+    "LOAD_CSD008_PERCEPTION_PACKAGE",
+    "LOAD_CANONICAL_SCENE_FACTS",
+    "CHECK_CHARACTER_COUNT",
+    "CHECK_REALITY_CONSISTENCY",
+    "CHECK_SENSORY_ACCESS",
+    "CHECK_KNOWLEDGE_AND_CHRONOLOGY",
+    "CHECK_EMOTIONAL_CONTINUITY",
+    "CHECK_OBJECTIVE_AND_INTERPRETATION",
+    "CHECK_OBSERVATION_VS_INTERPRETATION",
+    "CHECK_CHARACTER_DIFFERENTIATION",
+    "CHECK_BLIND_SPOTS",
+    "CHECK_AUDIENCE_BOUNDARY",
+    "CHECK_EIGHT_FRAME_COVERAGE",
+    "CALCULATE_PERCEPTION_QUALITY",
+    "GENERATE_REWORK_INSTRUCTIONS",
+    "PROMOTE_OR_BLOCK_CSD002_HANDOFF"
+  ],
+  "hard_rules":[
+    "A perception cannot assert an objective physical fact that contradicts canonical scene reality.",
+    "A character cannot perceive information unavailable through sensory access or a valid information event.",
+    "Future or later-scene information is a blocker unless explicitly authorized by the narrative mechanism.",
+    "Emotion may modify salience and interpretation but cannot serve as evidence of an unseen fact.",
+    "Observation and interpretation must remain distinguishable.",
+    "A character may misinterpret an observed fact, but the system must preserve the underlying fact.",
+    "Different character perceptions should differ for causal reasons, not arbitrary variation.",
+    "Blind spots must be plausible given attention, access and knowledge.",
+    "Perceived intention of another character must carry uncertainty unless directly established by dialogue/action.",
+    "Audience-only information must be explicitly marked and must not leak into character state.",
+    "The eight frames must preserve one canonical reality while providing meaningful perspective progression.",
+    "Identity and emotional continuity locks must remain intact.",
+    "Maximum five active characters."
+  ],
+  "score_model":{
+    "method":"weighted_dimension_assessment",
+    "dimensions":{
+      "reality_integrity":20,
+      "knowledge_boundary":15,
+      "sensory_access":10,
+      "chronology":10,
+      "emotional_continuity":10,
+      "causal_interpretation":10,
+      "character_differentiation":10,
+      "audience_boundary":5,
+      "frame_coverage":5,
+      "cinematic_continuity":5
+    },
+    "promotion_threshold":90,
+    "warning_threshold":80,
+    "automatic_block_below":80,
+    "score_is_quality_measure_not_character_rating":true
+  },
+  "result_states":["PASS","PASS_WITH_WARNINGS","REWORK_REQUIRED","BLOCKED"],
+  "rework_policy":{
+    "principle":"Fix the smallest causal layer that failed rather than rewriting the entire scene.",
+    "routing":{
+      "identity_or_state":"CSD-006",
+      "knowledge_or_provenance":"CSD-007",
+      "perception_or_attention":"CSD-008",
+      "scene_logic":"CSD-005",
+      "frame_structure":"CSD-002",
+      "visual_generation":"CSD-003"
+    }
+  },
+  "output_schema":{
+    "validation_id":"CSD9-{scene}-{timestamp}",
+    "status":"PASS | PASS_WITH_WARNINGS | REWORK_REQUIRED | BLOCKED",
+    "quality_score":"0-100",
+    "dimension_results":"per-dimension result and evidence",
+    "violations":"severity, rule, affected character/frame, evidence",
+    "rework_plan":"smallest upstream gate capable of correction",
+    "promotion":"CSD-002 handoff eligibility",
+    "audit_trail":"inputs, checks, timestamp and validation version"
+  },
+  "demo_test":{
+    "scene_id":"CSD9-RAMAYANA-DEMO-001",
+    "source":"CSD8-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "expected_result":"PASS",
+    "quality_score":98,
+    "dimension_results":{
+      "reality_integrity":"PASS",
+      "knowledge_boundary":"PASS",
+      "sensory_access":"PASS",
+      "chronology":"PASS",
+      "emotional_continuity":"PASS",
+      "causal_interpretation":"PASS",
+      "character_differentiation":"PASS",
+      "audience_boundary":"PASS",
+      "frame_coverage":"PASS",
+      "cinematic_continuity":"PASS"
+    },
+    "evidence":[
+      "All three characters observe the same physical event: Ravana contains his power.",
+      "Ravana interprets the event through challenged pride and self-questioning.",
+      "Rama interprets the same event through controlled confirmation.",
+      "Hanuman interprets it through protective vigilance and trust in Rama.",
+      "No character receives Ravana's private motive as established fact.",
+      "F01-F08 maintain a single scene reality while changing controlled perspective."
+    ],
+    "promotion":{
+      "status":"ELIGIBLE",
+      "target":"CSD-002-8-FRAME-DIRECTOR",
+      "next_stage":"CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION"
+    }
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-009-QUALITY-VALIDATION","CMSE-010-PRODUCTION-EXECUTION"]
+}

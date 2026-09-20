@@ -1,0 +1,113 @@
+{
+  "schema_version":"KALP-CSD-014-SCENE-BRANCHING-DECISION-NARRATIVE-CONSEQUENCE-1.0",
+  "engine_id":"KALP-CSD-014",
+  "engine_name":"Scene Branching, Decision & Narrative Consequence Engine",
+  "status":"LOCKED",
+  "purpose":"Evaluate explicit narrative decision points, select a governed branch, propagate its immediate and downstream consequences, and promote only the selected path into canonical scene reality.",
+  "core_principle":"Character agency selects a narrative path; the selected path becomes canon only after its conditions, causal consequences and continuity are validated.",
+  "decision_model":"decision_context + character_state + knowledge_state + relationship_pressure + available_branches → selected_branch → consequence_chain → validated_canonical_path",
+  "decision_schema":{
+    "required":["decision_id","scene_id","actor","decision_point","available_branches","selection_basis","selected_branch"],
+    "selection_basis":["CHARACTER_OBJECTIVE","KNOWLEDGE_STATE","BELIEF_STATE","EMOTIONAL_STATE","RELATIONSHIP_PRESSURE","EXTERNAL_FORCE","NARRATIVE_CONSTRAINT"],
+    "rule":"Selection must be explainable from available character state and scene conditions; the engine must not grant unavailable information."
+  },
+  "branch_schema":{
+    "required":["branch_id","condition","event_path","immediate_consequences","downstream_consequences","latent_alternatives"],
+    "condition_types":["CHARACTER_CHOICE","PRECONDITION","REACTION","DISCOVERY","EXTERNAL_EVENT","ENVIRONMENTAL_TRIGGER"],
+    "states":["AVAILABLE","SELECTED","REJECTED","LATENT","INVALID","COMPLETED"]
+  },
+  "consequence_model":{
+    "layers":["IMMEDIATE","SHORT_TERM","RELATIONAL","EMOTIONAL","KNOWLEDGE","WORLD","NARRATIVE","PRODUCTION"],
+    "propagation_rule":"A selected branch may trigger downstream consequences only through explicit causal edges or validated transition contracts.",
+    "latent_rule":"Unselected valid branches remain latent and cannot mutate canonical reality.",
+    "irreversibility":"A consequence marked irreversible cannot be silently removed by later branch selection."
+  },
+  "decision_pipeline":[
+    "LOAD_ACTIVE_CANONICAL_SNAPSHOT",
+    "LOAD_CSD006_CHARACTER_STATE",
+    "LOAD_CSD007_KNOWLEDGE_STATE",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "IDENTIFY_DECISION_POINT",
+    "VALIDATE_AVAILABLE_BRANCHES",
+    "EVALUATE_DECISION_BASIS",
+    "SELECT_OR_REQUEST_SELECTION",
+    "TRACE_CONSEQUENCE_CHAIN",
+    "VALIDATE_CAUSAL_DEPENDENCIES",
+    "CLASSIFY_IMMEDIATE_AND_DOWNSTREAM_EFFECTS",
+    "PRESERVE_LATENT_ALTERNATIVES",
+    "EMIT_CSD012_TRANSITION_PLAN",
+    "UPDATE_CANONICAL_BRANCH_STATE",
+    "RUN_CSD011_CONTINUITY_VALIDATION",
+    "HANDOFF_TO_CSD010_AND_CSD002"
+  ],
+  "agency_rules":[
+    "A character cannot select a branch using information unavailable under CSD-007.",
+    "Emotion can influence a decision but cannot substitute for a missing factual prerequisite.",
+    "A decision must have an actor with a valid active character state.",
+    "The engine does not rank branches as morally or narratively superior.",
+    "If multiple branches remain valid and no explicit selection exists, status is AWAITING_DECISION rather than arbitrary selection.",
+    "External forces may constrain or eliminate branches only through explicit event conditions.",
+    "A branch selection cannot mutate immutable identity.",
+    "Maximum five active characters remains enforced."
+  ],
+  "consequence_rules":[
+    "Every promoted consequence maps to an originating selected branch.",
+    "Character consequences route through CSD-006.",
+    "Knowledge consequences route through CSD-007 and require acquisition provenance.",
+    "Perception consequences route through CSD-008/CSD-009.",
+    "Physical/world consequences route through CSD-012 and CSD-011.",
+    "Unselected branches remain queryable as latent alternatives.",
+    "Branch convergence cannot erase branch-specific history.",
+    "A later scene may reference a latent alternative only if an explicit variant/revision path is opened."
+  ],
+  "hard_failures":[
+    "DECISION_ACTOR_NOT_ACTIVE",
+    "UNAVAILABLE_INFORMATION_USED",
+    "INVALID_BRANCH_CONDITION",
+    "CONSEQUENCE_WITHOUT_CAUSAL_SOURCE",
+    "LATENT_BRANCH_MUTATES_CANON",
+    "IMMUTABLE_IDENTITY_MUTATION",
+    "CANONICAL_SNAPSHOT_MISMATCH",
+    "CSD013_GRAPH_MISMATCH",
+    "CSD011_CONTINUITY_FAILURE",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+  ],
+  "output_contract":{
+    "decision_record":"validated decision and selection basis",
+    "selected_branch":"canonical branch",
+    "latent_branches":"preserved alternatives",
+    "consequence_chain":"ordered propagated consequences",
+    "transition_plan":"CSD-012 event/state transitions",
+    "canonical_branch_state":"ACTIVE selected path",
+    "continuity_validation":"CSD-011 result",
+    "orchestration_handoff":"CSD-010 package",
+    "frame_handoff":"CSD-002 must reflect selected canonical path"
+  },
+  "demo_test":{
+    "decision_id":"CSD14-RAMAYANA-DEMO-001",
+    "scene_id":"CSD11-RAMAYANA-DEMO-001",
+    "actor":"RAVAN_001",
+    "decision_point":"Choose escalation or restraint after Rama maintains a controlled challenge.",
+    "available_branches":[
+      {"branch_id":"BRANCH_RESTRAIN","condition":"Ravana consciously suppresses escalation","event_path":["E04"],"immediate_consequences":["power_field_contained"],"downstream_consequences":["controlled_introspection","non_escalating_tension"],"latent_alternatives":["BRANCH_ESCALATE"]},
+      {"branch_id":"BRANCH_ESCALATE","condition":"Ravana releases the contained power","event_path":["E05"],"immediate_consequences":["power_field_maximized"],"downstream_consequences":["heightened_threat","forced_reaction"],"latent_alternatives":["BRANCH_RESTRAIN"]}
+    ],
+    "selection_basis":["CHARACTER_OBJECTIVE","EMOTIONAL_STATE","RELATIONSHIP_PRESSURE"],
+    "selected_branch":"BRANCH_RESTRAIN",
+    "decision_record":{
+      "knowledge_used":["Ravana knows his own intention and the visible response from Rama"],
+      "knowledge_not_used":["Rama's private reasoning remains unavailable"],
+      "agency":"Ravana selects restraint"
+    },
+    "consequence_chain":[
+      {"order":1,"layer":"IMMEDIATE","effect":"power remains contained","source":"E04"},
+      {"order":2,"layer":"EMOTIONAL","effect":"Ravana enters controlled introspection","source":"E04"},
+      {"order":3,"layer":"RELATIONAL","effect":"tension remains high without escalation","source":"E04"},
+      {"order":4,"layer":"NARRATIVE","effect":"scene question shifts toward mastery versus force","source":"E04"}
+    ],
+    "latent_branch":{"branch_id":"BRANCH_ESCALATE","state":"LATENT","canonical_mutation":false},
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-012-SCENE-EVENT-TRANSITION","CSD-013-SCENE-EVENT-GRAPH","CSD-010-ADAPTIVE-ORCHESTRATOR","CSD-002-8-FRAME-DIRECTOR","CSD-006-CHARACTER-STATE","CSD-007-KNOWLEDGE-STATE","CSD-011-CANONICAL-REALITY"]
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": "KALP-CMSE-PRODUCTION-EXECUTION-1.0",
+  "engine_id": "KALP-PXMMCO-010",
+  "engine_name": "Production Execution & Multi-Modal Cinematic Orchestrator",
+  "scene_id": "CSD-DEMO-001",
+  "mode": "PROVISIONAL_VISUAL_ASSET_EXECUTION",
+  "asset_policy": "F01 is independently generated; F02-F08 are approved storyboard-derived visual references due provider/UI limitation. Their provenance is preserved and never represented as independent provider jobs.",
+  "state_machine": [
+    "CREATED",
+    "VALIDATING",
+    "PLANNED",
+    "ASSETS_READY",
+    "GENERATING",
+    "ASSEMBLING",
+    "QA",
+    "REWORK",
+    "MASTERED",
+    "PACKAGED",
+    "DELIVERABLE"
+  ],
+  "initial_state": "CREATED",
+  "assets": [
+    {
+      "frame_id": "F01",
+      "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "provenance": "INDEPENDENT",
+      "status": "APPROVED"
+    },
+    {
+      "frame_id": "F02",
+      "asset_id": "KALP-DERIVED-F02-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F03",
+      "asset_id": "KALP-DERIVED-F03-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F04",
+      "asset_id": "KALP-DERIVED-F04-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F05",
+      "asset_id": "KALP-DERIVED-F05-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F06",
+      "asset_id": "KALP-DERIVED-F06-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F07",
+      "asset_id": "KALP-DERIVED-F07-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    },
+    {
+      "frame_id": "F08",
+      "asset_id": "KALP-DERIVED-F08-CSD003",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050",
+      "status": "APPROVED_PROVISIONAL"
+    }
+  ],
+  "pipeline": {
+    "context_assembly": "CMSE-012",
+    "prompt_compilation": "CMSE-013",
+    "provider_routing": "CMSE-014",
+    "scheduling": "CMSE-015",
+    "execution": "CMSE-010",
+    "qa": "CSD-003.4 + production QA"
+  },
+  "production_jobs": [
+    "SHOT-F01",
+    "SHOT-F02",
+    "SHOT-F03",
+    "SHOT-F04",
+    "SHOT-F05",
+    "SHOT-F06",
+    "SHOT-F07",
+    "SHOT-F08"
+  ],
+  "rules": [
+    "Preserve canonical character locks.",
+    "Preserve Mount Kailash/twilight world continuity.",
+    "Preserve frame-specific perspective and performance state.",
+    "Do not upgrade provisional storyboard-derived assets to independent-generation provenance.",
+    "Any re-generation must update asset lineage without mutating canonical character identity."
+  ],
+  "current_status": "READY_FOR_PLANNING"
+}

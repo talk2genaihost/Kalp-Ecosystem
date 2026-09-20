@@ -1,0 +1,82 @@
+{
+  "schema_version":"KALP-CSD-042-PRODUCTION-RESOURCE-NEGOTIATION-CAPACITY-MANAGER-1.0",
+  "engine_id":"KALP-CSD-042",
+  "engine_name":"Production Resource Negotiation & Capacity Manager",
+  "status":"LOCKED",
+  "purpose":"Translate governed production plans into verified capacity requests, reservations and allocations across approved providers and models, reconcile provider responses, and safely release or reallocate capacity.",
+  "core_principle":"Capacity is a negotiated operational resource, never an assumption; provider claims must be reconciled against observed capability, current health and CSD-037 authority.",
+  "inputs":["CSD-041","CSD-040","CSD-039","CSD-038","CSD-037","CMSE-014","CMSE-015","CSD-031"],
+  "resource_domains":["PROVIDER_CAPACITY","MODEL_CAPACITY","CONCURRENCY_SLOTS","QUEUE_CAPACITY","COMPUTE_CAPACITY","RETRY_CAPACITY","BUDGET_CAPACITY","RESERVATION_WINDOWS"],
+  "capacity_states":["UNKNOWN","DISCOVERED","REQUESTED","RESERVED","PARTIALLY_RESERVED","ALLOCATED","IN_USE","RELEASE_PENDING","RELEASED","EXPIRED","REJECTED","DEGRADED","RECONCILIATION_REQUIRED"],
+  "provider_capability_record":["provider_id","model_id","capability_snapshot_id","max_concurrency","available_concurrency","queue_limit","supported_job_types","supported_media","pricing_reference","observed_at","expires_at"],
+  "negotiation_pipeline":[
+    "INGEST_CSD-041_PLAN",
+    "VERIFY_CSD-037_AUTHORIZATION",
+    "DISCOVER_CURRENT_CAPACITY",
+    "COMPARE_REQUIRED_VS_AVAILABLE",
+    "BUILD_CAPACITY_REQUEST",
+    "REQUEST_RESERVATION_OR_ALLOCATION",
+    "RECONCILE_PROVIDER_RESPONSE",
+    "BIND_CAPACITY_TO_PLAN_VERSION",
+    "ISSUE_ALLOCATION_LEASE",
+    "HANDOFF_TO_CSD-037",
+    "MONITOR_UTILIZATION_AND_EXPIRY",
+    "RELEASE_UNUSED_CAPACITY",
+    "RECONCILE_DRIFT",
+    "TRIGGER_CSD-041_REPLAN_WHEN_REQUIRED"
+  ],
+  "negotiation_policy":{
+    "provider_neutrality":"Use only providers/models approved by CMSE-014 and CSD-037.",
+    "truth_source":"Provider-reported capacity is evidence, not canonical truth; observed execution telemetry may reduce confidence.",
+    "reservation":"A reservation is valid only for its explicit scope, quantity, capability, authorization, time window and plan version.",
+    "partial_capacity":"Partial reservations may be used only when execution waves remain dependency-safe and CSD-037 approves admission.",
+    "expiry":"Expired reservations cannot be reused without fresh capacity discovery.",
+    "overcommit":"Never knowingly allocate beyond verified provider/model capability.",
+    "fairness":"Avoid indefinite starvation of eligible workloads while protecting authorized critical-path reservations."
+  },
+  "allocation_lease":["lease_id","plan_id","plan_version","provider_id","model_id","resource_type","quantity","scope","valid_from","valid_until","authorization_id","capability_snapshot_id","status"],
+  "reconciliation_rules":[
+    "Provider response must match requested provider/model or be explicitly rejected.",
+    "Allocated quantity cannot exceed verified capacity.",
+    "Every active lease maps to one current plan version.",
+    "Expired or released leases cannot admit new jobs.",
+    "Capacity drift creates RECONCILIATION_REQUIRED or CSD-041 replan trigger.",
+    "Failed reservation must not silently fall back to another provider.",
+    "Unused capacity should be released when no longer required."
+  ],
+  "dynamic_triggers":["CAPACITY_DROP","CAPACITY_RECOVERY","RESERVATION_REJECTION","LEASE_EXPIRY","PROVIDER_HEALTH_DEGRADATION","QUEUE_LIMIT_CHANGE","MODEL_CAPABILITY_CHANGE","PLAN_VERSION_CHANGE","BUDGET_HOLD","EXECUTION_COMPLETION"],
+  "governance":{
+    "auto_actions":["DISCOVER_CAPACITY","RELEASE_UNUSED_CAPACITY","REFRESH_EXPIRING_CAPACITY","RECONCILE_OBSERVED_UTILIZATION","REQUEST_WITHIN_AUTHORIZED_ALLOCATION"],
+    "governor_review":["RESERVE_PROVIDER_CAPACITY","INCREASE_RESERVED_QUANTITY","EXTEND_RESERVATION_WINDOW","SWITCH_TO_APPROVED_ALTERNATIVE"],
+    "operator_review":["UNAPPROVED_PROVIDER","CANONICAL_PRIORITY_CHANGE","BRANCH_ACTIVATION","IDENTITY_OR_MASTER_CHANGE"],
+    "never_allowed":["BYPASS_CSD-037","EXCEED_PROVIDER_CAPABILITY","USE_UNAPPROVED_PROVIDER","SILENT_PROVIDER_SWITCH","SILENT_PLAN_VERSION_CHANGE","MUTATE_CANONICAL_HISTORY"]
+  },
+  "failure_modes":{
+    "CAPACITY_UNKNOWN":"FAIL_CLOSED_FOR_NEW_ALLOCATION",
+    "RESERVATION_REJECTED":"RETURN_TO_CSD-041_FOR_REPLAN",
+    "PARTIAL_RESERVATION":"ALLOCATE_ONLY_VERIFIED_PORTION",
+    "CAPACITY_DRIFT":"RECONCILIATION_REQUIRED",
+    "LEASE_EXPIRED":"BLOCK_NEW_ADMISSION_UNTIL_REFRESHED",
+    "PROVIDER_UNAVAILABLE":"CSD-037_PAUSE_OR_GOVERNOR_REVIEW"
+  },
+  "manager_record":{
+    "required":["capacity_transaction_id","plan_id","plan_version","provider_id","model_id","resource_type","requested_quantity","verified_quantity","capacity_state","authorization_class","capability_snapshot_id","created_at"],
+    "immutability":"Capacity transactions are append-only; corrections create new records."
+  },
+  "demo":{
+    "capacity_transaction_id":"CAP-CSD42-HIGGSFIELD-F02-F08-001",
+    "plan_id":"PLAN-CSD41-RAMAYANA-F02-F08-001",
+    "plan_version":"v1.0",
+    "provider_id":"HIGGSFIELD",
+    "model_id":"cinematic_studio_2_5",
+    "resource_type":"PROVIDER_SLOT",
+    "requested_quantity":1,
+    "verified_quantity":1,
+    "capacity_state":"RESERVED",
+    "lease_id":"LEASE-CSD42-001",
+    "critical_path_protected":true,
+    "fallback":"Return to CSD-041 if reservation is rejected; no silent provider switch.",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-037-EXECUTION-GOVERNOR","CMSE-014-PROVIDER-ROUTING","CMSE-015-PRODUCTION-SCHEDULER","CSD-041-ADAPTIVE-PRODUCTION-STRATEGY-RESOURCE-PLANNER","CSD-043-PRODUCTION-CAPACITY-EXECUTION-ADAPTER"]
+}

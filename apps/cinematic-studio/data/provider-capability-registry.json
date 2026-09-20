@@ -1,0 +1,49 @@
+{
+  "schema_version": "KALP-PROVIDER-CAPABILITY-REGISTRY-1.0",
+  "registry_id": "KALP_PROVIDER_CAPABILITY_REGISTRY_001",
+  "policy": "Capabilities are declarative. A provider is not considered execution-ready until its adapter reports current health, supported reference workflow, limits, cost and latency.",
+  "providers": [
+    {
+      "provider_id": "CHATGPT_IMAGE_GENERATION",
+      "display_name": "ChatGPT Image Generation",
+      "status": "CONNECTED_RUNTIME",
+      "capabilities": {
+        "image_generation": true,
+        "aspect_ratio_16_9": true,
+        "reference_image": true,
+        "multi_character": true,
+        "negative_constraints": true,
+        "independent_job_api": false
+      },
+      "execution_note": "Current conversation generation path may return a composite/storyboard when multiple frames are requested; use one-frame requests for independent generation."
+    },
+    {
+      "provider_id": "HIGGSFIELD",
+      "display_name": "Higgsfield",
+      "status": "ADAPTER_AVAILABLE",
+      "capabilities": {
+        "image_generation": true,
+        "aspect_ratio_16_9": true,
+        "reference_image": true,
+        "multi_character": true,
+        "negative_constraints": true,
+        "independent_job_api": "ADAPTER_DEPENDENT"
+      },
+      "execution_note": "Requires runtime adapter/plan validation before production dispatch."
+    },
+    {
+      "provider_id": "EXTERNAL_PROVIDER_SLOT",
+      "display_name": "External Provider Slot",
+      "status": "UNCONFIGURED",
+      "capabilities": {
+        "image_generation": "UNKNOWN",
+        "aspect_ratio_16_9": "UNKNOWN",
+        "reference_image": "UNKNOWN",
+        "multi_character": "UNKNOWN",
+        "negative_constraints": "UNKNOWN",
+        "independent_job_api": "UNKNOWN"
+      },
+      "execution_note": "Placeholder for provider adapters such as a future dedicated image/video provider."
+    }
+  ]
+}

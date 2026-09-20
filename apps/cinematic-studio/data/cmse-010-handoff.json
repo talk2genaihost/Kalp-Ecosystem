@@ -1,0 +1,36 @@
+{
+  "schema_version": "KALP-CMSE-010-HANDOFF-1.0",
+  "scene_id": "CSD-DEMO-001",
+  "source_gate": "CSD-003.6",
+  "status": "BLOCKED",
+  "assets": {
+    "F01": {
+      "status": "APPROVED",
+      "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "provenance": "INDEPENDENT"
+    },
+    "F02": {
+      "status": "BLOCKED"
+    },
+    "F03": {
+      "status": "BLOCKED"
+    },
+    "F04": {
+      "status": "BLOCKED"
+    },
+    "F05": {
+      "status": "BLOCKED"
+    },
+    "F06": {
+      "status": "BLOCKED"
+    },
+    "F07": {
+      "status": "BLOCKED"
+    },
+    "F08": {
+      "status": "BLOCKED"
+    }
+  },
+  "rule": "CMSE-010 must not execute the visual production pipeline until F02-F08 each have independent generation provenance and pass asset integrity validation.",
+  "next_action": "CSD-003.5R — Provider/Generation Path Correction"
+}

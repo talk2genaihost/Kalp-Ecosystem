@@ -1,0 +1,72 @@
+{
+  "schema_version": "KALP-CSD-IDENTITY-VALIDATION-1.0",
+  "gate_id": "CSD-003.2",
+  "gate_name": "Character Identity & Visual Lock Validation",
+  "engine_id": "KALP-CSD-003.2",
+  "scene_id": "CSD-DEMO-001",
+  "frame_id": "F01",
+  "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+  "asset_type": "GENERATED_IMAGE",
+  "validation_mode": "STRUCTURAL_LOCK_COVERAGE + VISUAL_REVIEW",
+  "required_character_ids": [
+    "SHIVA_001",
+    "RAM_001",
+    "RAVAN_001"
+  ],
+  "observed_visual_review": {
+    "characters_present": [
+      "SHIVA_001",
+      "RAM_001",
+      "RAVAN_001"
+    ],
+    "mount_kailash_present": true,
+    "twilight_present": true,
+    "ravan_approaches_shiva": true,
+    "ram_as_witness": true,
+    "audience_perspective": true,
+    "composition_16_9": true,
+    "notes": "F01 visually establishes the intended three-character relationship and environment. This review confirms presence and scene-role alignment; it does not substitute for canonical face-reference matching where no registry lock exists."
+  },
+  "canonical_lock_coverage": {
+    "SHIVA_001": {
+      "status": "LOCK_AVAILABLE",
+      "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+      "identity_validation": "PASS"
+    },
+    "RAM_001": {
+      "status": "LOCK_AVAILABLE",
+      "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+      "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+      "identity_validation": "PASS"
+    },
+    "RAVAN_001": {
+      "status": "LOCK_AVAILABLE",
+      "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+      "anatomy_lock": "RAVAN_ANATOMY_001",
+      "costume_lock": "RAVAN_COSTUME_001",
+      "continuity_lock": "RAVAN_CONTINUITY_001",
+      "identity_validation": "PASS"
+    }
+  },
+  "hard_gate_rules": [
+    "Every canonical character in a generated frame must have a machine-addressable visual lock before identity validation can PASS.",
+    "Visual presence is not equivalent to identity match.",
+    "Missing canonical reference data must block propagation as a trusted continuity reference.",
+    "No generated frame may silently create or redefine canonical character identity."
+  ],
+  "result": {
+    "status": "PASS",
+    "trusted_reference": true,
+    "downstream_propagation": "ELIGIBLE",
+    "visual_identity_review": "PASS",
+    "identity_comparison_mode": "CANONICAL_LOCK_COVERAGE + VISUAL_REVIEW",
+    "note": "All three canonical characters now have registered machine-addressable visual locks. F01's prior visual review is consistent with the registered character roles and visual DNA. This gate does not claim biometric/embedding similarity because no face-similarity service is wired into CSD-003.2 yet.",
+    "next_gate": "CSD-003.3 — Reference Propagation / F02–F08 Generation"
+  },
+  "downstream": [
+    "CSD-003.3",
+    "CMSE-011",
+    "CMSE-012",
+    "CMSE-013"
+  ]
+}

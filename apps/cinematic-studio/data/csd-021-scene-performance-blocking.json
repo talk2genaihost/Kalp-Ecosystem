@@ -1,0 +1,154 @@
+{
+  "schema_version":"KALP-CSD-021-SCENE-PERFORMANCE-BLOCKING-1.0",
+  "engine_id":"KALP-CSD-021",
+  "engine_name":"Scene Performance & Blocking Director",
+  "status":"LOCKED",
+  "purpose":"Translate character objectives, emotional state, relationships, perception, camera geometry and temporal motion into coordinated actor blocking and performance choreography.",
+  "core_principle":"Performance is visible intention expressed through body, face, gaze, distance, posture, gesture, stillness and reaction; blocking makes that intention spatially legible.",
+  "performance_model":"objective + emotional_state + relationship_pressure + perception + canonical_geometry + beat_timing → blocking_and_performance_contract",
+  "blocking_schema":{
+    "required":["blocking_id","character_id","start_time","end_time","start_position","end_position","orientation","movement_intent","proximity_to_others","spatial_zone","interaction_target","continuity_state"],
+    "spatial_zones":["FOREGROUND","MIDGROUND","BACKGROUND","LEFT_ZONE","CENTER_ZONE","RIGHT_ZONE","ELEVATED","GROUND_LEVEL"],
+    "movement_intents":["HOLD","APPROACH","RETREAT","TURN","CIRCLE","ADVANCE","WITHDRAW","GUARD","ATTACK","DEFEND","OBSERVE","INTERVENE","REPOSITION"]
+  },
+  "performance_schema":{
+    "required":["performance_id","character_id","beat_id","objective","emotional_state","internal_state","facial_expression","eye_behavior","posture","gesture","breath","voice_body_alignment","reaction_trigger"],
+    "eye_behavior":["DIRECT_GAZE","OFF_AXIS_GAZE","AVOIDANCE","GLANCE","TRACK_TARGET","LOWERED_EYES","UPWARD_LOOK","STILL_GAZE"],
+    "posture":["OPEN","CLOSED","RELAXED","ALERT","DOMINANT","DEFENSIVE","CONTROLLED","TENSE","REFLECTIVE"],
+    "gesture":["NONE","MINIMAL","COMMANDING","PROTECTIVE","THREATENING","RESTRAINED","DEVOTIONAL","REFLECTIVE"]
+  },
+  "interpersonal_geometry":{
+    "required":["character_a","character_b","distance_band","relative_position","facing_relationship","power_signal","interaction_mode"],
+    "distance_bands":["INTIMATE","PERSONAL","SOCIAL","CONFRONTATIONAL","TACTICAL","DISTANT"],
+    "interaction_modes":["DIALOGUE","THREAT","PROTECTION","OBSERVATION","CHALLENGE","SUBMISSION","DOMINANCE","ALLIANCE","REACTION"]
+  },
+  "performance_rules":[
+    "Every performance choice must map to a character objective, emotional state, relationship pressure or perception.",
+    "Blocking must remain inside CSD-011 canonical spatial constraints.",
+    "Movement must have a CSD-012 causal source and fit CSD-020 timing.",
+    "Eyelines must agree with CSD-017 camera grammar and CSD-008 perspective.",
+    "Facial performance must remain consistent with CSD-006 emotional state.",
+    "Dialogue delivery must remain consistent with CSD-019 voice performance.",
+    "Power signals must not be inferred solely from physical size; use posture, distance, gaze, stillness and action.",
+    "A reaction cannot precede its trigger event.",
+    "Stillness is an intentional performance state.",
+    "Multi-character blocking must preserve the established camera axis unless an explicit motivated reset occurs.",
+    "Maximum five active characters remains enforced."
+  ],
+  "performance_dimensions":[
+    "objective",
+    "emotional_state",
+    "internal_state",
+    "facial_expression",
+    "eye_behavior",
+    "posture",
+    "gesture",
+    "breath",
+    "voice_body_alignment",
+    "reaction_latency",
+    "stillness",
+    "movement_intensity"
+  ],
+  "reaction_model":"trigger_event → perception → internal_response → visible_reaction → action_or_stillness",
+  "blocking_pipeline":[
+    "LOAD_CSD005_SCENE_INTELLIGENCE",
+    "LOAD_CSD006_EMOTIONAL_STATE",
+    "LOAD_CSD007_KNOWLEDGE_STATE",
+    "LOAD_CSD008_PERSPECTIVE_STATE",
+    "LOAD_CSD011_CANONICAL_GEOMETRY",
+    "LOAD_CSD015_CHARACTER_OBJECTIVES",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_GRAMMAR",
+    "LOAD_CSD019_AUDIO_DIALOGUE_STATE",
+    "LOAD_CSD020_TEMPORAL_MOTION_STATE",
+    "RESOLVE_CHARACTER_PERFORMANCE_INTENT",
+    "RESOLVE_START_AND_END_BLOCKING",
+    "RESOLVE_INTERPERSONAL_GEOMETRY",
+    "RESOLVE_EYELINE_NETWORK",
+    "RESOLVE_POSTURE_AND_GESTURE",
+    "RESOLVE_FACIAL_AND_EYE_PERFORMANCE",
+    "RESOLVE_REACTION_LATENCY",
+    "BIND_PERFORMANCE_TO_DIALOGUE_AND_SFX",
+    "BIND_BLOCKING_TO_CAMERA",
+    "VALIDATE_PERFORMANCE_CONTINUITY",
+    "EMIT_CSD002_PERFORMANCE_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "PERFORMANCE_WITHOUT_OBJECTIVE",
+      "PERFORMANCE_WITHOUT_EMOTIONAL_OR_INTERNAL_BASIS",
+      "BLOCKING_OUTSIDE_CANONICAL_GEOMETRY",
+      "MOVEMENT_WITHOUT_CAUSAL_SOURCE",
+      "EYE_LINE_TARGET_UNRESOLVED",
+      "REACTION_BEFORE_TRIGGER",
+      "PERFORMANCE_KNOWLEDGE_VIOLATION",
+      "CAMERA_AXIS_CONTRADICTION",
+      "DIALOGUE_BODY_MISMATCH",
+      "EMOTIONAL_CONTINUITY_CONTRADICTION",
+      "POSITION_DISCONTINUITY",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "PERFORMANCE_TOO_STATIC",
+      "GESTURE_DENSITY_HIGH",
+      "REACTION_LATENCY_LOW",
+      "BLOCKING_REPETITION",
+      "EYE_LINE_REPETITION",
+      "MULTI_CHARACTER_OVERLAP"
+    ]
+  },
+  "output_contract":{
+    "performance_contract":"character performance choreography",
+    "blocking_map":"spatial blocking over time",
+    "interpersonal_geometry_map":"relationship-based physical staging",
+    "eyeline_network":"character and camera gaze relationships",
+    "reaction_map":"trigger-to-reaction timing",
+    "frame_performance_package":"CSD-002-ready performance package",
+    "production_handoff":"CMSE-010-ready performance choreography"
+  },
+  "demo_test":{
+    "scene_id":"CSD21-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "character_performance":{
+      "RAVAN_001":{
+        "role":"DRIVER",
+        "entry_posture":"DOMINANT_CONTROLLED",
+        "B02":"controlled_commanding gaze; minimal hand movement; shoulders open",
+        "B03":"holds Rama's gaze; jaw tension increases; power contained in stillness",
+        "B05":"breath slows; gaze narrows; hands remain controlled as decision pressure rises",
+        "B06":"shoulders lower; hands release tension; gaze remains direct; no theatrical collapse",
+        "B08":"turns slightly away without retreating; reflective gaze; unresolved internal question"
+      },
+      "RAM_001":{
+        "role":"COUNTERFORCE",
+        "B01":"grounded stance; calm direct gaze",
+        "B03":"minimal facial movement; shoulders relaxed; does not mirror Ravan's escalation",
+        "B04":"holds stillness; controlled breathing",
+        "B07":"small acknowledgement through eyes and posture; no triumph display"
+      },
+      "HANUMAN_001":{
+        "role":"WITNESS",
+        "B01":"protective alert stance behind Rama",
+        "B03":"tracks Ravan's movement without intervening",
+        "B04":"still, watchful; hands ready but relaxed",
+        "B07":"protective tension releases slightly after restraint",
+        "B08":"maintains observation without claiming knowledge of Ravan's private motive"
+      }
+    },
+    "interpersonal_geometry":[
+      {"pair":"RAM_001-RAVAN_001","distance_band":"CONFRONTATIONAL","relative_position":"Rama east / Ravan west","facing_relationship":"DIRECT","power_signal":"Ravan expresses force; Rama expresses control","interaction_mode":"CHALLENGE"},
+      {"pair":"RAM_001-HANUMAN_001","distance_band":"TACTICAL","relative_position":"Hanuman rear-right of Rama","facing_relationship":"PROTECTIVE","power_signal":"Hanuman readiness","interaction_mode":"PROTECTION"},
+      {"pair":"RAVAN_001-HANUMAN_001","distance_band":"DISTANT","relative_position":"Ravan west / Hanuman rear-right","facing_relationship":"INDIRECT","power_signal":"mutual threat awareness","interaction_mode":"OBSERVATION"}
+    ],
+    "reaction_map":[
+      {"trigger":"E03","character":"RAVAN_001","latency_seconds":0.5,"reaction":"breath slows; gaze narrows"},
+      {"trigger":"E04","character":"RAVAN_001","latency_seconds":0.8,"reaction":"shoulders release; power posture lowers"},
+      {"trigger":"E04","character":"RAM_001","latency_seconds":1.2,"reaction":"subtle eye acknowledgement"},
+      {"trigger":"E04","character":"HANUMAN_001","latency_seconds":1.0,"reaction":"protective readiness decreases"}
+    ],
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-020-TEMPORAL-MOTION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-010-PRODUCTION-ORCHESTRATOR"]
+}

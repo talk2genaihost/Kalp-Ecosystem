@@ -1,0 +1,107 @@
+{
+  "schema_version":"KALP-CSD-036-CONTINUITY-HEALTH-PRODUCTION-READINESS-1.0",
+  "engine_id":"KALP-CSD-036",
+  "engine_name":"Continuity Health Graph & Production Readiness Director",
+  "status":"LOCKED",
+  "purpose":"Derive a live, auditable health state for the cinematic universe and determine whether scenes, assets, branches and production jobs are safe and ready for execution.",
+  "core_principle":"Production readiness is a derived property of reconciled dependencies, not a manually asserted status.",
+  "inputs":["CSD-028","CSD-031","CSD-032","CSD-033","CSD-034","CSD-035"],
+  "health_states":["HEALTHY","DEGRADED","RECOVERING","BLOCKED","UNKNOWN"],
+  "readiness_states":["NOT_READY","CONDITIONAL_READY","READY_FOR_PRODUCTION","PRODUCTION_LOCKED"],
+  "health_domains":[
+    "CANONICAL_INTEGRITY",
+    "CONTINUITY_INTEGRITY",
+    "CHARACTER_STATE_HEALTH",
+    "KNOWLEDGE_STATE_HEALTH",
+    "WORLD_STATE_HEALTH",
+    "ASSET_LINEAGE_HEALTH",
+    "RESULT_QA_HEALTH",
+    "RECOVERY_HEALTH",
+    "BRANCH_HEALTH",
+    "EXECUTION_JOB_HEALTH"
+  ],
+  "health_graph":{
+    "node_types":["UNIVERSE","ARC","SCENE","SCENE_VERSION","CHARACTER","CHARACTER_STATE","EVENT","BRANCH","WORLD_STATE","ASSET","ASSET_VERSION","FRAME","PRODUCTION_JOB","RECOVERY"],
+    "edge_types":["DEPENDS_ON","CAUSES","AFFECTS","USES","INHERITS","PERSISTS_TO","INVALIDATED_BY","RECOVERED_BY","BLOCKS","READY_FOR"]
+  },
+  "readiness_gates":[
+    "CANONICAL_GRAPH_INTEGRITY",
+    "NO_UNRESOLVED_CRITICAL_IMPACT",
+    "NO_ACTIVE_BLOCKED_RECOVERY",
+    "NO_UNRECONCILED_SUPERSEDED_DEPENDENCY",
+    "ALL_REQUIRED_ASSETS_HAVE_VALID_LINEAGE",
+    "ALL_PRODUCTION_JOBS_HAVE_VALID_MASTER_FINGERPRINT",
+    "LOCAL_RESULT_QA_PASS",
+    "CROSS_SCENE_CONTINUITY_PASS",
+    "ACTIVE_BRANCH_IS_EXPLICIT",
+    "ACTIVE_SCENE_CHARACTER_COUNT_MAX_FIVE",
+    "NO_ORPHAN_PRODUCTION_JOBS"
+  ],
+  "health_scoring":{
+    "canonical_integrity":20,
+    "continuity_integrity":20,
+    "asset_lineage":15,
+    "result_qa":10,
+    "recovery_health":10,
+    "branch_health":10,
+    "execution_health":10,
+    "graph_integrity":5,
+    "thresholds":{"HEALTHY":90,"DEGRADED":75,"BLOCKED":"Any critical readiness failure","UNKNOWN":"Insufficient evidence"}
+  },
+  "readiness_policy":{
+    "READY_FOR_PRODUCTION":"All hard readiness gates pass and health score is at least 90.",
+    "CONDITIONAL_READY":"No critical blocker exists, but warnings or non-critical recovery work remain.",
+    "NOT_READY":"One or more required gates fail.",
+    "PRODUCTION_LOCKED":"Production snapshot explicitly frozen and execution authorization issued."
+  },
+  "health_transitions":[
+    "UNKNOWN→HEALTHY",
+    "HEALTHY→DEGRADED",
+    "HEALTHY→BLOCKED",
+    "DEGRADED→RECOVERING",
+    "RECOVERING→HEALTHY",
+    "RECOVERING→DEGRADED",
+    "RECOVERING→BLOCKED",
+    "BLOCKED→RECOVERING",
+    "DEGRADED→HEALTHY"
+  ],
+  "alert_classes":{
+    "CRITICAL":["CANONICAL_GRAPH_CORRUPTION","ACTIVE_BRANCH_AMBIGUITY","MASTER_FINGERPRINT_MISMATCH","UNRESOLVED_CRITICAL_IMPACT","ACTIVE_BLOCKED_RECOVERY"],
+    "HIGH":["LINEAGE_BREAK","CROSS_SCENE_CONTINUITY_FAILURE","ORPHAN_JOB","SUPERSEDED_ACTIVE_DEPENDENCY"],
+    "MEDIUM":["QA_WARNING","RECOVERY_WARNING","NON_CRITICAL_ASSET_DRIFT","EXECUTION_DEGRADATION"],
+    "LOW":["PRESENTATION_METADATA_DRIFT"]
+  },
+  "health_record":{
+    "required":["health_snapshot_id","timestamp","scope","domain_status","health_score","health_state","readiness_state","blocking_issues","warnings","evidence","computed_from"],
+    "immutability":"Each health snapshot is immutable; a new observation creates a new snapshot."
+  },
+  "production_readiness_actions":{
+    "READY_FOR_PRODUCTION":"Authorize eligible production jobs.",
+    "CONDITIONAL_READY":"Allow only explicitly eligible jobs; preserve warnings.",
+    "NOT_READY":"Block new dependent production.",
+    "PRODUCTION_LOCKED":"Freeze readiness snapshot and issue execution authorization."
+  },
+  "demo":{
+    "health_snapshot_id":"HEALTH-CSD36-RAMAYANA-001",
+    "scope":"RAMAYANA_UNIVERSE_001",
+    "domain_status":{
+      "canonical_integrity":"HEALTHY",
+      "continuity_integrity":"HEALTHY",
+      "character_state_health":"HEALTHY",
+      "knowledge_state_health":"HEALTHY",
+      "world_state_health":"HEALTHY",
+      "asset_lineage_health":"HEALTHY",
+      "result_qa_health":"HEALTHY",
+      "recovery_health":"HEALTHY",
+      "branch_health":"HEALTHY",
+      "execution_job_health":"HEALTHY"
+    },
+    "health_score":97,
+    "health_state":"HEALTHY",
+    "readiness_state":"READY_FOR_PRODUCTION",
+    "blocking_issues":[],
+    "warnings":[],
+    "production_authorization":"ELIGIBLE"
+  },
+  "downstream":["CSD-037-Production-Readiness-Autopilot-and-Execution-Governor","CMSE-009","CMSE-015"]
+}
