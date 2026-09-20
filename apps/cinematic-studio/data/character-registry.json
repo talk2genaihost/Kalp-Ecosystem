@@ -17,12 +17,18 @@
     {
       "character_id": "RAM_001",
       "display_name": "Ram",
-      "status": "CANONICAL"
+      "status": "CANONICAL",
+      "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+      "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0"
     },
     {
       "character_id": "RAVAN_001",
       "display_name": "Ravan",
-      "status": "CANONICAL"
+      "status": "CANONICAL",
+      "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+      "anatomy_lock": "RAVAN_ANATOMY_001",
+      "costume_lock": "RAVAN_COSTUME_001",
+      "continuity_lock": "RAVAN_CONTINUITY_001"
     },
     {
       "character_id": "HANUMAN_001",
