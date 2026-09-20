@@ -1,0 +1,135 @@
+{
+  "schema_version":"KALP-CSD-018-SCENE-VISUAL-LANGUAGE-LIGHTING-ATMOSPHERE-1.0",
+  "engine_id":"KALP-CSD-018",
+  "engine_name":"Scene Visual Language, Lighting & Atmosphere Director",
+  "status":"LOCKED",
+  "purpose":"Translate narrative, emotional, spatial and camera intent into a physically coherent visual-language contract covering lighting, color, atmosphere, environmental mood and cinematic VFX.",
+  "core_principle":"Visual language expresses the scene state; it may shape emotion and attention but cannot contradict canonical reality, character identity, camera geometry or information boundaries.",
+  "visual_model":"canonical_scene_state + dramatic_beat + camera_contract + emotional_state + environment_state → visual_language_contract",
+  "lighting_schema":{
+    "required":["source_type","direction","quality","intensity","color_temperature","key_fill_ratio","shadow_behavior","rim_or_edge","practical_sources","continuity_state"],
+    "source_types":["SUN","MOON","FIRE","TORCH","LAMP","CELESTIAL","MAGICAL","ENVIRONMENTAL","PRACTICAL","BOUNCE","MIXED"],
+    "quality":["HARD","SOFT","DIFFUSED","DIRECTIONAL","WRAPPED","DYNAMIC"],
+    "rule":"Lighting direction and physically plausible source relationships must remain consistent with CSD-011 unless an explicit world event changes them."
+  },
+  "color_language":{
+    "required":["palette_family","dominant_tone","accent_tone","contrast_strategy","saturation_strategy","skin_tone_protection","continuity_rule"],
+    "palette_families":["WARM_EARTH","COOL_MOON","GOLDEN_DUSK","NEUTRAL_DAYLIGHT","STORM_DESATURATED","ROYAL_RICH","FOREST_NATURAL","LANKA_INFERNAL","DIVINE_LUMINOUS","CUSTOM"],
+    "rule":"Color may emphasize narrative state but must not visually rewrite canonical identity, costume or environment."
+  },
+  "atmosphere_schema":{
+    "required":["air_density","humidity","haze","fog","dust","smoke","wind","visibility","depth_separation","volumetric_light"],
+    "intensity_scale":"0-100",
+    "rule":"Atmospheric effects require environmental or event justification and cannot obscure required identity or continuity information without explicit intent."
+  },
+  "environmental_visual_state":{
+    "required":["time_of_day","weather","terrain_response","surface_response","ambient_motion","background_activity","environmental_mood"],
+    "mood_values":["CALM","TENSE","OMINOUS","SACRED","ROYAL","MELANCHOLIC","FEROCIOUS","MYSTERIOUS","TRIUMPHANT","REFLECTIVE"],
+    "rule":"Environmental mood is descriptive visual control metadata, not an audience-quality score."
+  },
+  "vfx_language":{
+    "categories":["ENERGY","DIVINE_AURA","DUST","SPARK","SMOKE","FIRE","WIND","PARTICLE","SHADOW_DISTORTION","LIGHT_RAYS","MAGICAL_FIELD"],
+    "required":["source_event","physical_behavior","intensity","screen_space","continuity","negative_constraints"],
+    "rule":"VFX must have a causal source or explicit canonical environmental basis."
+  },
+  "visual_continuity":{
+    "state":["key_direction","fill_direction","color_temperature","palette","contrast","atmosphere_density","visibility","vfx_state","environmental_mood"],
+    "handoff_rule":"Every frame inherits the previous visual state unless an explicit motivated event changes it.",
+    "hard_rule":"A visual change cannot silently change time, weather, location, character appearance or world condition."
+  },
+  "visual_rules":[
+    "Every lighting decision maps to canonical environment or an explicit production-motivated source.",
+    "Lighting cannot reveal physical information unavailable to the scene.",
+    "Emotional state may influence visual emphasis but cannot invent environmental facts.",
+    "Color language must preserve identity, costume and canonical world attributes.",
+    "Atmosphere must preserve minimum identity readability unless intentional occlusion is declared.",
+    "VFX requires a source event, environmental basis or explicit supernatural rule.",
+    "Camera exposure and lighting must remain compatible with CSD-017.",
+    "Visual state changes must be time-ordered and causally explainable.",
+    "All eight frames must inherit a coherent visual language unless a declared transition changes it.",
+    "Maximum five active characters remains enforced."
+  ],
+  "visual_pipeline":[
+    "LOAD_CSD011_CANONICAL_REALITY",
+    "LOAD_CSD016_DRAMATIC_BEATS",
+    "LOAD_CSD017_CAMERA_CONTRACT",
+    "LOAD_CSD006_EMOTIONAL_STATE",
+    "LOAD_ENVIRONMENT_STATE",
+    "RESOLVE_LIGHTING_SOURCES",
+    "RESOLVE_LIGHT_DIRECTION_AND_QUALITY",
+    "RESOLVE_COLOR_LANGUAGE",
+    "RESOLVE_CONTRAST_AND_EXPOSURE_INTENT",
+    "RESOLVE_ATMOSPHERE",
+    "RESOLVE_ENVIRONMENTAL_MOOD",
+    "RESOLVE_VFX_LANGUAGE",
+    "BIND_VISUAL_CONTINUITY",
+    "BIND_FRAME_VISUAL_STATE",
+    "VALIDATE_VISUAL_PHYSICS_AND_CONTINUITY",
+    "EMIT_CSD002_VISUAL_LANGUAGE_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "LIGHT_SOURCE_WITHOUT_CANONICAL_BASIS",
+      "LIGHT_DIRECTION_CONTRADICTION",
+      "IMPOSSIBLE_SHADOW_DIRECTION",
+      "COLOR_STATE_CONTRADICTS_ENVIRONMENT",
+      "IDENTITY_OR_COSTUME_VISUAL_MUTATION",
+      "ATMOSPHERE_WITHOUT_ENVIRONMENTAL_BASIS",
+      "ATMOSPHERE_OBSCURES_REQUIRED_IDENTITY",
+      "VFX_WITHOUT_CAUSAL_SOURCE",
+      "VISUAL_STATE_TEMPORAL_CONTRADICTION",
+      "CAMERA_LIGHTING_CONTRADICTION",
+      "FRAME_WITHOUT_VISUAL_CONTRACT",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "LOW_LIGHT_SEPARATION",
+      "HIGH_CONTRAST",
+      "HIGH_ATMOSPHERE_DENSITY",
+      "PALETTE_DRIFT",
+      "VFX_DENSITY_HIGH",
+      "REPEATED_VISUAL_STATE"
+    ]
+  },
+  "output_contract":{
+    "visual_language_contract":"scene-wide visual grammar",
+    "lighting_map":"per-frame lighting contracts",
+    "color_language_map":"palette and contrast continuity",
+    "atmosphere_map":"environmental atmospheric state",
+    "vfx_map":"causal visual effects",
+    "frame_visual_package":"CSD-002-ready visual language package",
+    "generation_handoff":"CSD-003-compatible provider-neutral visual specification"
+  },
+  "demo_test":{
+    "scene_id":"CSD18-RAMAYANA-DEMO-001",
+    "scene_visual_language":{
+      "time_of_day":"twilight",
+      "palette_family":"GOLDEN_DUSK",
+      "dominant_tone":"warm amber",
+      "accent_tone":"deep bronze",
+      "contrast_strategy":"controlled_high_contrast",
+      "environmental_mood":"TENSE_TO_REFLECTIVE",
+      "atmosphere":{"air_density":35,"humidity":30,"haze":20,"fog":0,"dust":10,"smoke":0,"wind":18,"visibility":88,"depth_separation":65,"volumetric_light":35}
+    },
+    "lighting_continuity":{
+      "key_direction":"west-low",
+      "fill_direction":"east-bounce",
+      "color_temperature":"4200K-4800K",
+      "shadow_behavior":"long_soft-edged twilight shadows",
+      "rim_or_edge":"subtle warm rim from low sun"
+    },
+    "frames":{
+      "F01":{"mood":"TENSE","lighting":"wide twilight key with controlled fill","color":"golden dusk","atmosphere":"light haze","vfx":"none"},
+      "F02":{"mood":"OMINOUS","lighting":"Ravan receives warm directional key with restrained shadow depth","color":"bronze-gold","atmosphere":"slightly increased depth haze","vfx":"contained energy shimmer"},
+      "F03":{"mood":"CALM","lighting":"Rama balanced key/fill","color":"warm earth-gold","atmosphere":"cleaner facial air","vfx":"subtle warm aura"},
+      "F04":{"mood":"TENSE","lighting":"shared-axis key maintained","color":"golden dusk","atmosphere":"layered depth","vfx":"none"},
+      "F05":{"mood":"SACRED","lighting":"softened contrast around the silent three-shot","color":"golden neutral","atmosphere":"quiet suspended dust","vfx":"none"},
+      "F06":{"mood":"FEROCIOUS","lighting":"Ravan key deepens while source direction remains fixed","color":"deep bronze-gold","atmosphere":"moderate haze","vfx":"contained power field"},
+      "F07":{"mood":"REFLECTIVE","lighting":"contrast releases as power is contained","color":"golden amber","atmosphere":"haze recedes slightly","vfx":"energy collapses inward"},
+      "F08":{"mood":"MYSTERIOUS","lighting":"low twilight rim with open negative space","color":"muted gold/bronze","atmosphere":"soft depth haze","vfx":"faint residual energy trace"}
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-007-WORLD-INTELLIGENCE","CMSE-013-PROMPT-COMPILER"]
+}
