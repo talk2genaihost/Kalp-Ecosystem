@@ -1,0 +1,172 @@
+{
+  "schema_version":"KALP-CSD-028-SCENE-ASSET-VERSIONING-MASTER-CONTINUITY-REGISTRY-1.0",
+  "engine_id":"KALP-CSD-028",
+  "engine_name":"Scene Asset Versioning & Master Continuity Registry",
+  "status":"LOCKED",
+  "purpose":"Maintain authoritative asset lineage, version history, canonical masters, provider proxies, derivatives, supersession, approval state and cross-scene continuity for all cinematic production assets.",
+  "core_principle":"Every asset has one auditable lineage; canonical masters are immutable, revisions create explicit versions, and no derivative or provider proxy can silently replace a master.",
+  "registry_model":"asset_source + dependency_graph + continuity_fingerprint + version_history + validation + approval → authoritative_asset_record → master_or_derivative_lineage",
+  "asset_identity":{
+    "required":["asset_id","asset_type","universe_id","source_scene_id","created_at","owner_engine","identity_fingerprint"],
+    "rule":"asset_id identifies the logical asset lineage; asset_version identifies a specific immutable artifact."
+  },
+  "version_schema":{
+    "required":["asset_id","asset_version","parent_version","version_type","created_from","created_at","created_by","change_reason","content_fingerprint","continuity_fingerprint","dependency_fingerprint","status"],
+    "version_types":["INITIAL","REVISION","DERIVATIVE","PROVIDER_PROXY","RENDER","UPSCALE","RESTORATION","VARIANT"],
+    "status":["DRAFT","VALIDATING","VALIDATED","MASTER","SUPERSEDED","INVALIDATED","ARCHIVED"],
+    "rule":"Every version is immutable after registration; corrections create a new version."
+  },
+  "master_registry":{
+    "required":["asset_id","master_version","master_type","canonicality","approval_state","approval_record","continuity_fingerprint","source_lineage","locked_dependencies"],
+    "master_types":["CHARACTER_MASTER","ENVIRONMENT_MASTER","OBJECT_MASTER","FRAME_MASTER","SHOT_MASTER","AUDIO_MASTER","VFX_MASTER","SCENE_MASTER"],
+    "canonicality":["CANONICAL","TRUSTED_REFERENCE","PROVIDER_DERIVED","DERIVATIVE"],
+    "rule":"Only one active MASTER may exist for a given logical asset lineage unless an explicit variant namespace is declared."
+  },
+  "lineage_schema":{
+    "required":["lineage_id","asset_id","parent_asset_id","parent_version","relationship","source_reason","created_at"],
+    "relationships":["DERIVED_FROM","PROVIDER_PROXY_OF","REVISION_OF","RENDERED_FROM","UPSCALED_FROM","RESTORED_FROM","VARIANT_OF","EXTRACTED_FROM","COMPOSITED_FROM"],
+    "rule":"Lineage is append-only and must remain traceable back to a canonical or explicitly trusted source."
+  },
+  "approval_model":{
+    "states":["UNREVIEWED","UNDER_REVIEW","APPROVED","LOCKED","REJECTED","RETIRED"],
+    "required":["approval_id","asset_id","asset_version","reviewer_role","decision","timestamp","validation_reference"],
+    "rule":"LOCKED requires successful continuity validation and explicit approval; rejection never deletes lineage."
+  },
+  "fingerprint_model":{
+    "required":["content_fingerprint","continuity_fingerprint","dependency_fingerprint","registry_fingerprint"],
+    "rule":"A fingerprint mismatch triggers revalidation before master promotion or reuse."
+  },
+  "provider_registry":{
+    "required":["provider_asset_id","provider_name","provider_job_id","provider_model","provider_version","source_asset_id","source_asset_version","provider_capabilities","retrieval_location","canonicality"],
+    "rule":"Provider outputs remain PROVIDER_PROXY or DERIVATIVE unless explicitly promoted through validation and approval; provider identity never overwrites KALP asset identity."
+  },
+  "cross_scene_reuse":{
+    "required":["asset_id","source_scene","target_scene","source_version","target_requirements","compatibility_result","reuse_decision"],
+    "reuse_decisions":["REUSE","REVALIDATE_THEN_REUSE","DERIVE_NEW_VERSION","REGENERATE","BLOCK"],
+    "rule":"Reuse is permitted only when continuity and dependency fingerprints satisfy target-scene requirements."
+  },
+  "supersession_model":{
+    "required":["asset_id","old_version","new_version","supersession_reason","effective_at","continuity_impact"],
+    "rule":"Supersession changes active production selection but preserves the old version for audit and rollback."
+  },
+  "rollback_model":{
+    "required":["asset_id","current_version","rollback_target","rollback_reason","dependency_check","continuity_check","approval_state"],
+    "rule":"Rollback selects a previously valid version; it never rewrites history."
+  },
+  "registry_rules":[
+    "One logical asset lineage may contain many immutable versions.",
+    "Only one active master exists per lineage unless an explicit variant namespace exists.",
+    "Canonical masters cannot be silently overwritten.",
+    "Provider proxies cannot silently become canonical.",
+    "Every derivative records its parent asset and parent version.",
+    "Every master records locked hard dependencies.",
+    "Continuity fingerprints must match before reuse.",
+    "Invalidated versions remain historical and auditable.",
+    "Superseded versions remain available for rollback.",
+    "Cross-scene reuse requires target-scene validation.",
+    "Variant timelines require explicit variant identifiers.",
+    "Asset identity is independent from provider job identity.",
+    "Maximum five active characters remains enforced."
+  ],
+  "registry_pipeline":[
+    "LOAD_CSD027_DEPENDENCY_GRAPH",
+    "LOAD_CSD026_WORLD_MEMORY",
+    "LOAD_EXISTING_ASSET_LINEAGE",
+    "REGISTER_ASSET_IDENTITY",
+    "REGISTER_VERSION",
+    "REGISTER_PARENT_LINEAGE",
+    "CALCULATE_FINGERPRINTS",
+    "REGISTER_PROVIDER_PROVENANCE",
+    "VALIDATE_CONTINUITY",
+    "VALIDATE_DEPENDENCIES",
+    "RESOLVE_MASTER_CANDIDATE",
+    "APPLY_APPROVAL_STATE",
+    "REGISTER_SUPERSESSION_IF_REQUIRED",
+    "RESOLVE_CROSS_SCENE_REUSE",
+    "BUILD_ROLLBACK_TARGETS",
+    "EMIT_MASTER_CONTINUITY_REGISTRY",
+    "EMIT_CMSE011_ASSET_MEMORY",
+    "EMIT_CMSE012_RETRIEVAL_CONTEXT"
+  ],
+  "validation":{
+    "hard_failures":[
+      "DUPLICATE_ACTIVE_MASTER",
+      "BROKEN_PARENT_LINEAGE",
+      "MISSING_CONTENT_FINGERPRINT",
+      "MISSING_CONTINUITY_FINGERPRINT",
+      "MISSING_DEPENDENCY_FINGERPRINT",
+      "PROVIDER_IDENTITY_COLLISION",
+      "UNAPPROVED_MASTER_PROMOTION",
+      "MASTER_WITH_INVALIDATED_DEPENDENCY",
+      "CROSS_SCENE_REUSE_WITHOUT_VALIDATION",
+      "SILENT_VERSION_OVERWRITE",
+      "INVALID_ROLLBACK_TARGET",
+      "VARIANT_TIMELINE_MIX",
+      "REGISTRY_LINEAGE_BREAK",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "MULTIPLE_DERIVATIVE_BRANCHES",
+      "HIGH_VERSION_FANOUT",
+      "PROVIDER_REVALIDATION_REQUIRED",
+      "STALE_RETRIEVAL_REFERENCE",
+      "ROLLBACK_CANDIDATE_AVAILABLE"
+    ]
+  },
+  "output_contract":{
+    "asset_registry":"authoritative asset records",
+    "version_registry":"immutable version history",
+    "master_registry":"active canonical/trusted masters",
+    "lineage_graph":"parent and derivative relationships",
+    "provider_registry":"provider provenance and proxy mapping",
+    "reuse_registry":"cross-scene reuse decisions",
+    "supersession_registry":"version replacement history",
+    "rollback_registry":"validated rollback targets",
+    "production_handoff":"CMSE-011/CMSE-012-ready registry context"
+  },
+  "demo_test":{
+    "scene_id":"CSD28-RAMAYANA-DEMO-001",
+    "asset_lineages":[
+      {
+        "asset_id":"F01_CANONICAL",
+        "versions":["v1.0"],
+        "master_version":"v1.0",
+        "canonicality":"TRUSTED_REFERENCE",
+        "approval_state":"LOCKED",
+        "parent_lineage":"ORIGINAL",
+        "decision":"MASTER_RETAINED"
+      },
+      {
+        "asset_id":"HF_F01_PROXY",
+        "versions":["v1.0"],
+        "master_version":null,
+        "canonicality":"PROVIDER_DERIVED",
+        "approval_state":"APPROVED",
+        "parent_lineage":"F01_CANONICAL:v1.0",
+        "decision":"REVALIDATE_THEN_REUSE"
+      },
+      {
+        "asset_id":"RAVAN_COSTUME_REFERENCE",
+        "versions":["v1.0","v1.1"],
+        "master_version":"v1.1",
+        "canonicality":"CANONICAL",
+        "approval_state":"LOCKED",
+        "supersedes":"v1.0",
+        "decision":"MASTER_V1.1"
+      }
+    ],
+    "lineage_examples":[
+      "HF_F01_PROXY:v1.0 → PROVIDER_PROXY_OF → F01_CANONICAL:v1.0",
+      "RAVAN_COSTUME_REFERENCE:v1.1 → REVISION_OF → RAVAN_COSTUME_REFERENCE:v1.0"
+    ],
+    "rollback_test":{
+      "asset_id":"RAVAN_COSTUME_REFERENCE",
+      "current_version":"v1.1",
+      "rollback_target":"v1.0",
+      "result":"BLOCKED_UNLESS_TARGET_DEPENDENCIES_AND_CANONICAL_TIMELINE_ARE_VALID"
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CMSE-011-ASSET-MEMORY","CMSE-012-PRODUCTION-RETRIEVAL","CMSE-013-PROMPT-COMPILER","CMSE-014-PROVIDER-ROUTING","CMSE-015-SCHEDULER","CSD-027-ASSET-DEPENDENCIES"]
+}

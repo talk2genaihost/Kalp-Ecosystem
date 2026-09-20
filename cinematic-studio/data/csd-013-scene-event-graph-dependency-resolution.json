@@ -1,0 +1,119 @@
+{
+  "schema_version":"KALP-CSD-013-SCENE-EVENT-GRAPH-DEPENDENCY-RESOLUTION-1.0",
+  "engine_id":"KALP-CSD-013",
+  "engine_name":"Scene Event Graph & Dependency Resolution Engine",
+  "status":"LOCKED",
+  "purpose":"Build, validate and resolve the directed causal graph of scene events, including prerequisites, parallel branches, dependencies, cascading consequences and convergence points.",
+  "core_principle":"Events may execute independently only when their causal prerequisites are satisfied; every branch must remain anchored to one canonical scene reality.",
+  "graph_model":"nodes=events; edges=causal_dependencies; branches=parallel_valid_paths; convergence=multiple valid predecessors resolving into one governed successor.",
+  "node_schema":{
+    "required":["event_id","sequence","event_type","actor","intent","preconditions","state_dependencies","outputs"],
+    "optional":["target","priority","parallel_group","branch_id","branch_condition","convergence_key","deadline_narrative_time"]
+  },
+  "edge_schema":{
+    "required":["from","to","edge_type"],
+    "edge_types":["REQUIRES","CAUSES","ENABLES","BLOCKS","CONFLICTS_WITH","PARALLEL_WITH","CONVERGES_WITH","FOLLOWS"],
+    "rule":"Edges describe causality or execution dependency; they never rewrite canonical physical reality."
+  },
+  "graph_stages":[
+    "LOAD_CANONICAL_SNAPSHOT",
+    "INGEST_EVENT_CANDIDATES",
+    "NORMALIZE_EVENT_NODES",
+    "RESOLVE_PRECONDITIONS",
+    "BUILD_DEPENDENCY_EDGES",
+    "DETECT_PARALLELIZABLE_EVENTS",
+    "DETECT_BRANCH_POINTS",
+    "DETECT_CONVERGENCE_POINTS",
+    "TOPOLOGICAL_ORDER_CHECK",
+    "CYCLE_DETECTION",
+    "CAUSAL_CONSISTENCY_CHECK",
+    "CANONICAL_STATE_COMPATIBILITY_CHECK",
+    "BUILD_EXECUTION_WAVES",
+    "IDENTIFY_CRITICAL_PATH",
+    "EMIT_RESOLUTION_PLAN"
+  ],
+  "dependency_rules":[
+    "Every non-root event must have a resolvable predecessor or explicit external trigger.",
+    "REQUIRES and CAUSES edges must point from earlier or causally prior nodes.",
+    "PARALLEL_WITH is permitted only when events do not mutate conflicting state paths.",
+    "Conflicting state mutations cannot execute in the same parallel wave.",
+    "A branch condition must be explicit; the engine does not invent outcomes.",
+    "Every branch must either terminate or converge through an explicit convergence key.",
+    "Convergence cannot erase branch-specific consequences.",
+    "An event may depend on character, knowledge, relationship, spatial, temporal, object, environment or world state.",
+    "Graph resolution never grants character knowledge; CSD-007 governs acquisition.",
+    "Resolved execution must remain compatible with the CSD-011 active snapshot.",
+    "Maximum five active characters remains enforced.",
+    "Identity locks remain immutable."
+  ],
+  "execution_waves":{
+    "definition":"A wave contains events that can be evaluated concurrently without violating dependency or state-conflict constraints.",
+    "rules":["All REQUIRES/CAUSES predecessors resolved","No conflicting state paths","Same canonical snapshot lineage","Explicit branch conditions satisfied"],
+    "statuses":["READY","BLOCKED","RUNNING","COMPLETED","REJECTED","SKIPPED"]
+  },
+  "branch_model":{
+    "branch_types":["DECISION","REACTION","DISCOVERY","COMBAT","ENVIRONMENTAL"],
+    "condition_required":true,
+    "selection_policy":"Preserve all valid branches until an explicit narrative decision selects one.",
+    "unselected_branch":"remains latent and cannot mutate ACTIVE canonical reality."
+  },
+  "critical_path":{
+    "definition":"Longest dependency chain from scene entry to scene resolution or required convergence.",
+    "purpose":["identify narrative bottlenecks","prioritize validation","estimate downstream readiness","protect turning-point dependencies"]
+  },
+  "hard_failures":[
+    "GRAPH_CYCLE",
+    "UNRESOLVED_REQUIRED_DEPENDENCY",
+    "PARALLEL_STATE_CONFLICT",
+    "AMBIGUOUS_BRANCH_CONDITION",
+    "ORPHAN_EVENT_WITHOUT_TRIGGER",
+    "INVALID_CONVERGENCE",
+    "CANONICAL_SNAPSHOT_MISMATCH",
+    "FUTURE_DEPENDENCY",
+    "IDENTITY_LOCK_MUTATION",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+  ],
+  "output_contract":{
+    "graph_id":"stable graph identifier",
+    "nodes":"normalized event nodes",
+    "edges":"resolved dependency edges",
+    "execution_waves":"parallel-safe execution groups",
+    "branches":"explicit branch states",
+    "convergence_points":"governed merges",
+    "critical_path":"ordered dependency chain",
+    "blocked_nodes":"unresolved nodes and reasons",
+    "canonical_snapshot_ref":"CSD-011 active snapshot",
+    "transition_handoffs":"CSD-012 transition contracts",
+    "production_handoff":"CSD-010/CSD-002 readiness"
+  },
+  "demo_test":{
+    "graph_id":"CSD13-RAMAYANA-DEMO-001",
+    "scene_id":"CSD11-RAMAYANA-DEMO-001",
+    "snapshot_version":"1.0",
+    "nodes":[
+      {"event_id":"E01","sequence":1,"event_type":"POWER_MANIFESTATION","actor":"RAVAN_001","intent":"demonstrate power","preconditions":[],"state_dependencies":[],"outputs":["power_field_elevated"]},
+      {"event_id":"E02","sequence":2,"event_type":"REACTION","actor":"RAM_001","intent":"maintain controlled challenge","preconditions":["power_field_elevated"],"state_dependencies":["power_field"],"outputs":["RAMA_COMPOSED"]},
+      {"event_id":"E03","sequence":3,"event_type":"DECISION","actor":"RAVAN_001","intent":"choose escalation or restraint","preconditions":["RAMA_COMPOSED"],"state_dependencies":["RAVAN_OBJECTIVE"],"outputs":["BRANCH_ESCALATE","BRANCH_RESTRAIN"]},
+      {"event_id":"E04","sequence":4,"event_type":"POWER_SUPPRESSION","actor":"RAVAN_001","intent":"choose restraint","preconditions":["BRANCH_RESTRAIN"],"state_dependencies":["power_field"],"outputs":["power_field_contained"]},
+      {"event_id":"E05","sequence":4,"event_type":"POWER_ESCALATION","actor":"RAVAN_001","intent":"choose escalation","preconditions":["BRANCH_ESCALATE"],"state_dependencies":["power_field"],"outputs":["power_field_maximized"]},
+      {"event_id":"E06","sequence":5,"event_type":"REACTION","actor":"HANUMAN_001","intent":"respond to selected Ravan state","preconditions":["E04_OR_E05"],"state_dependencies":["selected_ravan_outcome"],"outputs":["HANUMAN_RESPONSE"]},
+      {"event_id":"E07","sequence":6,"event_type":"DECISION","actor":"RAVAN_001","intent":"accept consequence of chosen path","preconditions":["HANUMAN_RESPONSE"],"state_dependencies":["character_state"],"outputs":["SCENE_RESOLUTION"]}
+    ],
+    "edges":[
+      {"from":"E01","to":"E02","edge_type":"CAUSES"},
+      {"from":"E02","to":"E03","edge_type":"REQUIRES"},
+      {"from":"E03","to":"E04","edge_type":"ENABLES"},
+      {"from":"E03","to":"E05","edge_type":"ENABLES"},
+      {"from":"E04","to":"E06","edge_type":"CONVERGES_WITH","convergence_key":"RAVAN_OUTCOME"},
+      {"from":"E05","to":"E06","edge_type":"CONVERGES_WITH","convergence_key":"RAVAN_OUTCOME"},
+      {"from":"E06","to":"E07","edge_type":"CAUSES"}
+    ],
+    "execution_waves":[["E01"],["E02"],["E03"],["E04","E05"],["E06"],["E07"]],
+    "critical_path":["E01","E02","E03","E04","E06","E07"],
+    "branch_point":"E03",
+    "convergence_point":"E06",
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-012-SCENE-EVENT-TRANSITION","CSD-010-ADAPTIVE-ORCHESTRATOR","CSD-002-8-FRAME-DIRECTOR","CMSE-003-NARRATIVE-SCENE-GRAPH","CMSE-015-PRODUCTION-SCHEDULER"]
+}

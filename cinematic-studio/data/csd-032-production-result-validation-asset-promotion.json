@@ -1,0 +1,93 @@
+{
+  "schema_version":"KALP-CSD-032-PRODUCTION-RESULT-VALIDATION-ASSET-PROMOTION-1.0",
+  "engine_id":"KALP-CSD-032",
+  "engine_name":"Production Result Validation & Asset Promotion Director",
+  "status":"LOCKED",
+  "purpose":"Validate provider-generated production results against the immutable CSD-030 master and CSD-031 execution evidence, classify defects, and promote only accepted results into the CSD-028 master continuity registry.",
+  "core_principle":"A generated result is not a production asset until it proves lineage, contract fidelity, identity continuity, technical integrity and cinematic validity.",
+  "inputs":["CSD-030","CSD-031","CSD-027","CSD-028"],
+  "validation_stages":[
+    "RESULT_INGESTION",
+    "PROVENANCE_VALIDATION",
+    "JOB_LINEAGE_VALIDATION",
+    "MASTER_FINGERPRINT_VALIDATION",
+    "TECHNICAL_INTEGRITY",
+    "IDENTITY_CONTINUITY",
+    "SCENE_STATE_CONTINUITY",
+    "FRAME_CONTRACT_VALIDATION",
+    "NEGATIVE_CONSTRAINT_VALIDATION",
+    "AUDIO_VIDEO_MODALITY_VALIDATION",
+    "CINEMATIC_QA",
+    "PROMOTION_DECISION"
+  ],
+  "result_states":["RECEIVED","VALIDATING","VALIDATION_FAILED","QA_REVIEW","QA_PASSED","QA_REJECTED","PROMOTION_PENDING","PROMOTED","QUARANTINED","SUPERSEDED"],
+  "decision_policy":{
+    "PROMOTE":"All hard gates pass and no blocking defect exists.",
+    "PROMOTION_PENDING":"Validation passes but registry approval or required human review is outstanding.",
+    "QUARANTINE":"Lineage, identity, integrity or canonical-state uncertainty prevents safe use.",
+    "REJECT":"Hard validation failure or cinematic defect makes the result unsuitable for the contracted frame."
+  },
+  "hard_gates":[
+    "Result must map to exactly one logical job and execution attempt.",
+    "Provider job identity and result provenance must be verifiable.",
+    "CSD-030 master revision and fingerprint must match the execution contract.",
+    "Result must not claim a superseded or rejected input asset as current master.",
+    "Technical media integrity must pass.",
+    "Character identity must remain within the locked identity tolerance.",
+    "Costume, props, environment and spatial continuity must remain contract-compliant.",
+    "Frame perspective, camera intent and blocking must remain within the approved production contract.",
+    "Negative constraints must not be violated.",
+    "No future-state or cross-scene information leakage may be introduced.",
+    "Promotion cannot occur before QA acceptance.",
+    "Promotion must create an immutable asset version with complete lineage."
+  ],
+  "quality_dimensions":{
+    "provenance":15,
+    "technical_integrity":15,
+    "identity_continuity":20,
+    "scene_continuity":10,
+    "frame_contract":10,
+    "negative_constraints":10,
+    "cinematic_quality":10,
+    "lineage_completeness":10
+  },
+  "thresholds":{
+    "PROMOTE":90,
+    "PROMOTION_PENDING":80,
+    "QUARANTINE":null,
+    "REJECT":"Any hard-gate failure"
+  },
+  "defect_classes":{
+    "BLOCKING":["IDENTITY_DRIFT","MASTER_MISMATCH","LINEAGE_MISSING","CORRUPT_MEDIA","CANONICAL_STATE_CONFLICT","NEGATIVE_CONSTRAINT_BREACH","UNAUTHORIZED_FUTURE_STATE"],
+    "MAJOR":["COSTUME_DRIFT","PROP_DRIFT","SPATIAL_CONTINUITY_ERROR","CAMERA_CONTRACT_BREACH","PERFORMANCE_CONTRACT_BREACH","VFX_CONTINUITY_ERROR"],
+    "MINOR":["FRAMING_VARIANCE","NON_CRITICAL_ATMOSPHERE_VARIANCE","MICRO_EXPRESSION_VARIANCE"]
+  },
+  "promotion_record":{
+    "required":["asset_version_id","logical_job_id","attempt_id","master_revision","master_fingerprint","source_result_uri","result_fingerprint","validation_record","qa_status","approved_at","lineage"],
+    "registry_target":"CSD-028-MASTER-CONTINUITY-REGISTRY",
+    "immutability":"PROMOTED ASSET VERSION IS IMMUTABLE"
+  },
+  "rework_routes":{
+    "identity":"CSD-006",
+    "knowledge":"CSD-007",
+    "perception":"CSD-008",
+    "scene_logic":"CSD-005",
+    "frame":"CSD-002",
+    "visual_compilation":"CSD-011",
+    "asset_dependency":"CSD-027",
+    "asset_registry":"CSD-028",
+    "execution":"CSD-031"
+  },
+  "demo":{
+    "logical_job_id":"JOB-CSD31-RAMAYANA-F01",
+    "attempt_id":3,
+    "result_id":"RESULT-CSD32-RAMAYANA-F01-A3",
+    "validation_score":97,
+    "hard_gates":"PASS",
+    "qa_status":"QA_PASSED",
+    "promotion":"PROMOTED",
+    "asset_version_id":"ASSET-F01-v1.1",
+    "canonical_master_preserved":true
+  },
+  "downstream":["CSD-028-MASTER-CONTINUITY-REGISTRY","CSD-033-PRODUCTION-QA-AND-CROSS-SCENE-CONTINUITY"]
+}

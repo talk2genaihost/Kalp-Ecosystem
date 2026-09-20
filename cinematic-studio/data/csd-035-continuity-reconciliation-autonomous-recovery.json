@@ -1,0 +1,98 @@
+{
+  "schema_version":"KALP-CSD-035-CONTINUITY-RECONCILIATION-AUTONOMOUS-RECOVERY-1.0",
+  "engine_id":"KALP-CSD-035",
+  "engine_name":"Continuity Reconciliation & Autonomous Recovery Director",
+  "status":"LOCKED",
+  "purpose":"Convert CSD-034 impact frontiers into dependency-safe recovery plans, execute eligible repairs in deterministic order, reconcile resulting state, and reopen only proven-consistent production nodes.",
+  "core_principle":"Recovery repairs derived state without rewriting history; autonomous action is permitted only inside explicit safety boundaries.",
+  "inputs":["CSD-034","CSD-033","CSD-032","CSD-031","CSD-028"],
+  "recovery_states":["RECOVERY_REQUESTED","IMPACT_LOCKED","PLAN_BUILT","AWAITING_AUTHORIZATION","RECOVERY_EXECUTING","REVALIDATING","RECONCILING","RECOVERY_PASSED","RECOVERY_PASSED_WITH_WARNINGS","RECOVERY_BLOCKED","RECOVERY_FAILED","QUARANTINED"],
+  "action_classes":["REVALIDATE","REASSEMBLE","REGENERATE","REEXECUTE","RESTORE_LAST_VALID","QUARANTINE","BLOCK","NO_ACTION"],
+  "autonomy_policy":{
+    "AUTO_ALLOWED":["REVALIDATE","REASSEMBLE","REGENERATE","REEXECUTE","RESTORE_LAST_VALID","QUARANTINE","NO_ACTION"],
+    "AUTHORIZATION_REQUIRED":["IDENTITY_CHANGE","CANONICAL_SCENE_CHANGE","BRANCH_PROMOTION","HISTORICAL_REVISION","MASTER_ASSET_REPLACEMENT"],
+    "NEVER_ALLOWED":["DELETE_CANONICAL_HISTORY","OVERWRITE_IMMUTABLE_MASTER","SILENT_BRANCH_SWITCH","BYPASS_VALIDATION","PROMOTE_UNVALIDATED_RESULT"]
+  },
+  "recovery_pipeline":[
+    "INGEST_IMPACT_PLAN",
+    "LOCK_AFFECTED_DERIVATIVES",
+    "VERIFY_CANONICAL_SOURCE",
+    "CLASSIFY_RECOVERY_ACTIONS",
+    "BUILD_DEPENDENCY_SAFE_PLAN",
+    "CHECK_AUTONOMY_BOUNDARIES",
+    "EXECUTE_LEAF_REPAIRS_FIRST",
+    "REBUILD_DEPENDENT_DERIVATIVES",
+    "REEXECUTE_INVALIDATED_JOBS",
+    "RUN_LOCAL_RESULT_VALIDATION",
+    "RUN_CROSS_SCENE_CONTINUITY",
+    "RECONCILE_GRAPH_FINGERPRINTS",
+    "REOPEN_ONLY_RECONCILED_NODES",
+    "ISSUE_RECOVERY_REPORT"
+  ],
+  "ordering_rules":[
+    "Canonical source truth is resolved before derived repair.",
+    "Leaf derivatives are repaired before dependent aggregates.",
+    "Scene-state and event-state reconciliation precedes frame regeneration.",
+    "Asset dependency reconciliation precedes production re-execution.",
+    "Successful result validation precedes cross-scene QA.",
+    "Cross-scene QA precedes reopening dependent scene production.",
+    "Failed recovery nodes remain quarantined and cannot silently reopen."
+  ],
+  "reconciliation_checks":[
+    "source_fingerprint_matches",
+    "dependency_fingerprint_matches",
+    "scene_master_version_consistent",
+    "character_state_consistent",
+    "knowledge_state_consistent",
+    "relationship_state_consistent",
+    "event_graph_consistent",
+    "world_memory_consistent",
+    "asset_lineage_consistent",
+    "result_validation_passed",
+    "cross_scene_continuity_passed",
+    "no_orphan_jobs",
+    "no_superseded_active_dependency",
+    "no_unresolved_blocker"
+  ],
+  "recovery_outcomes":{
+    "RECOVERY_PASSED":"All affected active nodes reconciled and eligible for production.",
+    "RECOVERY_PASSED_WITH_WARNINGS":"No blocking inconsistency remains; warnings are recorded.",
+    "RECOVERY_BLOCKED":"A canonical or authorization boundary prevents autonomous recovery.",
+    "RECOVERY_FAILED":"An authorized repair was attempted but validation failed.",
+    "QUARANTINED":"A node remains isolated until missing evidence or lineage is restored."
+  },
+  "safety_invariants":[
+    "Historical canonical scene versions remain immutable.",
+    "CSD-030 master snapshots remain immutable.",
+    "Every autonomous action creates an auditable recovery event.",
+    "Every regenerated asset receives new lineage; old versions remain preserved.",
+    "A failed replacement never destroys the last valid version.",
+    "Recovery cannot activate an inactive narrative branch.",
+    "Recovery cannot exceed five active scene characters.",
+    "Recovery cannot bypass CSD-032 or CSD-033.",
+    "Recovery must be idempotent: repeating the same plan does not create uncontrolled duplicate work."
+  ],
+  "recovery_record":{
+    "required":["recovery_id","source_change_id","started_at","affected_nodes","action_plan","authorization_state","events","validation_results","reconciliation_results","final_state"],
+    "event_fields":["event_id","recovery_id","node_id","action","from_state","to_state","reason","timestamp","input_fingerprint","output_fingerprint"]
+  },
+  "demo":{
+    "recovery_id":"RECOVERY-CSD35-RAVAN-COSTUME-001",
+    "source_change_id":"CHANGE-CSD34-RAVAN-COSTUME-001",
+    "authorization_state":"AUTO_ALLOWED",
+    "plan":[
+      {"node":"SCENE-KAILASH-CONFRONTATION","action":"REVALIDATE"},
+      {"node":"FRAME-F04","action":"REGENERATE"},
+      {"node":"FRAME-F06","action":"REGENERATE"},
+      {"node":"JOB-F04","action":"REEXECUTE"},
+      {"node":"JOB-F06","action":"REEXECUTE"},
+      {"node":"SCENE-AFTER-CONFRONTATION","action":"REVALIDATE"},
+      {"node":"SCENE-LANKA-RETURN","action":"REVALIDATE"}
+    ],
+    "reconciliation":"PASS",
+    "final_state":"RECOVERY_PASSED",
+    "canonical_history_mutated":false,
+    "last_valid_versions_preserved":true
+  },
+  "downstream":["CSD-036-Continuity-Health-Graph-and-Production-Readiness","CMSE-009","CMSE-015","CMSE-011"]
+}

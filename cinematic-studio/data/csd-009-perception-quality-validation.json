@@ -1,0 +1,113 @@
+{
+  "schema_version":"KALP-CSD-009-PERCEPTION-QUALITY-VALIDATION-1.0",
+  "engine_id":"KALP-CSD-009",
+  "engine_name":"Scene Perception Quality & Validation Director",
+  "status":"LOCKED",
+  "purpose":"Act as the hard quality gate between CSD-008 perception resolution and downstream CSD-002 storyboard/visual production.",
+  "core_principle":"A perception is production-ready only when it is causally supported, information-valid, physically plausible, emotionally coherent, continuity-safe and meaningfully distinct from other perspectives while remaining inside one canonical reality.",
+  "validation_layers":[
+    "CANONICAL_REALITY_INTEGRITY",
+    "CHARACTER_IDENTITY_INTEGRITY",
+    "SENSORY_ACCESS_VALIDATION",
+    "KNOWLEDGE_BOUNDARY_VALIDATION",
+    "EMOTIONAL_CAUSALITY_VALIDATION",
+    "BELIEF_INTERPRETATION_VALIDATION",
+    "RELATIONSHIP_CONTEXT_VALIDATION",
+    "TEMPORAL_CONTINUITY_VALIDATION",
+    "OBSERVATION_INTERPRETATION_SEPARATION",
+    "BLIND_SPOT_VALIDATION",
+    "AUDIENCE_INFORMATION_BOUNDARY",
+    "MULTI_CHARACTER_PERSPECTIVE_DIFFERENTIATION",
+    "EIGHT_FRAME_COVERAGE",
+    "CSD002_HANDOFF_VALIDATION"
+  ],
+  "hard_failures":[
+    "MULTIPLE_CANONICAL_REALITIES",
+    "UNKNOWN_INFORMATION_LEAK",
+    "FUTURE_INFORMATION_LEAK",
+    "AUDIENCE_ONLY_INFORMATION_LEAK",
+    "IMPOSSIBLE_SENSORY_ACCESS",
+    "EMOTION_PRESENTED_AS_PHYSICAL_EVIDENCE",
+    "BELIEF_PRESENTED_AS_OBJECTIVE_FACT",
+    "PERCEPTION_WITHOUT_CHARACTER_STATE_BASIS",
+    "IDENTITY_OR_CONTINUITY_CONTRADICTION",
+    "UNEXPLAINED_RELATIONSHIP_STATE",
+    "FRAME_PERSPECTIVE_WITHOUT_VALID_CHARACTER",
+    "FRAME_COUNT_NOT_EQUAL_TO_8",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+  ],
+  "quality_dimensions":{
+    "reality_integrity":"All characters perceive the same underlying physical events and world state.",
+    "information_integrity":"Each perception uses only information legitimately available to its character.",
+    "causal_integrity":"Attention and interpretation are explainable from objective, emotion, knowledge and relationship state.",
+    "sensory_integrity":"Perceived details are accessible through established sight, sound, proximity, timing or other valid sensory channels.",
+    "temporal_integrity":"No state or knowledge from a later narrative point is imported early.",
+    "interpretive_integrity":"Subjective meaning remains distinguishable from observable evidence.",
+    "continuity_integrity":"Character identity, emotional carryover, relationships and world state remain consistent.",
+    "perspective_differentiation":"Different POVs produce meaningful differences in attention or interpretation rather than cosmetic camera changes.",
+    "audience_integrity":"Audience-only information is explicitly controlled and never silently assigned to a character.",
+    "production_readiness":"The result contains enough deterministic information for CSD-002 frame direction."
+  },
+  "scoring_model":{
+    "mode":"GATE_BASED_NOT_RANKING",
+    "required_gates":10,
+    "pass_rule":"All hard gates pass; advisory observations may remain open.",
+    "advisory_categories":["LOW_PERSPECTIVE_DIFFERENTIATION","WEAK_SALIENCE","UNDERDEFINED_BLIND_SPOT","LOW_AUDIENCE_CLARITY"],
+    "no_score_claim":"This engine does not rank characters or scenes; it determines production validity."
+  },
+  "validation_contract":{
+    "input":{
+      "required":["canonical_reality","character_perceptions","frame_perspective_map","knowledge_state","emotional_state"],
+      "optional":["relationship_state","audience_information_boundary","scene_id","story_arc_id"]
+    },
+    "output":{
+      "status":"PASS | PASS_WITH_ADVISORIES | BLOCKED",
+      "gate_results":"per-validation gate status and evidence",
+      "violations":"hard and advisory findings",
+      "canonical_reality_check":"shared reality confirmation",
+      "perspective_differentiation_check":"meaningful POV differences",
+      "frame_coverage":"F01-F08 coverage",
+      "production_handoff":"CSD-002 readiness and constraints",
+      "validation_fingerprint":"stable digest input for downstream lineage"
+    }
+  },
+  "deterministic_rules":[
+    "Every perception must map to at least one valid emotional, informational, objective or relational cause.",
+    "Every perceived external detail must have sensory access or explicit scene evidence.",
+    "Every interpretation must be marked as interpretation, belief or inference.",
+    "Unknown and withheld information must remain unavailable.",
+    "One canonical event may have multiple interpretations but never multiple incompatible physical occurrences.",
+    "At least two meaningful perspective dimensions must differ across distinct character POVs when multiple POV characters are used.",
+    "All eight frame directives must resolve to valid perspective assignments.",
+    "CSD-006 emotional state and CSD-007 information state are mandatory upstream dependencies.",
+    "A failed hard gate blocks downstream visual promotion."
+  ],
+  "demo_test":{
+    "scene_id":"CSD9-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "canonical_reality":["Ravana contains his power","Rama remains composed","Hanuman remains ready but does not intervene","no physical escalation occurs"],
+    "expected_gate_results":{
+      "CANONICAL_REALITY_INTEGRITY":"PASS",
+      "CHARACTER_IDENTITY_INTEGRITY":"PASS",
+      "SENSORY_ACCESS_VALIDATION":"PASS",
+      "KNOWLEDGE_BOUNDARY_VALIDATION":"PASS",
+      "EMOTIONAL_CAUSALITY_VALIDATION":"PASS",
+      "BELIEF_INTERPRETATION_VALIDATION":"PASS",
+      "RELATIONSHIP_CONTEXT_VALIDATION":"PASS",
+      "TEMPORAL_CONTINUITY_VALIDATION":"PASS",
+      "OBSERVATION_INTERPRETATION_SEPARATION":"PASS",
+      "BLIND_SPOT_VALIDATION":"PASS",
+      "AUDIENCE_INFORMATION_BOUNDARY":"PASS",
+      "MULTI_CHARACTER_PERSPECTIVE_DIFFERENTIATION":"PASS",
+      "EIGHT_FRAME_COVERAGE":"PASS",
+      "CSD002_HANDOFF_VALIDATION":"PASS"
+    },
+    "advisories":[],
+    "production_handoff":{
+      "status":"READY",
+      "constraints":["Preserve one canonical physical reality","Do not expose unknown information through dialogue or reaction","Keep Ravan's introspection visible only through supported performance cues","Preserve Rama's composure and Hanuman's latent readiness"],
+      "next_stage":"CSD-002-8-FRAME-DIRECTOR"
+    }
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-009-CINEMATIC-QUALITY-VALIDATION"]
+}

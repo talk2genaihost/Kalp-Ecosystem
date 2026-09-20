@@ -1,0 +1,155 @@
+{
+  "schema_version":"KALP-CSD-019-SCENE-SOUND-DIALOGUE-AUDIO-ATMOSPHERE-1.0",
+  "engine_id":"KALP-CSD-019",
+  "engine_name":"Scene Sound, Dialogue & Audio Atmosphere Director",
+  "status":"LOCKED",
+  "purpose":"Translate narrative beats, character intent, knowledge state, emotional state, canonical environment and visual pacing into an executable audio contract for dialogue, voice performance, ambience, sound effects, music, silence and spatial perspective.",
+  "core_principle":"Sound carries narrative information through time; it may reveal, conceal, intensify or release attention, but it cannot grant characters knowledge they do not possess or contradict canonical events.",
+  "audio_model":"dramatic_beat + character_state + knowledge_state + canonical_event_state + visual_state + camera_perspective → synchronized_audio_contract",
+  "audio_layers":{
+    "required":["dialogue","voice_performance","diegetic_ambience","sound_effects","music","silence","spatial_audio","transition"],
+    "priority_rule":"Narrative-critical dialogue and causally required sounds take precedence over decorative audio."
+  },
+  "dialogue_schema":{
+    "required":["line_id","speaker","text","intent","emotional_state","delivery","knowledge_basis","target","start_offset_seconds","duration_seconds","mix_priority"],
+    "delivery":["WHISPER","SOFT","CONVERSATIONAL","CONTROLLED","COMMANDING","INTENSE","ROAR","CHANT","VOICEOVER"],
+    "mix_priority":["PRIMARY","SECONDARY","BACKGROUND"],
+    "rules":[
+      "Dialogue must be consistent with CSD-015 character objective.",
+      "Speaker can only verbalize information permitted by CSD-007.",
+      "Delivery must reflect CSD-006 emotional state and CSD-015 intention.",
+      "No dialogue may create an event that does not exist in CSD-012.",
+      "Dialogue timing must fit the CSD-016 beat and preserve dramatic pauses."
+    ]
+  },
+  "voice_performance":{
+    "dimensions":["register","pace","pitch","intensity","articulation","breath","pause_pattern","emotional_color","authority","distance"],
+    "rule":"Voice identity is immutable; performance state may change scene by scene."
+  },
+  "ambience_schema":{
+    "required":["environment_source","base_layer","activity_layers","weather_layer","distance_bed","intensity","continuity"],
+    "sources":["WIND","WATER","FOREST","CITY","BATTLEFIELD","PALACE","TEMPLE","MOUNTAIN","NIGHT","CROWD","SILENCE","CUSTOM"],
+    "rule":"Diegetic ambience must have a canonical environmental basis."
+  },
+  "sfx_schema":{
+    "required":["sfx_id","source_event","sound","perspective","intensity","duration_seconds","sync_point","diegetic_status"],
+    "perspectives":["ON_AXIS","OFF_AXIS","CHARACTER_SUBJECTIVE","WORLD_AMBIENT","DISTANT","CLOSE"],
+    "diegetic_status":["DIEGETIC","NON_DIEGETIC","HYBRID"],
+    "rule":"Every significant SFX must map to a CSD-012 event, canonical environmental condition or explicitly declared production transition."
+  },
+  "music_schema":{
+    "required":["music_id","source","function","entry_beat","exit_beat","motif","intensity","instrumentation","diegetic_status"],
+    "functions":["TENSION","MYSTERY","DEVOTIONAL","ROYAL","CONFRONTATION","REFLECTION","TRANSITION","HOOK","SILENCE_REPLACEMENT"],
+    "rule":"Music supports the scene objective; it must not replace required causal information."
+  },
+  "silence_schema":{
+    "required":["silence_id","beat_id","duration_seconds","reason","preceding_state","following_state"],
+    "rule":"Silence is an intentional dramatic state and must be represented explicitly when it carries narrative or emotional function."
+  },
+  "spatial_audio":{
+    "required":["listener_anchor","source_positions","distance_model","occlusion","reverb_space","perspective_mode"],
+    "perspective_modes":["AUDIENCE","CHARACTER_SUBJECTIVE","WORLD_OBJECTIVE","POV"],
+    "rule":"Spatial audio must resolve from CSD-011 geometry and CSD-017 camera/perspective state."
+  },
+  "audio_continuity":{
+    "state":["dialogue_register","ambience_bed","music_state","active_sfx","reverb_space","listener_anchor","dynamic_range","spatial_perspective"],
+    "handoff_rule":"Every beat inherits the previous audio state unless a causally motivated event or transition changes it."
+  },
+  "audio_rules":[
+    "Every audio event has a narrative, environmental or production basis.",
+    "Character voice identity remains immutable.",
+    "Dialogue respects knowledge and belief boundaries.",
+    "Audio perspective must agree with visual perspective unless explicitly motivated.",
+    "A sound cannot imply an unseen event that has not occurred.",
+    "Off-screen sound may create uncertainty but cannot fabricate canonical events.",
+    "Music and ambience cannot mask required dialogue or causally essential SFX.",
+    "Silence may be used as an explicit dramatic beat.",
+    "Audio transitions must remain synchronized with CSD-016 timing.",
+    "Maximum five active characters remains enforced."
+  ],
+  "audio_pipeline":[
+    "LOAD_CSD015_SCENE_OBJECTIVES",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_PERSPECTIVE",
+    "LOAD_CSD018_VISUAL_STATE",
+    "LOAD_CSD006_EMOTIONAL_STATE",
+    "LOAD_CSD007_KNOWLEDGE_BOUNDARY",
+    "LOAD_CSD011_CANONICAL_EVENTS_AND_ENVIRONMENT",
+    "RESOLVE_DIALOGUE",
+    "RESOLVE_VOICE_PERFORMANCE",
+    "RESOLVE_AMBIENCE",
+    "RESOLVE_EVENT_SFX",
+    "RESOLVE_MUSIC",
+    "RESOLVE_INTENTIONAL_SILENCE",
+    "RESOLVE_SPATIAL_AUDIO",
+    "BIND_AUDIO_TO_BEATS",
+    "BIND_AUDIO_CONTINUITY",
+    "VALIDATE_AUDIO_CAUSALITY_AND_KNOWLEDGE",
+    "EMIT_CSD002_AUDIO_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "DIALOGUE_KNOWLEDGE_VIOLATION",
+      "DIALOGUE_WITHOUT_CHARACTER_OBJECTIVE",
+      "VOICE_IDENTITY_MUTATION",
+      "SFX_WITHOUT_CAUSAL_SOURCE",
+      "AMBIENCE_WITHOUT_CANONICAL_BASIS",
+      "MUSIC_TIMING_CONTRADICTS_BEAT",
+      "AUDIO_EVENT_OUTSIDE_CANONICAL_TIMELINE",
+      "SPATIAL_AUDIO_GEOMETRY_CONTRADICTION",
+      "AUDIO_VISUAL_PERSPECTIVE_CONTRADICTION",
+      "SILENCE_DURATION_INVALID",
+      "FRAME_OR_BEAT_WITHOUT_AUDIO_BINDING",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "DIALOGUE_DENSITY_HIGH",
+      "MUSIC_MASKING_RISK",
+      "LOW_DYNAMIC_RANGE",
+      "AMBIENCE_TOO_STATIC",
+      "SFX_DENSITY_HIGH",
+      "SPATIAL_SOURCE_UNRESOLVED"
+    ]
+  },
+  "output_contract":{
+    "audio_language_contract":"scene-wide audio grammar",
+    "dialogue_map":"timed dialogue and voice performance",
+    "ambience_map":"continuous environmental sound state",
+    "sfx_map":"event-synchronized sound effects",
+    "music_map":"music and motif timing",
+    "silence_map":"intentional silence units",
+    "spatial_audio_map":"listener/source geometry",
+    "frame_audio_package":"CSD-002-ready audio package",
+    "generation_handoff":"CMSE-010 / provider-neutral audio production specification"
+  },
+  "demo_test":{
+    "scene_id":"CSD19-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "audio_language_contract":{
+      "dialogue_style":"minimal, authoritative, deliberate",
+      "ambient_bed":"mountain wind with restrained distant battlefield presence",
+      "music":"low devotional-confrontation drone, entering after establishment",
+      "dynamic_strategy":"quiet baseline → pressure rise → near-silence at decision → controlled release"
+    },
+    "beats":{
+      "B01":{"dialogue":"Ravan declares the purpose of his demonstration","voice":"CONTROLLED_COMMANDING","ambience":"twilight mountain wind","music":"very low drone","silence":"none"},
+      "B02":{"dialogue":"Ravan continues the challenge","voice":"COMMANDING","ambience":"wind sustained","music":"confrontation motif enters","sfx":"subtle energy resonance"},
+      "B03":{"dialogue":"Rama answers without raising his voice","voice":"CONTROLLED","ambience":"wind reduced","music":"motif held beneath dialogue","sfx":"none"},
+      "B04":{"dialogue":"no dialogue","voice":"none","ambience":"wind and distant space","music":"drops","silence":"6-second dramatic breathing space"},
+      "B05":{"dialogue":"Ravan's breath and restrained preparation carry the decision","voice":"INTENSE_INTERNAL","ambience":"low wind","music":"tension rises","sfx":"contained power resonance"},
+      "B06":{"dialogue":"no explanatory dialogue; restraint is heard through breath and collapsing energy","voice":"CONTROLLED","ambience":"energy decays","music":"releases","sfx":"energy collapse"},
+      "B07":{"dialogue":"minimal reaction only if causally required","voice":"SOFT_CONTROLLED","ambience":"wind returns","music":"reflective motif","sfx":"none"},
+      "B08":{"dialogue":"Ravan leaves the mastery question unresolved","voice":"LOW_REFLECTIVE","ambience":"open twilight wind","music":"faint unresolved motif","sfx":"residual energy trace"}
+    },
+    "spatial_audio_state":{
+      "listener_anchor":"AUDIENCE",
+      "source_positions":"resolved from CSD-011 character and environment geometry",
+      "reverb_space":"open mountain confrontation",
+      "perspective_mode":"AUDIENCE",
+      "dynamic_range":"wide"
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CMSE-010-PRODUCTION-ORCHESTRATOR","CMSE-013-PROMPT-COMPILER","CMSE-015-PRODUCTION-SCHEDULER"]
+}

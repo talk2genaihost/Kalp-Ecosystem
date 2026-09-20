@@ -1,0 +1,107 @@
+{
+  "schema_version":"KALP-CMSE-013-PRODUCTION-PROMPT-COMPILER-1.0",
+  "engine_id":"CMSE-013",
+  "engine_name":"Production Prompt Compiler & Provider Translation Engine",
+  "status":"LOCKED",
+  "purpose":"Translate approved CSD-012 provider-neutral production context into provider-native prompt and job semantics without changing cinematic meaning.",
+  "core_principle":"Translation changes syntax and capability expression, never approved narrative intent, identity, perception, continuity or causal meaning.",
+  "inputs":["CSD-012 production_context_bundles","CMSE-014 provider capability profile"],
+  "outputs":["provider_native_prompt_contract","provider_constraints","translation_lineage","translation_validation"],
+  "translation_layers":[
+    "SEMANTIC_NORMALIZATION",
+    "IDENTITY_LOCK_TRANSLATION",
+    "PERFORMANCE_TRANSLATION",
+    "PERSPECTIVE_TRANSLATION",
+    "ACTION_AND_BLOCKING_TRANSLATION",
+    "ENVIRONMENT_TRANSLATION",
+    "CAMERA_TRANSLATION",
+    "LIGHTING_AND_ATMOSPHERE_TRANSLATION",
+    "VFX_TRANSLATION",
+    "REFERENCE_TRANSLATION",
+    "NEGATIVE_CONSTRAINT_TRANSLATION",
+    "OUTPUT_PARAMETER_TRANSLATION",
+    "PROVIDER_SYNTAX_EMISSION",
+    "LINEAGE_AND_FINGERPRINT"
+  ],
+  "hard_rules":[
+    "Never invent story facts.",
+    "Never promote belief, inference or audience knowledge into fact.",
+    "Never modify immutable character identity.",
+    "Never remove a continuity lock because a provider cannot express it.",
+    "Unsupported capabilities become explicit constraints or warnings; they are not silently substituted.",
+    "Provider-specific syntax may be emitted only after provider capability data is supplied.",
+    "A provider adapter may reorder syntax but may not reorder narrative priority.",
+    "Negative constraints remain explicit even when the provider has no native negative-prompt field.",
+    "References retain their role and lineage.",
+    "Translation must remain reversible to the CSD-012 semantic representation."
+  ],
+  "semantic_priority":[
+    "IDENTITY",
+    "CANONICAL_REALITY",
+    "CONTINUITY",
+    "PERFORMANCE",
+    "KNOWLEDGE",
+    "PERCEPTION",
+    "ACTION",
+    "ENVIRONMENT",
+    "CAMERA",
+    "LIGHTING",
+    "ATMOSPHERE",
+    "VFX",
+    "STYLE"
+  ],
+  "provider_capability_contract":{
+    "required_fields":["provider_id","model_id","prompt_format","supported_aspect_ratios","reference_support","negative_prompt_support","camera_control","image_generation"],
+    "optional_fields":["motion_control","seed","resolution_options","style_controls","duration","audio_support"],
+    "unknown_capability_policy":"BLOCK_OR_EXPLICIT_UNSUPPORTED",
+    "selection_owner":"CMSE-014"
+  },
+  "validation":{
+    "hard_failures":[
+      "CSD012_CONTEXT_MISSING",
+      "CSD012_VALIDATION_FAILED",
+      "PROVIDER_CAPABILITY_PROFILE_MISSING",
+      "IDENTITY_SEMANTICS_LOST",
+      "CANONICAL_REALITY_LOST",
+      "KNOWLEDGE_LEAK_INTRODUCED",
+      "PERCEPTION_MEANING_CHANGED",
+      "CONTINUITY_LOCK_DROPPED",
+      "UNSUPPORTED_FEATURE_SILENTLY_SUBSTITUTED",
+      "NEGATIVE_CONSTRAINT_LOST",
+      "REFERENCE_ROLE_LOST",
+      "PROVIDER_SYNTAX_EMITTED_WITHOUT_PROVIDER",
+      "FRAME_COUNT_NOT_8"
+    ],
+    "pass_conditions":[
+      "8 provider-native prompt contracts emitted",
+      "semantic lineage retained",
+      "provider capability constraints explicit",
+      "negative constraints preserved",
+      "identity and continuity locks preserved",
+      "translation fingerprint generated",
+      "ready for CMSE-014 routing/execution"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CMSE13-RAMAYANA-DEMO-001",
+    "frame_id":"F02",
+    "provider_profile":{
+      "provider_id":"HIGGSFIELD",
+      "model_id":"cinematic_studio_2_5",
+      "prompt_format":"TEXT",
+      "supported_aspect_ratios":["16:9","9:16","1:1"],
+      "reference_support":true,
+      "negative_prompt_support":false,
+      "camera_control":true,
+      "image_generation":true
+    },
+    "translation":{
+      "positive_prompt":"Cinematic Mount Kailash confrontation at twilight. Canonical Ravan studies canonical Rama's unchanged composure after deliberately restraining his power. Ravan shows contained intensity and challenged curiosity; Rama remains calm and composed. Subjective visual attention follows Ravan's perception. Preserve established scene geography, character identity, costume and continuity. Naturalistic cinematic lighting, controlled energy, restrained atmosphere.",
+      "negative_constraints":["identity drift","face drift","costume drift","new characters","uncontrolled power release","omniscient representation of Rama's thoughts","spatial continuity break"],
+      "provider_mapping":{"negative_prompt":"UNSUPPORTED; retain in adapter_constraints and validation","aspect_ratio":"16:9"},
+      "meaning_delta":"NONE"
+    },
+    "result":"PASS"
+  },
+  "downstream":["CMSE-014-PROVIDER-ROUTING","CMSE-015-SCHEDULING","CMSE-010-PRODUCTION-EXECUTION"]
+}

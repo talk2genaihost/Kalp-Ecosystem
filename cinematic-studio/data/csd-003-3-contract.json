@@ -1,0 +1,60 @@
+{
+  "schema_version": "KALP-CSD-REFERENCE-PROPAGATION-1.0",
+  "gate_id": "CSD-003.3",
+  "engine_id": "KALP-CSD-003.3",
+  "engine_name": "Reference Propagation & Multi-Frame Visual Generation",
+  "purpose": "Propagate an approved canonical frame into downstream visual generation jobs while preserving identity, world, spatial, perspective and continuity locks.",
+  "source_reference": {
+    "scene_id": "CSD-DEMO-001",
+    "frame_id": "F01",
+    "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+    "status": "TRUSTED_REFERENCE"
+  },
+  "hard_propagation_locks": [
+    "CHARACTER_IDENTITY",
+    "FACE_AND_BODY_IDENTITY",
+    "COSTUME_IDENTITY",
+    "WORLD_LOCATION",
+    "TIME_OF_DAY",
+    "SPATIAL_CONTINUITY",
+    "ENVIRONMENT_CONTINUITY",
+    "FRAME_ASPECT_RATIO"
+  ],
+  "mutable_per_frame": [
+    "PERSPECTIVE",
+    "NARRATIVE_PURPOSE",
+    "EMOTIONAL_STATE",
+    "ACTION",
+    "DIALOGUE",
+    "CAMERA",
+    "COMPOSITION",
+    "LIGHTING_INTENSITY",
+    "VFX_STATE"
+  ],
+  "frame_targets": [
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08"
+  ],
+  "propagation_rule": "F01 establishes canonical visual truth; downstream frames may change cinematic perception and performance state but may not redefine identity or world continuity.",
+  "validation": [
+    "SOURCE_REFERENCE_TRUSTED",
+    "IDENTITY_PROPAGATION",
+    "WORLD_PROPAGATION",
+    "SPATIAL_PROPAGATION",
+    "PERSPECTIVE_PRESERVATION",
+    "EMOTIONAL_CONTINUITY",
+    "GENERATION_READINESS"
+  ],
+  "downstream": [
+    "CMSE-011",
+    "CMSE-012",
+    "CMSE-013",
+    "CMSE-014",
+    "CMSE-015"
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schema_version":"KALP-CSD-022-SCENE-CHARACTER-INTERACTION-CHOREOGRAPHY-1.0",
+  "engine_id":"KALP-CSD-022",
+  "engine_name":"Scene Character Interaction & Choreography Director",
+  "status":"LOCKED",
+  "purpose":"Convert individual character performance and blocking into coordinated relationship-driven interaction choreography across dialogue, reaction, proximity, protection, confrontation, combat and synchronized action.",
+  "core_principle":"Interaction is a causal exchange: one character's intention produces a perceivable action, which creates another character's reaction, which changes the shared scene state.",
+  "interaction_model":"character_intention + relationship_state + perception + blocking + temporal_state → interaction_exchange → reaction → shared_state_change",
+  "interaction_schema":{
+    "required":["interaction_id","sequence","beat_id","initiator","receiver","interaction_type","initiator_intent","observable_action","receiver_perception","receiver_reaction","state_change","timing"],
+    "interaction_types":["DIALOGUE_EXCHANGE","CHALLENGE","THREAT","PROTECTION","WARNING","OBSERVATION","APPROACH","RETREAT","POWER_DISPLAY","POWER_SUPPRESSION","TOUCH","BLOCK","STRIKE","DEFENSE","COUNTER","ALLY_SUPPORT","REACTION","SILENT_EXCHANGE","SYNCHRONIZED_ACTION"]
+  },
+  "choreography_schema":{
+    "required":["choreography_id","participants","sequence","action_units","spatial_relationship","timing","camera_compatibility","continuity_state"],
+    "action_units":["INITIATE","RESPOND","COUNTER","REPOSITION","ESCALATE","HOLD","RELEASE","RECOVER","CONVERGE","SEPARATE","PROTECT","INTERVENE"],
+    "rule":"Each action unit must have a causal predecessor and a defined participant response or intentional non-response."
+  },
+  "relationship_dynamics":{
+    "required":["relationship_type","power_balance","trust_state","tension_state","proximity_permission","interaction_constraint"],
+    "power_balance":["DOMINANT","CONTESTED","BALANCED","SUBORDINATE","SHIFTING"],
+    "trust_state":["TRUSTED","UNCERTAIN","DISTRUSTED","HOSTILE","DEVOTED","PROTECTIVE"],
+    "tension_state":["LOW","MEDIUM","HIGH","CRITICAL","RELEASING"],
+    "proximity_permission":["INTIMATE","PERSONAL","SOCIAL","CONFRONTATIONAL","TACTICAL","DISTANT","PROHIBITED"]
+  },
+  "contact_choreography":{
+    "required":["contact_id","source_actor","target_actor","contact_type","intent","pre_contact_state","contact_event","post_contact_state","safety_constraint"],
+    "contact_types":["NONE","GRAB","PUSH","BLOCK","STRIKE","PARRY","GRAPPLE","LIFT","RESCUE","SUPPORT","WEAPON_CONTACT","ENERGY_CONTACT"],
+    "rule":"Contact must be explicitly caused, spatially possible and represented in CSD-012 event state before it becomes canonical."
+  },
+  "multi_character_rules":[
+    "Every interaction has an initiator, receiver or explicit shared trigger.",
+    "Receiver reaction must respect CSD-007 knowledge and CSD-008 perception.",
+    "Relationship dynamics come from CSD-004 and current state, not invented scene metadata.",
+    "No character may react to an action they could not perceive.",
+    "A reaction may be delayed; latency must be explicit.",
+    "One interaction may change multiple character states, but every change needs a causal mapping.",
+    "Synchronized action requires a shared trigger or explicit coordination.",
+    "Protection and intervention must identify the protected target and threat source.",
+    "Combat/contact requires explicit spatial feasibility and event authorization.",
+    "Power-display choreography must distinguish visible force from internal intention.",
+    "Non-response is a valid interaction outcome when causally justified.",
+    "Maximum five active characters remains enforced."
+  ],
+  "combat_choreography":{
+    "required":["combat_exchange_id","participants","initiative","attack_vector","defense_vector","counter_vector","impact_point","recovery_state","environmental_effect","camera_safety"],
+    "rules":[
+      "Every attack has an initiating event and intended target.",
+      "Every defense has a perceptual and temporal opportunity.",
+      "Counters cannot occur before the triggering attack.",
+      "Impact must resolve against canonical spatial geometry.",
+      "Weapon or power effects require CSD-012 authorization.",
+      "Recovery state becomes the next valid performance state.",
+      "Camera safety prevents choreography that makes required action unreadable."
+    ]
+  },
+  "interaction_pipeline":[
+    "LOAD_CSD004_RELATIONSHIPS",
+    "LOAD_CSD005_SCENE_INTELLIGENCE",
+    "LOAD_CSD006_EMOTIONAL_STATE",
+    "LOAD_CSD007_KNOWLEDGE_STATE",
+    "LOAD_CSD008_PERSPECTIVE_STATE",
+    "LOAD_CSD011_CANONICAL_GEOMETRY",
+    "LOAD_CSD012_CAUSAL_EVENTS",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "LOAD_CSD014_SELECTED_BRANCH",
+    "LOAD_CSD015_OBJECTIVES",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_GRAMMAR",
+    "LOAD_CSD020_TEMPORAL_MOTION",
+    "LOAD_CSD021_PERFORMANCE_BLOCKING",
+    "RESOLVE_RELATIONSHIP_DYNAMICS",
+    "RESOLVE_INTERACTION_INITIATION",
+    "RESOLVE_RECEIVER_PERCEPTION",
+    "RESOLVE_REACTION",
+    "RESOLVE_PROXIMITY_CHANGES",
+    "RESOLVE_CONTACT_OR_COMBAT",
+    "RESOLVE_SYNCHRONIZED_ACTION",
+    "BIND_INTERACTION_TO_BEATS",
+    "BIND_INTERACTION_TO_CAMERA",
+    "VALIDATE_SHARED_CAUSALITY",
+    "EMIT_CSD002_INTERACTION_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "INTERACTION_WITHOUT_INITIATOR_OR_TRIGGER",
+      "RECEIVER_CANNOT_PERCEIVE_ACTION",
+      "REACTION_BEFORE_INTERACTION",
+      "RELATIONSHIP_CONSTRAINT_VIOLATION",
+      "PROXIMITY_OUTSIDE_CANONICAL_GEOMETRY",
+      "CONTACT_WITHOUT_CAUSAL_EVENT",
+      "COMBAT_COUNTER_BEFORE_ATTACK",
+      "COMBAT_IMPOSSIBLE_SPATIAL_GEOMETRY",
+      "SYNCHRONIZED_ACTION_WITHOUT_SHARED_TRIGGER",
+      "STATE_CHANGE_WITHOUT_CAUSAL_MAPPING",
+      "CAMERA_COVERAGE_CONFLICT",
+      "KNOWLEDGE_BOUNDARY_VIOLATION",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "REACTION_LATENCY_LOW",
+      "INTERACTION_DENSITY_HIGH",
+      "PROXIMITY_CHANGES_FREQUENT",
+      "COMBAT_ACTION_DENSITY_HIGH",
+      "CAMERA_COVERAGE_COMPLEX"
+    ]
+  },
+  "output_contract":{
+    "interaction_contract":"ordered interaction exchanges",
+    "choreography_map":"multi-character action choreography",
+    "relationship_dynamics_map":"current relational power/trust/tension",
+    "contact_choreography":"authorized physical contact",
+    "combat_choreography":"attack-defense-counter structure",
+    "reaction_map":"causal response timing",
+    "frame_interaction_package":"CSD-002-ready interaction package",
+    "production_handoff":"CMSE-010-ready interaction choreography"
+  },
+  "demo_test":{
+    "scene_id":"CSD22-RAMAYANA-DEMO-001",
+    "participants":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "interaction_contract":[
+      {"interaction_id":"I01","sequence":1,"beat_id":"B02","initiator":"RAVAN_001","receiver":"RAM_001","interaction_type":"POWER_DISPLAY","initiator_intent":"demonstrate superiority","observable_action":"controlled energy rises","receiver_perception":"Rama recognizes deliberate testing","receiver_reaction":"holds position and gaze","state_change":"pressure increases"},
+      {"interaction_id":"I02","sequence":2,"beat_id":"B03","initiator":"RAM_001","receiver":"RAVAN_001","interaction_type":"CHALLENGE","initiator_intent":"hold the boundary without escalation","observable_action":"calm verbal response and stillness","receiver_perception":"Ravan perceives resistance without fear","receiver_reaction":"jaw tightens; breath slows","state_change":"decision pressure increases"},
+      {"interaction_id":"I03","sequence":3,"beat_id":"B05","initiator":"RAVAN_001","receiver":"RAM_001","interaction_type":"POWER_SUPPRESSION","initiator_intent":"choose restraint","observable_action":"energy contracts inward","receiver_perception":"Rama detects meaningful restraint","receiver_reaction":"subtle acknowledgement","state_change":"conflict shifts from force to mastery"},
+      {"interaction_id":"I04","sequence":4,"beat_id":"B06","initiator":"HANUMAN_001","receiver":"RAM_001","interaction_type":"PROTECTION","initiator_intent":"remain ready without interfering","observable_action":"protective stance remains active","receiver_perception":"Rama registers support","receiver_reaction":"continues without intervention","state_change":"protective pressure remains stable"},
+      {"interaction_id":"I05","sequence":5,"beat_id":"B07","initiator":"RAM_001","receiver":"RAVAN_001","interaction_type":"SILENT_EXCHANGE","initiator_intent":"allow the choice to stand","observable_action":"steady eye contact","receiver_perception":"Ravan senses recognition without submission","receiver_reaction":"slight turn inward","state_change":"Ravan's unresolved mastery question persists"}
+    ],
+    "choreography_map":[
+      {"choreography_id":"C01","sequence":1,"participants":["RAVAN_001","RAM_001"],"action_units":["INITIATE","HOLD","RESPOND"],"spatial_relationship":"confrontational axis preserved","timing":"B02-B03","camera_compatibility":"S02-S04"},
+      {"choreography_id":"C02","sequence":2,"participants":["RAVAN_001","RAM_001"],"action_units":["ESCALATE","HOLD","RELEASE"],"spatial_relationship":"no displacement","timing":"B05-B06","camera_compatibility":"S06-S07"},
+      {"choreography_id":"C03","sequence":3,"participants":["HANUMAN_001","RAM_001","RAVAN_001"],"action_units":["PROTECT","OBSERVE","HOLD"],"spatial_relationship":"Hanuman rear-right remains stable","timing":"B06-B08","camera_compatibility":"S07-S08"}
+    ],
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-020-TEMPORAL-MOTION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-010-PRODUCTION-ORCHESTRATOR"]
+}

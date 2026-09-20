@@ -1,0 +1,167 @@
+{
+  "schema_version":"KALP-CSD-020-SCENE-TEMPORAL-MOTION-CONTINUITY-1.0",
+  "engine_id":"KALP-CSD-020",
+  "engine_name":"Scene Temporal & Motion Continuity Director",
+  "status":"LOCKED",
+  "purpose":"Synchronize character motion, camera motion, object movement, environmental motion, VFX motion and audio timing across the complete scene timeline while preserving canonical state and continuity.",
+  "core_principle":"Motion is state changing through time; every meaningful movement must have a temporal origin, destination, duration and causal basis.",
+  "motion_model":"canonical_state(t) + beat_timing + shot_contract + visual_state + audio_state → temporal_motion_contract",
+  "timeline_schema":{
+    "required":["timeline_id","scene_id","scene_duration_seconds","timebase","events","motion_tracks","continuity_checkpoints"],
+    "timebase":["SECONDS","FRAMES","TIMECODE"],
+    "rule":"All motion, audio and visual transitions resolve onto one authoritative scene timeline."
+  },
+  "motion_track_schema":{
+    "required":["track_id","entity_id","entity_type","start_time","end_time","start_state","end_state","motion_type","causal_source","interpolation","continuity_state"],
+    "entity_types":["CHARACTER","CAMERA","OBJECT","ENVIRONMENT","VFX","AUDIO_SOURCE"],
+    "motion_types":["STATIC","WALK","TURN","GESTURE","BREATH","COMBAT","POWER","CAMERA_MOVE","OBJECT_MOVE","WIND","DUST","PARTICLE","LIGHT_CHANGE","AUDIO_TRANSITION"],
+    "interpolation":["LINEAR","EASE_IN","EASE_OUT","EASE_IN_OUT","STEP","PHYSICS","PERFORMANCE_DRIVEN"]
+  },
+  "character_motion":{
+    "required":["character_id","body_state","movement_intent","path","speed_profile","orientation_changes","gesture_state","facial_transition","entry_state","exit_state"],
+    "rules":[
+      "Character movement must remain compatible with CSD-011 spatial state.",
+      "Movement intent must derive from CSD-005/CSD-015 character objective and CSD-006 state.",
+      "A character cannot change position without a valid movement event.",
+      "Facial and body transitions must remain continuous unless a causally motivated cut/reset occurs.",
+      "Identity, anatomy and costume remain immutable."
+    ]
+  },
+  "camera_motion":{
+    "required":["shot_id","movement","start_position","end_position","duration_seconds","speed_profile","motivation","continuity"],
+    "rules":[
+      "Camera motion must match CSD-017 movement contract.",
+      "Camera cannot cross physical space impossible for the declared rig/path.",
+      "Movement speed must fit beat timing and shot duration.",
+      "Camera motion cannot silently alter canonical character geography."
+    ]
+  },
+  "object_motion":{
+    "required":["object_id","start_state","end_state","movement_path","source_event","collision_constraints","continuity_lock"],
+    "rules":[
+      "Object motion must map to CSD-012 event or canonical environmental process.",
+      "Objects cannot teleport between frames without an explicit transition.",
+      "Collision and ownership constraints must remain valid."
+    ]
+  },
+  "environment_motion":{
+    "required":["environment_id","motion_source","direction","intensity","continuity","affected_entities"],
+    "examples":["WIND","CLOUD","DUST","WATER","FIRE","VEGETATION","LIGHT","WEATHER"],
+    "rule":"Environmental motion must remain compatible with CSD-011 environment and CSD-018 atmosphere."
+  },
+  "vfx_motion":{
+    "required":["vfx_id","source_event","entry_time","peak_time","exit_time","trajectory","intensity_curve","interaction_with_subjects"],
+    "rule":"VFX motion must have a causal source and must not overwrite character identity or canonical geography."
+  },
+  "sync_contract":{
+    "required":["beat_id","shot_id","motion_tracks","dialogue_events","sfx_events","music_events","visual_transitions","sync_points"],
+    "sync_point_types":["ACTION_START","ACTION_PEAK","REACTION_START","REACTION_PEAK","DIALOGUE_START","DIALOGUE_END","SFX_HIT","MUSIC_ENTRY","MUSIC_RELEASE","VFX_PEAK","CAMERA_PEAK","TURNING_POINT","CUT","FADE"],
+    "rule":"Critical visual, audio and narrative events must share explicit synchronization points."
+  },
+  "temporal_continuity":{
+    "state":["scene_time","character_positions","character_orientation","camera_position","object_positions","environment_motion","vfx_state","audio_state"],
+    "handoff_rule":"Every frame inherits the previous temporal state unless a validated event or explicit cinematic transition changes it.",
+    "hard_rule":"No temporal discontinuity may silently change physical state."
+  },
+  "transition_types":["CONTINUOUS","CUT","MATCH_CUT","DISSOLVE","FADE","TIME_SHIFT","SLOW_MOTION","SPEED_RAMP","FREEZE","FLASH_TRANSITION"],
+  "temporal_rules":[
+    "Every meaningful motion has a causal source.",
+    "Every motion has explicit start and end timing.",
+    "Movement cannot contradict CSD-011 canonical positions.",
+    "Motion timing must fit CSD-016 beat duration.",
+    "Camera movement must agree with CSD-017.",
+    "Visual transitions must agree with CSD-018.",
+    "Audio transitions must agree with CSD-019.",
+    "Character reactions must follow causal event order.",
+    "Parallel motion is permitted only when tracks do not create state conflicts.",
+    "Time manipulation must be explicit and cannot silently alter narrative chronology.",
+    "Maximum five active characters remains enforced."
+  ],
+  "temporal_pipeline":[
+    "LOAD_CSD011_CANONICAL_STATE",
+    "LOAD_CSD012_CAUSAL_EVENTS",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "LOAD_CSD015_OBJECTIVES",
+    "LOAD_CSD016_BEAT_TIMING",
+    "LOAD_CSD017_CAMERA_CONTRACT",
+    "LOAD_CSD018_VISUAL_STATE",
+    "LOAD_CSD019_AUDIO_STATE",
+    "RESOLVE_SCENE_TIMEBASE",
+    "RESOLVE_CHARACTER_MOTION",
+    "RESOLVE_CAMERA_MOTION",
+    "RESOLVE_OBJECT_MOTION",
+    "RESOLVE_ENVIRONMENT_MOTION",
+    "RESOLVE_VFX_MOTION",
+    "RESOLVE_AUDIO_SYNC_POINTS",
+    "BIND_MOTION_TO_BEATS_AND_SHOTS",
+    "BUILD_CONTINUITY_CHECKPOINTS",
+    "VALIDATE_TEMPORAL_CONTINUITY",
+    "EMIT_CSD002_TEMPORAL_MOTION_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "MOTION_WITHOUT_CAUSAL_SOURCE",
+      "POSITION_DISCONTINUITY",
+      "ORIENTATION_DISCONTINUITY",
+      "OBJECT_TELEPORTATION",
+      "CAMERA_PATH_CONTRADICTION",
+      "MOTION_OUTSIDE_BEAT_TIMING",
+      "AUDIO_VISUAL_SYNC_FAILURE",
+      "VFX_TIMELINE_CONTRADICTION",
+      "REACTION_BEFORE_CAUSE",
+      "UNAUTHORIZED_TIME_SHIFT",
+      "CONTINUITY_CHECKPOINT_MISMATCH",
+      "IDENTITY_OR_COSTUME_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "RAPID_MOTION_TRANSITION",
+      "LONG_STATIC_INTERVAL",
+      "CAMERA_ACCELERATION_HIGH",
+      "MOTION_DENSITY_HIGH",
+      "SYNC_POINT_DENSITY_HIGH"
+    ]
+  },
+  "output_contract":{
+    "temporal_contract":"authoritative scene timeline",
+    "character_motion_map":"character movement and performance continuity",
+    "camera_motion_map":"camera trajectories",
+    "object_motion_map":"object trajectories",
+    "environment_motion_map":"environmental motion",
+    "vfx_motion_map":"VFX temporal behavior",
+    "sync_map":"cross-modal synchronization points",
+    "continuity_checkpoints":"validated temporal snapshots",
+    "frame_temporal_package":"CSD-002-ready temporal package",
+    "production_handoff":"CMSE-010-ready synchronized motion package"
+  },
+  "demo_test":{
+    "scene_id":"CSD20-RAMAYANA-DEMO-001",
+    "scene_duration_seconds":80,
+    "timebase":"SECONDS",
+    "critical_sync_points":[
+      {"time":8,"type":"OBJECTIVE_REVEAL","beat_id":"B02"},
+      {"time":30,"type":"PRESSURE_PEAK","beat_id":"B03"},
+      {"time":42,"type":"DIALOGUE_END","beat_id":"B04"},
+      {"time":48,"type":"DECISION_START","beat_id":"B05"},
+      {"time":58,"type":"TURNING_POINT","beat_id":"B06"},
+      {"time":68,"type":"VFX_RELEASE","beat_id":"B07"},
+      {"time":80,"type":"HOOK","beat_id":"B08"}
+    ],
+    "motion_examples":[
+      {"entity":"RAVAN_001","motion":"POWER_BUILD","start_time":30,"end_time":58,"source_event":"E03","interpolation":"PERFORMANCE_DRIVEN"},
+      {"entity":"RAVAN_001","motion":"POWER_CONTAINMENT","start_time":58,"end_time":68,"source_event":"E04","interpolation":"EASE_OUT"},
+      {"entity":"RAM_001","motion":"CONTROLLED_STANCE","start_time":30,"end_time":68,"source_event":"E02","interpolation":"PERFORMANCE_DRIVEN"},
+      {"entity":"HANUMAN_001","motion":"WATCHFUL_STILLNESS","start_time":30,"end_time":68,"source_event":"E02","interpolation":"PERFORMANCE_DRIVEN"},
+      {"entity":"CAMERA","motion":"SLOW_PUSH_IN","start_time":48,"end_time":58,"source_event":"B05","interpolation":"EASE_IN_OUT"},
+      {"entity":"CAMERA","motion":"PULL_OUT","start_time":58,"end_time":68,"source_event":"B06","interpolation":"EASE_OUT"}
+    ],
+    "cross_modal_sync":[
+      {"time":58,"sync":["TURNING_POINT","RAVAN_POWER_CONTAINMENT","CAMERA_PEAK","MUSIC_RELEASE"]},
+      {"time":68,"sync":["VFX_RELEASE","AMBIENCE_RETURN","CAMERA_PULL_OUT"]}
+    ],
+    "continuity_checkpoints":["T0_SCENE_ENTRY","T30_PRESSURE","T58_TURN","T68_RELEASE","T80_SCENE_EXIT"],
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CMSE-010-PRODUCTION-ORCHESTRATOR","CMSE-002-MULTI-SCENE-CONTINUITY","CMSE-015-PRODUCTION-SCHEDULER"]
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version":"KALP-CSD-017-SCENE-SHOT-COMPOSITION-CAMERA-GRAMMAR-1.0",
+  "engine_id":"KALP-CSD-017",
+  "engine_name":"Scene Shot Composition & Camera Grammar Director",
+  "status":"LOCKED",
+  "purpose":"Translate each approved dramatic beat into executable shot and camera language while preserving canonical reality, perspective, character identity, blocking, timing and narrative intent.",
+  "core_principle":"Camera language expresses the story state; it must never invent or contradict the canonical scene reality.",
+  "shot_model":"beat + perspective + blocking + emotional_intent + canonical_state → shot_contract",
+  "shot_schema":{
+    "required":["shot_id","frame_id","beat_id","shot_type","subject","purpose","camera_position","lens","composition","blocking","eyeline","movement","duration_seconds","transition"],
+    "shot_types":["EXTREME_WIDE","WIDE","FULL","MEDIUM_WIDE","MEDIUM","MEDIUM_CLOSE","CLOSE_UP","EXTREME_CLOSE_UP","OVER_SHOULDER","TWO_SHOT","THREE_SHOT","POV","INSERT","CUTAWAY"],
+    "movement_types":["STATIC","PUSH_IN","PULL_OUT","DOLLY","TRACK","PAN","TILT","CRANE","ORBIT","HANDHELD","STEADICAM","WHIP_PAN","RACK_FOCUS","NONE"]
+  },
+  "camera_grammar":{
+    "position":["front","rear","left","right","high","low","overhead","character_anchored","world_anchored"],
+    "lens_families":["ultra_wide","wide","normal","portrait","telephoto","macro"],
+    "composition":["symmetrical","asymmetrical","leading_lines","centered","rule_of_thirds","negative_space","layered_depth","silhouette","foreground_obstruction"],
+    "depth":["foreground","subject_plane","background","deep_focus","shallow_focus"],
+    "eyeline":["direct","off_axis_left","off_axis_right","down","up","shared_axis","subjective"],
+    "continuity_rules":["180_DEGREE_AXIS","EYELINE_MATCH","SCREEN_DIRECTION","SIZE_MATCH","POSITION_MATCH","LENS_CONTINUITY","MOTION_MATCH","LIGHT_DIRECTION_MATCH"]
+  },
+  "shot_selection_rules":[
+    "Shot purpose must map to the assigned CSD-016 beat.",
+    "Camera position must be physically reachable within the CSD-011 spatial state.",
+    "Lens/composition may shape audience perception but cannot alter physical facts.",
+    "Character POV shots must comply with CSD-007 knowledge and CSD-008 perception.",
+    "Blocking must preserve CSD-011 character positions and permitted movement.",
+    "Eyelines must resolve against actual character orientation and target position.",
+    "Camera movement requires a narrative or perceptual purpose.",
+    "A shot cannot cross the established axis without an explicit transition or motivated axis reset.",
+    "Lighting direction must remain compatible with canonical environment state.",
+    "Shot duration must fit within the CSD-016 beat timing contract.",
+    "Maximum five active characters remains enforced.",
+    "Identity and costume locks remain immutable."
+  ],
+  "composition_contract":{
+    "required":["subject_priority","visual_hierarchy","foreground","midground","background","negative_space_intent","focus_priority"],
+    "rule":"Composition must communicate the beat's intended narrative hierarchy without adding unapproved story information."
+  },
+  "camera_continuity":{
+    "state":["axis","screen_direction","camera_side","focal_length_family","movement_state","eyeline_network","lighting_direction"],
+    "handoff_rule":"Every shot inherits the previous shot's continuity state unless an explicit motivated transition updates it.",
+    "hard_rule":"A camera change cannot silently change character geography."
+  },
+  "shot_transition_types":["CUT","MATCH_CUT","DISSOLVE","FADE","WIPE","WHIP_TRANSITION","RACK_FOCUS","MOTION_MATCH","CONTINUOUS_MOVE"],
+  "camera_pipeline":[
+    "LOAD_CSD016_BEAT_MAP",
+    "LOAD_CSD011_CANONICAL_SPATIAL_STATE",
+    "LOAD_CSD008_PERSPECTIVE_STATE",
+    "LOAD_CSD015_FRAME_OBJECTIVE",
+    "RESOLVE_SHOT_PURPOSE",
+    "RESOLVE_SUBJECT_PRIORITY",
+    "RESOLVE_CAMERA_POSITION",
+    "RESOLVE_LENS",
+    "RESOLVE_COMPOSITION",
+    "RESOLVE_BLOCKING_AND_EYELINE",
+    "RESOLVE_CAMERA_MOVEMENT",
+    "RESOLVE_CONTINUITY_STATE",
+    "BIND_SHOT_DURATION",
+    "BIND_TRANSITION",
+    "VALIDATE_SPATIAL_AND_CAMERA_GRAMMAR",
+    "EMIT_CSD002_FRAME_CAMERA_PACKAGE"
+  ],
+  "validation":{
+    "hard_failures":[
+      "SHOT_WITHOUT_BEAT",
+      "CAMERA_POSITION_PHYSICALLY_IMPOSSIBLE",
+      "BLOCKING_CONTRADICTS_CANONICAL_STATE",
+      "EYELINE_TARGET_UNRESOLVED",
+      "POV_KNOWLEDGE_VIOLATION",
+      "AXIS_BREAK_WITHOUT_MOTIVATION",
+      "SCREEN_DIRECTION_CONTRADICTION",
+      "LIGHT_DIRECTION_CONTRADICTION",
+      "SHOT_DURATION_OUTSIDE_BEAT",
+      "IDENTITY_LOCK_MUTATION",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5",
+      "FRAME_WITHOUT_CAMERA_CONTRACT"
+    ],
+    "advisories":[
+      "REPEATED_SHOT_SIZE",
+      "LOW_VISUAL_VARIATION",
+      "EXCESSIVE_CAMERA_MOVEMENT",
+      "LONG_STATIC_DURATION",
+      "FOCAL_LENGTH_JUMP"
+    ]
+  },
+  "output_contract":{
+    "shot_map":"ordered shot contracts",
+    "camera_continuity_state":"axis, eyeline, screen direction and movement state",
+    "composition_contracts":"visual hierarchy for each shot",
+    "frame_camera_package":"CSD-002-ready camera package",
+    "visual_generation_handoff":"CSD-003-compatible provider-neutral camera specification"
+  },
+  "demo_test":{
+    "scene_id":"CSD17-RAMAYANA-DEMO-001",
+    "frames":{
+      "F01":{"beat_id":"B01","shot_id":"S01","shot_type":"WIDE","subject":"RAM_001 + RAVAN_001 + HANUMAN_001","purpose":"Establish confrontation geometry","camera_position":"world_anchored front-east","lens":"wide","composition":"layered_depth","blocking":"Rama center-east; Ravan center-west; Hanuman rear-right","eyeline":"shared_axis","movement":"STATIC","duration_seconds":8,"transition":"CUT"},
+      "F02":{"beat_id":"B02","shot_id":"S02","shot_type":"MEDIUM_CLOSE","subject":"RAVAN_001","purpose":"Reveal Ravan's objective through controlled presence","camera_position":"character_anchored front","lens":"portrait","composition":"centered_negative_space","blocking":"Ravan remains center-west","eyeline":"direct","movement":"SLOW_PUSH_IN","duration_seconds":10,"transition":"CUT"},
+      "F03":{"beat_id":"B03","shot_id":"S03","shot_type":"MEDIUM_CLOSE","subject":"RAM_001","purpose":"Show deliberate composure under pressure","camera_position":"character_anchored opposite Ravan","lens":"portrait","composition":"symmetrical","blocking":"Rama remains center-east","eyeline":"direct","movement":"STATIC","duration_seconds":6,"transition":"CUT"},
+      "F04":{"beat_id":"B03","shot_id":"S04","shot_type":"OVER_SHOULDER","subject":"RAVAN_001 from RAM_001 side","purpose":"Make objective collision spatially legible","camera_position":"Rama-side over-shoulder","lens":"normal","composition":"foreground_obstruction","blocking":"Rama foreground; Ravan center-west","eyeline":"direct","movement":"PUSH_IN","duration_seconds":6,"transition":"CUT"},
+      "F05":{"beat_id":"B04","shot_id":"S05","shot_type":"THREE_SHOT","subject":"RAM_001 + RAVAN_001 + HANUMAN_001","purpose":"Hold the silence and relationship geometry","camera_position":"world_anchored side","lens":"wide","composition":"layered_depth","blocking":"canonical positions preserved","eyeline":"shared_axis","movement":"STATIC","duration_seconds":6,"transition":"DISSOLVE"},
+      "F06":{"beat_id":"B05","shot_id":"S06","shot_type":"CLOSE_UP","subject":"RAVAN_001","purpose":"Compress decision pressure before the choice","camera_position":"character_anchored front-left","lens":"telephoto","composition":"negative_space","blocking":"Ravan stationary","eyeline":"off_axis_right","movement":"SLOW_PUSH_IN","duration_seconds":8,"transition":"CUT"},
+      "F07":{"beat_id":"B06","shot_id":"S07","shot_type":"CLOSE_UP","subject":"RAVAN_001","purpose":"Register the reversal into restraint","camera_position":"character_anchored front","lens":"portrait","composition":"centered","blocking":"power posture lowers without displacement","eyeline":"direct","movement":"PULL_OUT","duration_seconds":10,"transition":"MATCH_CUT"},
+      "F08":{"beat_id":"B08","shot_id":"S08","shot_type":"MEDIUM_WIDE","subject":"RAVAN_001 with Rama/Hanuman context","purpose":"Leave the mastery question unresolved","camera_position":"world_anchored rear-right","lens":"normal","composition":"negative_space","blocking":"Ravan remains center-west; Rama/Hanuman retain positions","eyeline":"off_axis","movement":"SLOW_PULL_OUT","duration_seconds":10,"transition":"FADE"}
+    },
+    "camera_continuity_state":{
+      "axis":"RAM-RAVAN shared confrontation axis",
+      "screen_direction":"Rama screen-right / Ravan screen-left",
+      "lighting_direction":"consistent twilight source",
+      "movement_state":"controlled, restrained movement; no handheld escalation"
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-001-CINEMATIC-MASTER-SCENE","CMSE-002-MULTI-SCENE-CONTINUITY","CMSE-013-PROMPT-COMPILER"]
+}

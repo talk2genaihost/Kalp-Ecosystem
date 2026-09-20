@@ -1,0 +1,69 @@
+{
+  "schema_version":"KALP-CMSE-010-PRODUCTION-EXECUTION-ORCHESTRATOR-1.0",
+  "engine_id":"CMSE-010",
+  "engine_name":"Production Execution & Multi-Modal Cinematic Orchestrator",
+  "status":"LOCKED",
+  "purpose":"Execute approved CMSE-015 jobs through resolved provider adapters, track lifecycle state, validate returned assets, and persist production lineage without changing creative intent.",
+  "core_principle":"Execution is a controlled side effect of an approved production plan. The orchestrator may execute, observe, validate and register; it may not creatively reinterpret.",
+  "inputs":["CMSE-015 execution jobs","execution adapter registry","provider runtime responses"],
+  "outputs":["dispatch records","provider job records","execution state","asset validation","asset registration records","execution lineage"],
+  "execution_pipeline":[
+    "EXECUTION_GATE_CHECK",
+    "LOAD_SCHEDULED_JOB",
+    "VERIFY_IDEMPOTENCY",
+    "RESOLVE_EXECUTION_ADAPTER",
+    "RESERVE_PROVIDER_CAPACITY",
+    "DISPATCH_PROVIDER_JOB",
+    "PERSIST_PROVIDER_JOB_ID",
+    "POLL_OR_RECEIVE_CALLBACK",
+    "NORMALIZE_PROVIDER_RESULT",
+    "OUTPUT_ASSET_VALIDATION",
+    "CONTINUITY_AND_IDENTITY_VALIDATION",
+    "REGISTER_ASSET",
+    "RELEASE_CAPACITY",
+    "UPDATE_JOB_STATE",
+    "EMIT_EXECUTION_LINEAGE",
+    "CMSE011_ASSET_MEMORY_HANDOFF"
+  ],
+  "execution_rules":[
+    "Only DISPATCH_READY or RESERVED CMSE-015 jobs may dispatch.",
+    "Idempotency is mandatory.",
+    "Provider payload is read-only from CMSE-013/014/015.",
+    "Provider response must be normalized before asset registration.",
+    "A provider URL alone is not proof of successful production; terminal provider state is required.",
+    "Asset registration requires output validation.",
+    "Failed validation cannot become MASTER.",
+    "Canonical trusted references remain immutable.",
+    "Execution may not silently reroute; rerouting returns to CMSE-014.",
+    "Provider-specific errors are normalized into scheduler-compatible states.",
+    "Every dispatch and result retains source lineage."
+  ],
+  "asset_validation":{
+    "required":["provider_terminal_success","asset_presence","mime_or_media_type","frame_identity","source_job_lineage"],
+    "identity_checks":["character_identity","face_or_subject_consistency","costume_consistency","reference_lineage"],
+    "continuity_checks":["scene_geography","temporal_state","frame_relationship","approved_reference_usage"],
+    "statuses":["PASS","PASS_WITH_ADVISORIES","FAILED"]
+  },
+  "job_states":["DISPATCH_READY","RESERVED","DISPATCHED","RUNNING","SUCCEEDED","FAILED_RETRYABLE","FAILED_FINAL","VALIDATION_FAILED","REGISTERED"],
+  "adapter_contract":{
+    "required":["provider_id","model_id","submit","get_status","normalize_result"],
+    "optional":["cancel","estimate","validate_output"]
+  },
+  "failure_policy":{
+    "adapter_missing":"FAILED_FINAL",
+    "provider_submit_error":"FAILED_RETRYABLE",
+    "provider_terminal_failure":"FAILED_RETRYABLE_OR_FINAL",
+    "asset_missing":"VALIDATION_FAILED",
+    "identity_or_continuity_failure":"VALIDATION_FAILED",
+    "duplicate_idempotency":"RETURN_EXISTING_RESULT",
+    "reroute_required":"HANDOFF_CMSE014"
+  },
+  "demo_test":{
+    "scene_id":"CMSE10-RAMAYANA-DEMO-001",
+    "frame_id":"F01",
+    "provider":"HIGGSFIELD/cinematic_studio_2_5",
+    "expected_lifecycle":["DISPATCH_READY","RESERVED","DISPATCHED","RUNNING","SUCCEEDED","REGISTERED"],
+    "result":"EXECUTION_CONTRACT_PASS"
+  },
+  "downstream":["CMSE011-ASSET-MEMORY","CSD-002-CONTINUITY","CSD-009-QUALITY","CMSE-015-STATE-UPDATE"]
+}

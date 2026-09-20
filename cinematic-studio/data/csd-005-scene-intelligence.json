@@ -1,0 +1,267 @@
+{
+  "schema_version": "KALP-CSD-005-SCENE-INTELLIGENCE-1.0",
+  "engine_id": "KALP-CSD-005",
+  "engine_name": "Multi-Character Scene Intelligence & Relationship-Aware Scene Director",
+  "status": "LOCKED",
+  "purpose": "Transform selected characters, narrative intent, relationship graph, knowledge state and story-arc context into a deterministic multi-character scene decision package for CSD-002.",
+  "inputs": {
+    "required": [
+      "character_ids",
+      "story_arc_id",
+      "narrative_intent"
+    ],
+    "optional": [
+      "location",
+      "time",
+      "scene_state",
+      "previous_scene_id",
+      "audience_objective",
+      "requested_duration"
+    ],
+    "constraints": {
+      "min_characters": 1,
+      "max_characters": 5,
+      "registered_characters_only": true
+    }
+  },
+  "pipeline": [
+    "CHARACTER_SELECTION",
+    "RELATIONSHIP_RESOLUTION",
+    "KNOWLEDGE_RECONCILIATION",
+    "INDIVIDUAL_OBJECTIVE_ASSIGNMENT",
+    "INTENTION_COLLISION_ANALYSIS",
+    "POWER_DYNAMICS",
+    "EMOTIONAL_STATE_INFERENCE",
+    "SCENE_PURPOSE_SELECTION",
+    "ACTION_REACTION_CAUSALITY",
+    "PARTICIPATION_VALIDATION",
+    "8_FRAME_DIRECTORIAL_PLAN"
+  ],
+  "decision_model": {
+    "principle": "The scene is generated from interacting character objectives, not from a fixed shot template.",
+    "character_state": {
+      "fields": [
+        "identity",
+        "role",
+        "current_emotion",
+        "objective",
+        "fear_or_resistance",
+        "knowledge",
+        "misbelief",
+        "relationship_pressure",
+        "intended_action"
+      ]
+    },
+    "relationship_state": {
+      "fields": [
+        "type",
+        "direction",
+        "strength",
+        "shared_arc",
+        "trust",
+        "tension",
+        "power_asymmetry",
+        "unresolved_thread"
+      ]
+    },
+    "causal_loop": "character_objective → perception → interpretation → intention → action → other_character_reaction → state_change",
+    "scene_decisions": [
+      "why_this_scene_exists",
+      "why_these_characters_are_present",
+      "who_drives_the_scene",
+      "what_each_character_wants",
+      "what_prevents_resolution",
+      "what_changes_by_end",
+      "what_question_is_created_for_next_scene"
+    ]
+  },
+  "director_rules": [
+    "Never add a character merely to fill a frame.",
+    "Never remove a selected character when that character has causal responsibility for the scene.",
+    "Use the relationship graph before inventing interaction.",
+    "Respect character knowledge at the selected narrative phase.",
+    "Distinguish physical dominance from narrative dominance.",
+    "Every active character must have a scene function.",
+    "Every scene must contain a state change or meaningful reveal.",
+    "Conflict may be external, interpersonal, internal, informational or value-based.",
+    "Perspective must follow character knowledge and emotional state.",
+    "Maximum five active characters.",
+    "Identity locks remain immutable; scene state is mutable.",
+    "Do not manufacture dialogue until intention and action logic are resolved."
+  ],
+  "scene_roles": [
+    "DRIVER",
+    "COUNTERFORCE",
+    "WITNESS",
+    "ALLY",
+    "CATALYST"
+  ],
+  "output_schema": {
+    "scene_id": "CSD5-{universe}-{sequence}",
+    "active_characters": "1-5 canonical IDs",
+    "scene_purpose": "single causal statement",
+    "narrative_question": "question driving audience attention",
+    "character_states": "per-character objective/knowledge/emotion/intention",
+    "relationship_dynamics": "resolved relationship edges affecting scene",
+    "power_map": "physical,narrative,informational,emotional",
+    "conflict_map": "forces preventing immediate resolution",
+    "causal_sequence": "ordered action-reaction chain",
+    "turning_point": "specific state-changing event",
+    "ending_state": "canonical state snapshot for next scene",
+    "audience_model": "know/suspect/expect/feel",
+    "frame_director": "8 perspective-aware frame directives",
+    "validation": "identity,relationship,knowledge,causality,perspective,continuity"
+  },
+  "demo_test": {
+    "scene_id": "CSD5-RAMAYANA-DEMO-001",
+    "story_arc_id": "ARC-08",
+    "title": "The Test of Power",
+    "active_characters": [
+      "RAM_001",
+      "RAVAN_001",
+      "HANUMAN_001"
+    ],
+    "scene_purpose": "Ravana attempts to demonstrate superiority; Rama's controlled response exposes the difference between power and mastery, while Hanuman witnesses the confrontation and reads its deeper meaning.",
+    "narrative_question": "Will Ravana use power to dominate the moment, or understand that restraint is itself power?",
+    "character_states": [
+      {
+        "id": "RAM_001",
+        "role": "COUNTERFORCE",
+        "objective": "test Ravana's self-mastery without unnecessary escalation",
+        "emotion": "calm vigilance",
+        "knowledge": "Ravana seeks to prove power",
+        "intention": "observe, challenge, remain controlled"
+      },
+      {
+        "id": "RAVAN_001",
+        "role": "DRIVER",
+        "objective": "prove that his power cannot be challenged",
+        "emotion": "confidence under pressure",
+        "knowledge": "Rama is evaluating him",
+        "intention": "manifest controlled power and force recognition"
+      },
+      {
+        "id": "HANUMAN_001",
+        "role": "WITNESS",
+        "objective": "protect Rama and understand Ravana's intent",
+        "emotion": "alert devotion",
+        "knowledge": "Ravana is testing the limits of the encounter",
+        "intention": "remain restrained until intervention becomes necessary"
+      }
+    ],
+    "relationship_dynamics": [
+      {
+        "between": [
+          "RAM_001",
+          "RAVAN_001"
+        ],
+        "type": "PRINCIPAL_ADVERSARIES",
+        "dynamic": "philosophical_power_test",
+        "tension": "HIGH",
+        "power_asymmetry": "Ravana displays force; Rama controls escalation"
+      },
+      {
+        "between": [
+          "RAM_001",
+          "HANUMAN_001"
+        ],
+        "type": "DEVOTEE_LORD",
+        "dynamic": "trust_and_restraint",
+        "tension": "LOW",
+        "power_asymmetry": "Rama directs; Hanuman protects"
+      },
+      {
+        "between": [
+          "RAVAN_001",
+          "HANUMAN_001"
+        ],
+        "type": "ADVERSARIAL_FORESHADOWING",
+        "dynamic": "mutual_recognition",
+        "tension": "MEDIUM"
+      }
+    ],
+    "causal_sequence": [
+      "Ravana announces intent to demonstrate power",
+      "Rama recognizes the underlying need for validation",
+      "Hanuman reads the threat and prepares to intervene",
+      "Ravana begins controlled power manifestation",
+      "Rama refuses escalation and redirects the test toward self-control",
+      "Ravana experiences the contradiction between force and mastery",
+      "Hanuman lowers his intervention posture",
+      "Ravana chooses whether to restrain or escalate"
+    ],
+    "turning_point": "Ravana voluntarily suppresses the rising power instead of forcing Rama into a larger confrontation.",
+    "ending_state": "Ravana remains powerful but has encountered a new internal conflict: mastery requires restraint.",
+    "audience_model": {
+      "know": "Ravana is being tested",
+      "suspect": "the test is about self-control",
+      "expect": "Ravana will demonstrate power",
+      "feel": "anticipation",
+      "payoff": "Ravana's choice to restrain"
+    },
+    "frame_director": [
+      {
+        "frame": "F01",
+        "purpose": "establish_relationship_geometry",
+        "perspective": "AUDIENCE"
+      },
+      {
+        "frame": "F02",
+        "purpose": "Rama_reads_intention",
+        "perspective": "RAM_001"
+      },
+      {
+        "frame": "F03",
+        "purpose": "Hanuman_detects_threat",
+        "perspective": "HANUMAN_001"
+      },
+      {
+        "frame": "F04",
+        "purpose": "Ravana_commits_to_demonstration",
+        "perspective": "RAVAN_001"
+      },
+      {
+        "frame": "F05",
+        "purpose": "three_way_tension",
+        "perspective": "SHARED"
+      },
+      {
+        "frame": "F06",
+        "purpose": "power_manifestation_without_full_release",
+        "perspective": "RAVAN_001"
+      },
+      {
+        "frame": "F07",
+        "purpose": "Rama_redirects_test",
+        "perspective": "RAM_001"
+      },
+      {
+        "frame": "F08",
+        "purpose": "Ravana_chooses_restraint",
+        "perspective": "AUDIENCE"
+      }
+    ],
+    "validation": {
+      "status": "PASS",
+      "checks": [
+        "ALL_CHARACTERS_REGISTERED",
+        "MAX_5_CHARACTERS",
+        "RELATIONSHIPS_RESOLVED",
+        "KNOWLEDGE_CONSISTENT",
+        "EACH_CHARACTER_HAS_FUNCTION",
+        "CAUSAL_CHAIN_COMPLETE",
+        "TURNING_POINT_DEFINED",
+        "ENDING_STATE_DEFINED",
+        "PERSPECTIVE_DERIVABLE",
+        "CSD_002_READY"
+      ]
+    }
+  },
+  "downstream": [
+    "KALP-CSD-002",
+    "KALP-CSD-003",
+    "KALP-CMSE-005",
+    "KALP-CMSE-006",
+    "KALP-CMSE-012"
+  ]
+}

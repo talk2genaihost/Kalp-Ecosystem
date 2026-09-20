@@ -1,0 +1,103 @@
+{
+  "schema_version":"KALP-CMSE-015-AUTONOMOUS-SCHEDULER-1.0",
+  "engine_id":"CMSE-015",
+  "engine_name":"Autonomous Production Scheduler, Queue & Dependency Execution Engine",
+  "status":"LOCKED",
+  "purpose":"Convert CMSE-014 route decisions into an idempotent, dependency-aware, resumable production execution plan and queue.",
+  "core_principle":"Scheduling controls when and how an approved job executes; it never changes what the job means.",
+  "inputs":["CMSE-014 routes","execution adapter registry","provider runtime state"],
+  "outputs":["execution_plan","queue","job_state_machine","reservation_plan","retry_plan","dependency_graph","execution_handoff"],
+  "job_state_machine":[
+    "CREATED",
+    "VALIDATED",
+    "QUEUED",
+    "WAITING_DEPENDENCY",
+    "WAITING_CAPACITY",
+    "RESERVED",
+    "DISPATCH_READY",
+    "DISPATCHED",
+    "RUNNING",
+    "SUCCEEDED",
+    "FAILED_RETRYABLE",
+    "FAILED_FINAL",
+    "CANCELLED",
+    "DEFERRED"
+  ],
+  "dependency_rules":[
+    "A job cannot dispatch until all hard dependencies are SUCCEEDED.",
+    "Soft dependencies may be satisfied by approved fallback/reference state.",
+    "Dependency cycles are a hard failure.",
+    "A failed dependency blocks descendants unless an explicit recovery policy exists.",
+    "F01 canonical/reference assets may be dependencies for later frames when explicitly declared.",
+    "Frame independence must never be assumed when continuity/reference lineage declares a dependency."
+  ],
+  "scheduling_rules":[
+    "Respect provider/model max concurrency.",
+    "Respect queue depth and rate limits when supplied.",
+    "Reserve capacity before dispatch.",
+    "Release reservations on terminal state.",
+    "Do not dispatch the same idempotency key twice.",
+    "Preserve route decision; re-routing requires CMSE-014.",
+    "Retry only retryable failures.",
+    "Use bounded exponential backoff with jitter policy.",
+    "A retry cannot mutate the production payload.",
+    "Execution can resume from persisted job state."
+  ],
+  "default_policy":{
+    "max_attempts":3,
+    "backoff_seconds":[10,30,90],
+    "jitter_seconds":5,
+    "priority":"NORMAL",
+    "dependency_policy":"STRICT",
+    "allow_deferred_execution":true,
+    "idempotency":"REQUIRED"
+  },
+  "dependency_graph_demo":{
+    "F01":[],
+    "F02":["F01"],
+    "F03":["F01"],
+    "F04":["F01","F02"],
+    "F05":["F01","F02","F03"],
+    "F06":["F05"],
+    "F07":["F05","F06"],
+    "F08":["F07"]
+  },
+  "validation":{
+    "hard_failures":[
+      "CMSE014_ROUTE_MISSING",
+      "EXECUTION_ADAPTER_MISSING",
+      "DEPENDENCY_CYCLE",
+      "INVALID_DEPENDENCY",
+      "DUPLICATE_IDEMPOTENCY_KEY",
+      "CONCURRENCY_POLICY_MISSING",
+      "UNSUPPORTED_RETRY_POLICY",
+      "CREATIVE_PAYLOAD_MUTATION",
+      "FRAME_COUNT_NOT_8"
+    ],
+    "pass_conditions":[
+      "eight route jobs converted to execution jobs",
+      "dependency graph acyclic",
+      "idempotency keys unique",
+      "provider capacity reservations calculated",
+      "retry policy bounded",
+      "execution handoff contracts emitted",
+      "job states resumable"
+    ]
+  },
+  "execution_handoff":{
+    "owner":"CMSE-010",
+    "required":["execution_job_id","provider_id","model_id","attempt","idempotency_key","payload_reference","reservation_reference","dependency_state"],
+    "scheduler_role":"ORCHESTRATE",
+    "provider_execution_role":"EXECUTE",
+    "result_return":"PERSIST_AND_UPDATE_JOB_STATE"
+  },
+  "demo_test":{
+    "scene_id":"CMSE15-RAMAYANA-DEMO-001",
+    "frame_count":8,
+    "dependency_graph":"dependency_graph_demo",
+    "result":"PLAN_READY",
+    "initial_ready":["F01"],
+    "waiting":["F02","F03","F04","F05","F06","F07","F08"]
+  },
+  "downstream":["CMSE-010-PRODUCTION-EXECUTION","ASSET-REGISTRY","CSD-011-CONTINUITY"]
+}

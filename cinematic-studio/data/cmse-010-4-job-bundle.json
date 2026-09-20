@@ -1,0 +1,603 @@
+{
+  "schema_version": "KALP-CMSE-010.4-JOB-BUNDLE-1.0",
+  "engine_id": "KALP-CMSE-010.4",
+  "engine_name": "Provider Job Specification & Translation",
+  "scene_id": "CSD-DEMO-001",
+  "status": "PASS_WITH_ADAPTER_RESOLUTION_PENDING",
+  "translation_policy": "Translate PIR semantics into provider-job structure without inventing provider-specific model names or unsupported parameters.",
+  "job_count": 8,
+  "jobs": [
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F01-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F01",
+      "shot_job_id": "SHOT-F01",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F01-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F01:v1",
+      "provenance": "INDEPENDENT",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for AUDIENCE perspective. Narrative: Ravan approaches Shiva. Emotional state: Anticipation. Action: Ravan approaches Shiva.. Location: Mount Kailash, TWILIGHT. Camera: Extreme wide, slow push-in, 35mm. Characters: SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F01-v1",
+        "source_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F02-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F02",
+      "shot_job_id": "SHOT-F02",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F02-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F02:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for SHIVA_001 perspective. Narrative: Shiva opens his eyes. Emotional state: Stillness → Awareness. Action: Shiva opens his eyes.. Location: Mount Kailash, TWILIGHT. Camera: 85mm close-up, subtle push-in. Characters: SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F02-v1",
+        "source_asset": "KALP-DERIVED-F02-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F03-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F03",
+      "shot_job_id": "SHOT-F03",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F03-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F03:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for RAM_001 perspective. Narrative: Ram watches Shiva and Ravan. Emotional state: Calm observation. Action: Ram watches Shiva and Ravan.. Location: Mount Kailash, TWILIGHT. Camera: 50mm over-shoulder. Characters: RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F03-v1",
+        "source_asset": "KALP-DERIVED-F03-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F04-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F04",
+      "shot_job_id": "SHOT-F04",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F04-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F04:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for RAVAN_001 perspective. Narrative: Ravan questions Shiva. Emotional state: Confidence → Uncertainty. Action: Ravan questions Shiva.. Location: Mount Kailash, TWILIGHT. Camera: 85mm Ravan OTS. Characters: RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0 | SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F04-v1",
+        "source_asset": "KALP-DERIVED-F04-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F05-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F05",
+      "shot_job_id": "SHOT-F05",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F05-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F05:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for SHARED perspective. Narrative: All three confront the idea of power. Emotional state: Conflict. Action: All three confront the idea of power.. Location: Mount Kailash, TWILIGHT. Camera: 50mm lateral dolly. Characters: SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F05-v1",
+        "source_asset": "KALP-DERIVED-F05-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F06-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F06",
+      "shot_job_id": "SHOT-F06",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F06-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F06:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for RAVAN_001 perspective. Narrative: Ravan's energy begins to manifest. Emotional state: Temptation. Action: Ravan's energy begins to manifest.. Location: Mount Kailash, TWILIGHT. Camera: Low angle, 35mm push-in. Characters: RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0 | SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F06-v1",
+        "source_asset": "KALP-DERIVED-F06-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F07-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F07",
+      "shot_job_id": "SHOT-F07",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F07-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F07:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for SHIVA_001 perspective. Narrative: Shiva stops Ravan's power. Emotional state: Absolute control. Action: Shiva stops Ravan's power.. Location: Mount Kailash, TWILIGHT. Camera: 50mm low angle. Characters: SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F07-v1",
+        "source_asset": "KALP-DERIVED-F07-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    },
+    {
+      "job_spec_id": "PJS-CSD-DEMO-001-F08-v1",
+      "schema_version": "KALP-PROVIDER-JOB-SPECIFICATION-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F08",
+      "shot_job_id": "SHOT-F08",
+      "status": "TRANSLATED",
+      "pir_id": "PIR-CSD-DEMO-001-F08-v1",
+      "semantic_checksum": "PIR:CSD-DEMO-001:F08:v1",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "provider": {
+        "primary": "HIGGSFIELD",
+        "fallback": "CHATGPT_IMAGE_GENERATION",
+        "selection_status": "CANDIDATE_REQUIRES_HEALTH_CHECK",
+        "model": "UNSELECTED_UNTIL_ADAPTER_RESOLUTION"
+      },
+      "modality": "IMAGE",
+      "output": {
+        "aspect_ratio": "16:9",
+        "quality_profile": "QUALITY_FIRST"
+      },
+      "references": [
+        {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      ],
+      "prompt_ir": {
+        "positive": "Cinematic 16:9 frame for AUDIENCE perspective. Narrative: Ravan lowers his hand. Emotional state: Recognition → Restraint. Action: Ravan lowers his hand.. Location: Mount Kailash, TWILIGHT. Camera: 35mm wide, slow pull-back. Characters: SHIVA_001:SHIVA_001_VISUAL_LOCK_v1.0 | RAM_001:RAM_001_IDENTITY_LOCK_v1.0 | RAVAN_001:RAVAN_CHARACTER_PACKAGE_v1.0. Preserve canonical identity, anatomy, costume, hair, crown, ornaments, weapons, world and spatial continuity.",
+        "negative_constraints": [
+          "No identity change",
+          "No costume/anatomy/hair/crown/ornament/weapon mutation",
+          "No modern objects or text artifacts",
+          "No Mount Kailash/twilight change",
+          "No extra principal characters",
+          "No perspective override",
+          "No uncontrolled F06 power discharge"
+        ]
+      },
+      "provider_parameters": {
+        "resolution": "CINEMATIC",
+        "aspect_ratio": "16:9",
+        "reference_strength": "ADAPTER_DEFINED",
+        "seed_policy": "CONTINUITY_MANAGED",
+        "steps": "ADAPTER_DEFINED"
+      },
+      "hard_locks": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "execution": {
+        "retry_policy": "TARGETED_RETRY",
+        "fallback_policy": "DO_NOT_WEAKEN_HARD_LOCKS",
+        "timeout_policy": "ADAPTER_DEFINED"
+      },
+      "lineage": {
+        "source_context": "PCP-CSD-DEMO-001-F08-v1",
+        "source_asset": "KALP-DERIVED-F08-CSD003",
+        "reference_anchor": {
+          "frame_id": "F01",
+          "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+          "trusted": true
+        }
+      },
+      "downstream": [
+        "CMSE-015",
+        "CMSE-010"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": "KALP-CSD-PRODUCTION-ASSET-INTEGRITY-1.0",
+  "gate_id": "CSD-003.6",
+  "scene_id": "CSD-DEMO-001",
+  "source_reference": {
+    "frame_id": "F01",
+    "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+    "status": "TRUSTED_CANONICAL_REFERENCE"
+  },
+  "required_frames": [
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08"
+  ],
+  "latest_generation_attempt": {
+    "artifact_id": "c0bd3ab0-ab7d-4f11-a2f6-526fe7292ccf",
+    "type": "GENERATED_STORYBOARD_SHEET",
+    "status": "REJECTED_FOR_PROMOTION",
+    "reason": "Generation returned one storyboard sheet instead of seven independent frame assets."
+  },
+  "frame_status": {
+    "F02": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F03": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F04": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F05": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F06": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F07": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    },
+    "F08": {
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "independent_generation": false,
+      "production_promotion": "BLOCKED"
+    }
+  },
+  "integrity_rules": [
+    "Independent production asset requires its own generation artifact/job identity.",
+    "Storyboard sheets cannot satisfy individual-frame provenance.",
+    "Derived crops may remain review references but cannot be promoted to production assets.",
+    "CMSE-010 handoff requires every required frame to pass production asset integrity."
+  ],
+  "result": {
+    "status": "BLOCKED",
+    "promoted_assets": [
+      "F01"
+    ],
+    "blocked_assets": [
+      "F02",
+      "F03",
+      "F04",
+      "F05",
+      "F06",
+      "F07",
+      "F08"
+    ],
+    "cmse_010_handoff": "BLOCKED",
+    "rework_required": "INDIVIDUAL_FRAME_GENERATION"
+  },
+  "next_gate": "CSD-003.5R — Provider/Generation Path Correction"
+}

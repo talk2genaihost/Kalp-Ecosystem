@@ -1,0 +1,47 @@
+{
+  "schema_version": "KALP-CANONICAL-VISUAL-LOCK-1.0",
+  "registry_id": "KALP_CANONICAL_VISUAL_LOCK_REGISTRY_001",
+  "locks": {
+    "RAM_001": {
+      "character_id": "RAM_001",
+      "display_name": "Ram",
+      "status": "CANONICAL",
+      "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+      "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+      "invariants": {
+        "age": "~28–32",
+        "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+        "hair": "dark shoulder-length hair, neatly tied",
+        "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+        "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+        "accessories": "minimal purposeful ornaments; no modern elements",
+        "weapon": "canonical bow and arrows",
+        "aura": "warm golden aura",
+        "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+      }
+    },
+    "RAVAN_001": {
+      "character_id": "RAVAN_001",
+      "display_name": "Ravan",
+      "status": "CANONICAL",
+      "master_package": "RAVAN_CHARACTER_PACKAGE_v1.0",
+      "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+      "anatomy_lock": "RAVAN_ANATOMY_001",
+      "costume_lock": "RAVAN_COSTUME_001",
+      "continuity_lock": "RAVAN_CONTINUITY_001",
+      "invariants": {
+        "face": "mature, sharp, commanding face; intense intelligent eyes",
+        "hair": "long dark hair",
+        "body": "tall, broad, powerful human-derived warrior anatomy",
+        "complexion": "warm bronze/dark cinematic complexion",
+        "costume": "royal/warrior/devotional costume families",
+        "crown": "canonical royal crown architecture",
+        "ornaments": "gold/bronze royal ornaments",
+        "weapon": "canonical weapon identity",
+        "identity_mode": "king first, demon second",
+        "form_modes": "controlled single/triple/ten-head modes",
+        "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+      }
+    }
+  }
+}

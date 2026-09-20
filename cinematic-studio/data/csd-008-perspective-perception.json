@@ -1,0 +1,163 @@
+{
+  "schema_version":"KALP-CSD-008-PERSPECTIVE-PERCEPTION-1.0",
+  "engine_id":"KALP-CSD-008",
+  "engine_name":"Perspective & Perception Director",
+  "status":"LOCKED",
+  "purpose":"Transform character emotional state, knowledge, beliefs, objectives and relationships into a controlled perception model that determines what each character attends to, notices, interprets, ignores and experiences within the same canonical scene reality.",
+  "core_principle":"One canonical reality can produce multiple valid character perceptions because attention and interpretation are constrained by state.",
+  "perception_model":"reality → sensory access → attention → salience → interpretation → emotional coloration → perceived meaning → intention",
+  "inputs":{
+    "required":["character_ids","scene_state","knowledge_state","emotional_state"],
+    "optional":["relationship_state","narrative_intent","camera_context","audience_model","previous_perception_state"]
+  },
+  "perception_dimensions":[
+    "sensory_access",
+    "attention_target",
+    "attention_priority",
+    "noticed",
+    "ignored",
+    "salient_detail",
+    "interpretation",
+    "emotional_coloration",
+    "perceived_threat",
+    "perceived_opportunity",
+    "perceived_power",
+    "perceived_intention_of_others",
+    "blind_spot",
+    "uncertainty",
+    "subjective_meaning"
+  ],
+  "director_rules":[
+    "Maintain one canonical scene reality; never create contradictory physical realities merely to satisfy POV.",
+    "Perception must be explainable from knowledge, emotion, objective and sensory access.",
+    "Characters notice what is relevant to their current objective before neutral background detail.",
+    "Emotional state can amplify or suppress salience but cannot manufacture impossible evidence.",
+    "Belief influences interpretation, not objective physical facts.",
+    "A character may misread an objectively visible action.",
+    "A character may overlook a visible detail when attention is occupied elsewhere.",
+    "Different characters may assign different meanings to the same event.",
+    "Perception must distinguish observed fact from interpretation.",
+    "Unknown information remains outside perception unless acquired through a valid scene event.",
+    "The audience may receive controlled information outside any single character's perception only when explicitly authorized by the audience model.",
+    "Maximum five active characters."
+  ],
+  "perception_resolution_pipeline":[
+    "LOAD_CANONICAL_SCENE_REALITY",
+    "LOAD_CSD-006_EMOTIONAL_STATE",
+    "LOAD_CSD-007_INFORMATION_STATE",
+    "LOAD_OBJECTIVE_AND_INTENTION",
+    "LOAD_RELATIONSHIP_PRESSURE",
+    "CALCULATE_SENSORY_ACCESS",
+    "CALCULATE_ATTENTION_TARGET",
+    "CALCULATE_SALIENCE",
+    "CALCULATE_INTERPRETATION",
+    "CALCULATE_EMOTIONAL_COLORATION",
+    "CALCULATE_BLIND_SPOTS",
+    "CALCULATE_OTHER_CHARACTER_INTENT_PERCEPTION",
+    "SEPARATE_OBSERVATION_FROM_INTERPRETATION",
+    "BUILD_CHARACTER_PERSPECTIVE",
+    "BUILD_AUDIENCE_INFORMATION_BOUNDARY",
+    "GENERATE_CSD002_FRAME_PERSPECTIVE_MAP",
+    "VALIDATE_PERCEPTION"
+  ],
+  "output_schema":{
+    "canonical_reality":"scene facts shared across all perspectives",
+    "character_perceptions":"per-character perception packages",
+    "attention_map":"what each character prioritizes",
+    "salience_map":"what becomes visually/emotionally prominent",
+    "interpretation_map":"how observed facts are understood",
+    "blind_spot_map":"relevant details not perceived or not recognized",
+    "other_character_read":"perceived intention of other active characters with confidence",
+    "audience_information_boundary":"know/suspect/expect/feel plus controlled omniscient information",
+    "frame_perspective_map":"eight frame-specific perspective directives",
+    "validation":"reality, access, knowledge, emotion, interpretation, chronology and audience-boundary checks"
+  },
+  "validation":{
+    "hard_failures":[
+      "multiple_canonical_realities",
+      "perception_without_information_or_sensory_basis",
+      "objective_fact_rewritten_as_subjective_perception",
+      "future_information_leak",
+      "emotion_used_as_physical_evidence",
+      "audience_information_leaked_without_authorization",
+      "active_character_count_above_5"
+    ],
+    "pass_conditions":[
+      "single canonical reality preserved",
+      "every major perception has a causal basis",
+      "observation and interpretation remain distinct",
+      "character-specific blind spots are explicit",
+      "audience boundary is explicit",
+      "CSD-002 frame map is complete"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD8-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "canonical_reality":[
+      "Ravana has contained his rising power.",
+      "Rama remains physically composed.",
+      "Hanuman remains positioned to protect Rama.",
+      "No physical escalation is occurring at this moment."
+    ],
+    "character_perceptions":[
+      {
+        "character_id":"RAVAN_001",
+        "attention_target":"Rama's unchanged composure",
+        "noticed":["Rama's steady gaze","absence of fear response","Ravana's own contained power"],
+        "ignored":["Hanuman's exact readiness posture"],
+        "interpretation":"Rama's calm may indicate that the test was never about brute force.",
+        "emotional_coloration":"challenged pride becoming introspection",
+        "perceived_threat":"loss of certainty about his definition of authority",
+        "perceived_opportunity":"discover a stronger form of mastery",
+        "blind_spot":"Rama's complete internal reasoning",
+        "subjective_meaning":"The confrontation has become a test of what power means."
+      },
+      {
+        "character_id":"RAM_001",
+        "attention_target":"Ravana's post-restraint behavior",
+        "noticed":["reduced gesture amplitude","contained intensity","continued attention"],
+        "ignored":["minor environmental movement"],
+        "interpretation":"Ravana is processing the consequence of his own choice.",
+        "emotional_coloration":"calm confirmation",
+        "perceived_threat":"low immediate physical threat",
+        "perceived_opportunity":"allow self-recognition without humiliation",
+        "blind_spot":"Ravana's exact private conclusion",
+        "subjective_meaning":"Restraint has created the opening for understanding."
+      },
+      {
+        "character_id":"HANUMAN_001",
+        "attention_target":"both principals' hands, posture and intent",
+        "noticed":["Rama's stability","Ravana's contained power","absence of escalation"],
+        "ignored":["subtle philosophical implications not yet verbalized"],
+        "interpretation":"Rama has deliberately allowed Ravana to confront himself.",
+        "emotional_coloration":"watchful devotion",
+        "perceived_threat":"latent rather than immediate",
+        "perceived_opportunity":"observe without interrupting Rama's test",
+        "blind_spot":"Ravana's private motive",
+        "subjective_meaning":"The greatest action may be the action deliberately withheld."
+      }
+    ],
+    "shared_event_example":{
+      "objective_fact":"Ravana lowers the intensity of his power.",
+      "ravan_interpretation":"I am choosing restraint and testing what it means.",
+      "ram_interpretation":"He has made a meaningful choice.",
+      "hanuman_interpretation":"The threat has reduced; Rama's test continues."
+    },
+    "frame_perspective_map":[
+      {"frame_id":"F01","perspective":"AUDIENCE","purpose":"establish canonical reality and relationship geometry"},
+      {"frame_id":"F02","perspective":"RAVAN_001","purpose":"show what Ravana notices in Rama's composure"},
+      {"frame_id":"F03","perspective":"HANUMAN_001","purpose":"show threat assessment and protective attention"},
+      {"frame_id":"F04","perspective":"RAVAN_001","purpose":"subjective experience of contained power"},
+      {"frame_id":"F05","perspective":"SHARED","purpose":"show one event carrying three interpretations"},
+      {"frame_id":"F06","perspective":"RAVAN_001","purpose":"internal meaning of restraint expressed visually"},
+      {"frame_id":"F07","perspective":"RAM_001","purpose":"Rama reads the state change without escalating"},
+      {"frame_id":"F08","perspective":"AUDIENCE","purpose":"resolve the moment while preserving Ravana's unanswered internal question"}
+    ],
+    "csd002_handoff":{
+      "status":"READY",
+      "rule":"CSD-002 may vary camera and framing, but each perspective frame must preserve the canonical reality and use the assigned character perception state."
+    }
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CSD-009-SCENE-PERCEPTION-QUALITY","CMSE-008-CINEMATIC-PERCEPTION-AUDIENCE-EXPERIENCE"]
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version":"KALP-CSD-011-SCENE-STATE-CANONICAL-REALITY-1.0",
+  "engine_id":"KALP-CSD-011",
+  "engine_name":"Scene State & Canonical Reality Manager",
+  "status":"LOCKED",
+  "purpose":"Maintain one authoritative, versioned and queryable scene reality shared by all character, perception, storyboard and production engines.",
+  "core_principle":"Every frame, perception and production asset must resolve against the same canonical scene-state snapshot.",
+  "scene_state_domains":{
+    "identity":["scene_id","universe_id","story_arc_id","scene_version","state_fingerprint"],
+    "temporal":["narrative_time","time_of_day","date_or_epoch","duration_from_previous_scene","temporal_order"],
+    "spatial":["location","sub_location","world_coordinates","orientation","blocking_zones","spatial_relationships"],
+    "environment":["weather","lighting_state","atmosphere","terrain","ambient_conditions","environmental_events"],
+    "characters":["active_character_ids","position","orientation","posture","visibility","proximity","current_state_reference"],
+    "objects":["object_id","type","position","owner","state","continuity_lock"],
+    "world_state":["political_state","battle_state","damage_state","access_state","known_world_conditions"],
+    "event_ledger":["event_id","sequence","actor","action","target","observable_effect","causal_effect"],
+    "production_state":["camera_constraints","frame_constraints","vfx_state","audio_state","asset_dependencies"]
+  },
+  "immutability_model":{
+    "immutable":["scene_id","universe_id","canonical_baseline","identity_locks","historical_events"],
+    "versioned":["spatial_state","temporal_state","environment_state","character_positions","object_states","world_state","production_state"],
+    "rule":"A new state creates a new scene-state version; historical versions remain addressable and cannot be silently overwritten."
+  },
+  "canonical_reality_rules":[
+    "Exactly one active canonical reality exists for a scene version.",
+    "Character POV may alter attention and interpretation but never physical scene facts.",
+    "All active character positions must be spatially resolvable.",
+    "Every state-changing event must have an ordered event-graph position.",
+    "Future events cannot mutate a prior scene-state snapshot.",
+    "Retcons require an explicit variant or revision record and cannot silently overwrite canonical history.",
+    "Environmental and object changes persist until a subsequent event changes them.",
+    "Character state references must resolve to CSD-006 snapshots.",
+    "Knowledge references must resolve to CSD-007 states.",
+    "Perception references must resolve to CSD-008/CSD-009 outputs.",
+    "Maximum five active characters per scene.",
+    "Identity locks are immutable even when scene state changes."
+  ],
+  "state_transition_model":"scene_state(t) + validated_event(t+1) → scene_state(t+1)",
+  "event_ledger_rules":[
+    "Events must be causally ordered.",
+    "An event may change multiple state domains.",
+    "Every state mutation must name its triggering event.",
+    "Observed effects are separate from hidden causal effects.",
+    "Character knowledge is not automatically updated by an event unless the character has a valid acquisition path."
+  ],
+  "snapshot_model":{
+    "required":["scene_id","scene_version","parent_version","created_from_event","canonical_reality","state_fingerprint"],
+    "promotion_states":["DRAFT","VALIDATED","ACTIVE","SUPERSEDED"],
+    "active_rule":"Only one ACTIVE snapshot may exist for a scene ID at a time."
+  },
+  "continuity_checks":[
+    "CHARACTER_SPATIAL_CONTINUITY",
+    "OBJECT_CONTINUITY",
+    "ENVIRONMENT_CONTINUITY",
+    "TEMPORAL_CONTINUITY",
+    "EVENT_ORDER_CONTINUITY",
+    "IDENTITY_LOCK_CONTINUITY",
+    "WORLD_STATE_CONTINUITY",
+    "FRAME_TO_SCENE_STATE_ALIGNMENT"
+  ],
+  "hard_failures":[
+    "MULTIPLE_ACTIVE_CANONICAL_REALITIES",
+    "UNRESOLVED_CHARACTER_POSITION",
+    "EVENT_OUT_OF_ORDER",
+    "FUTURE_EVENT_IN_PRIOR_SNAPSHOT",
+    "SILENT_RETCON",
+    "IDENTITY_LOCK_MUTATION",
+    "STATE_MUTATION_WITHOUT_EVENT",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5",
+    "FRAME_REFERENCES_NON_ACTIVE_SNAPSHOT"
+  ],
+  "output_contract":{
+    "scene_state_snapshot":"authoritative state",
+    "event_ledger":"ordered causal events",
+    "state_deltas":"version-to-version changes",
+    "continuity_constraints":"mandatory downstream locks",
+    "character_state_refs":"CSD-006 references",
+    "knowledge_state_refs":"CSD-007 references",
+    "perception_validation_ref":"CSD-009 reference",
+    "csd010_handoff":"orchestration-ready canonical scene package",
+    "csd002_handoff":"frame generation must bind to active snapshot"
+  },
+  "demo_test":{
+    "scene_id":"CSD11-RAMAYANA-DEMO-001",
+    "universe_id":"RAMAYANA_UNIVERSE_001",
+    "story_arc_id":"ARC-08",
+    "scene_version":"1.0",
+    "canonical_reality":{
+      "location":"Lanka confrontation ground",
+      "time_of_day":"twilight",
+      "active_character_ids":["RAM_001","RAVAN_001","HANUMAN_001"],
+      "environment":"charged but physically stable atmosphere",
+      "event_ledger":[
+        {"event_id":"E01","sequence":1,"actor":"RAVAN_001","action":"initiates power demonstration","observable_effect":"power intensity rises","causal_effect":"tension increases"},
+        {"event_id":"E02","sequence":2,"actor":"RAM_001","action":"maintains controlled challenge","observable_effect":"Rama remains composed","causal_effect":"Ravana's certainty is pressured"},
+        {"event_id":"E03","sequence":3,"actor":"RAVAN_001","action":"suppresses escalation","observable_effect":"power intensity falls","causal_effect":"Ravana enters introspection"}
+      ],
+      "character_positions":{
+        "RAM_001":"center-east; stable stance; facing RAVAN_001",
+        "RAVAN_001":"center-west; facing RAM_001; power contained",
+        "HANUMAN_001":"rear-right protective position; unobstructed sightline"
+      }
+    },
+    "snapshot_transition":{
+      "parent_version":"0.9",
+      "created_from_event":"E03",
+      "new_state":"Ravana's power is contained; Rama remains composed; Hanuman remains ready; no physical escalation."
+    },
+    "continuity_validation":"PASS",
+    "csd010_handoff":"READY",
+    "csd002_handoff":"READY"
+  },
+  "downstream":["CSD-010-ADAPTIVE-ORCHESTRATOR","CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-002-MULTI-SCENE-CONTINUITY","CMSE-011-ASSET-CONTINUITY-REGISTRY"]
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version":"KALP-CMSE-012-INTELLIGENT-PRODUCTION-RETRIEVAL-1.0",
+  "engine_id":"CMSE-012",
+  "engine_name":"Intelligent Production Retrieval & Context Assembly Engine",
+  "status":"LOCKED",
+  "purpose":"Retrieve constraint-compatible historical production assets and continuity state, then assemble a traceable context package for future cinematic production.",
+  "core_principle":"Retrieve by narrative and continuity constraints first; use visual similarity only after compatibility is established.",
+  "inputs":["scene_request","CMSE-011 asset registry","CSD-006 emotional continuity","CSD-007 knowledge state","CSD-008 perception state","world/character registries"],
+  "outputs":["retrieved_assets","continuity_state","reference_manifest","context_bundle","retrieval_lineage"],
+  "retrieval_pipeline":[
+    "REQUEST_NORMALIZATION",
+    "NARRATIVE_TIMESTAMP_RESOLUTION",
+    "CHARACTER_AND_SCENE_CONSTRAINTS",
+    "IDENTITY_COMPATIBILITY_FILTER",
+    "CANONICAL_REFERENCE_FILTER",
+    "TEMPORAL_CONTINUITY_FILTER",
+    "SCENE_AND_WORLD_FILTER",
+    "EMOTIONAL_CONTINUITY_FILTER",
+    "PERSPECTIVE_CONTINUITY_FILTER",
+    "ASSET_VALIDATION_FILTER",
+    "PROVIDER_VARIANT_FILTER",
+    "SIMILARITY_AS_SECONDARY_SIGNAL",
+    "CONSTRAINT_SCORING",
+    "REFERENCE_ROLE_ASSIGNMENT",
+    "CONTEXT_ASSEMBLY",
+    "LINEAGE_FINGERPRINT"
+  ],
+  "retrieval_priority":[
+    "IDENTITY_COMPATIBILITY",
+    "CANONICAL_REFERENCE",
+    "NARRATIVE_TIMESTAMP",
+    "SCENE_CONTINUITY",
+    "WORLD_LOCATION",
+    "COSTUME_CONTINUITY",
+    "PROP_CONTINUITY",
+    "EMOTIONAL_STATE_CONTINUITY",
+    "PERSPECTIVE_CONTINUITY",
+    "VALIDATION_STATUS",
+    "PROVIDER_COMPATIBILITY",
+    "VISUAL_SIMILARITY"
+  ],
+  "hard_rules":[
+    "Never retrieve a failed or rejected asset as a master/reference.",
+    "Never use visual similarity to override identity or narrative continuity.",
+    "Canonical trusted references outrank provider variants.",
+    "Provider variants remain derivatives unless explicitly promoted.",
+    "Future-state assets cannot be injected into an earlier narrative timestamp.",
+    "Knowledge state cannot be inferred from visual similarity.",
+    "Emotional continuity must be sourced from approved state history.",
+    "A retrieved asset must have traceable lineage.",
+    "Maximum active scene characters remains five.",
+    "Retrieval must be deterministic for identical registry state and request.",
+    "Missing continuity evidence must be reported, not invented."
+  ],
+  "context_contract":{
+    "sections":["scene_constraints","character_context","canonical_references","continuity_assets","world_context","costume_and_prop_context","emotional_context","perspective_context","reference_manifest","retrieval_warnings","lineage"],
+    "reference_roles":["IDENTITY","CONTINUITY","COMPOSITION","ENVIRONMENT","COSTUME","PROP","PERFORMANCE"],
+    "downstream":"CSD-011/CSD-012/CMSE-013"
+  },
+  "scoring":{
+    "method":"constraint_compatibility_then_secondary_similarity",
+    "weights":{
+      "identity":30,
+      "canonical":20,
+      "temporal":15,
+      "scene":10,
+      "world":8,
+      "costume":5,
+      "prop":4,
+      "emotional":4,
+      "perspective":2,
+      "validation":2
+    },
+    "tie_break":["asset_class","version_status","asset_id","version_id"]
+  },
+  "validation":{
+    "hard_failures":[
+      "ASSET_REGISTRY_MISSING",
+      "SCENE_REQUEST_MISSING",
+      "IDENTITY_CONSTRAINT_MISSING",
+      "NARRATIVE_TIMESTAMP_MISSING",
+      "INVALID_ACTIVE_CHARACTER_COUNT",
+      "LINEAGE_MISSING",
+      "FUTURE_ASSET_LEAK",
+      "FAILED_ASSET_SELECTED_AS_REFERENCE",
+      "NONDETERMINISTIC_RESULT"
+    ],
+    "pass_conditions":[
+      "retrieval constraints resolved",
+      "eligible assets filtered",
+      "continuity state assembled",
+      "reference roles assigned",
+      "warnings explicit",
+      "lineage fingerprint generated"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CMSE12-RAMAYANA-DEMO-002",
+    "story_arc_id":"ARC-08-LANKA-WAR",
+    "narrative_timestamp":"POST_RESTRAINT_SCENE",
+    "characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "required_context":{
+      "RAVAN_001":"latest validated emotional/performance state",
+      "RAM_001":"canonical identity reference plus latest continuity-compatible state",
+      "HANUMAN_001":"latest continuity-compatible witness state",
+      "world":"Mount Kailash confrontation geography",
+      "frame_reference":"F01 canonical trusted reference"
+    },
+    "result":"CONTEXT_READY"
+  },
+  "downstream":["CSD-011","CSD-012","CMSE-013"]
+}

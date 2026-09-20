@@ -1,0 +1,141 @@
+{
+  "schema_version":"KALP-CSD-026-SCENE-ENVIRONMENTAL-CONTINUITY-WORLD-MEMORY-1.0",
+  "engine_id":"KALP-CSD-026",
+  "engine_name":"Scene Environmental Continuity & World-State Memory Director",
+  "status":"LOCKED",
+  "purpose":"Persist validated environmental and world-state consequences across scenes, reconstruct location state on re-entry, track recovery and repair, and prevent silent environmental resets.",
+  "core_principle":"A location remembers validated consequences; returning to a place restores its latest canonical environmental state unless an explicit intervening event changes it.",
+  "memory_model":"validated_world_delta + location_identity + narrative_time + causal_history → persistent_world_memory → scene_reentry_snapshot",
+  "memory_scope":["LOCATION","REGION","WORLD"],
+  "location_memory_schema":{
+    "required":["memory_id","universe_id","location_id","location_version","canonical_baseline","current_state","active_consequences","resolved_consequences","historical_deltas","last_validated_scene","last_narrative_time","recovery_state"],
+    "rule":"Location memory is authoritative for persistent environmental state and is updated only by validated world-state transitions."
+  },
+  "world_state_schema":{
+    "required":["state_id","location_id","version","terrain_state","atmosphere_state","weather_state","structure_state","vegetation_state","water_state","damage_state","access_state","ambient_activity","active_environmental_effects"],
+    "version_rule":"Every accepted environmental change creates a new location-state version; prior versions remain auditable."
+  },
+  "memory_entry_schema":{
+    "required":["delta_id","location_id","source_scene_id","source_event","narrative_time","domain","before_state","after_state","persistence","causal_chain","validation_status"],
+    "persistence":["TRANSIENT","PERSISTENT","ACCUMULATING","PERMANENT_UNTIL_REPAIRED","RECOVERING","RESOLVED"],
+    "rule":"Only VALIDATED deltas enter persistent world memory."
+  },
+  "reentry_reconstruction":{
+    "required":["location_id","requested_narrative_time","latest_valid_state","intervening_events","recovery_events","reconstructed_state","reconstruction_basis"],
+    "rule":"Re-entry state is reconstructed from the latest canonical location state plus all validated intervening events and recovery transitions."
+  },
+  "recovery_and_repair":{
+    "required":["recovery_id","target_delta","recovery_type","trigger","start_time","completion_time","restored_domains","remaining_effects"],
+    "recovery_types":["NATURAL_RECOVERY","CHARACTER_ACTION","WORLD_EVENT","REPAIR","WEATHER_RECOVERY","MAGICAL_RESTORATION","TIME_BASED_DECAY"],
+    "rule":"Recovery cannot erase history; it creates a new validated transition while preserving the prior consequence."
+  },
+  "cross_scene_continuity":{
+    "checks":["LOCATION_IDENTITY","TEMPORAL_ORDER","PERSISTENT_DAMAGE","ATMOSPHERE","WEATHER","STRUCTURAL_STATE","ACCESS_STATE","ACTIVE_EFFECTS","RECOVERY_PROGRESS","WORLD_CONDITIONS"],
+    "rule":"Every scene entering an existing location must reconcile requested scene state against persistent world memory before production."
+  },
+  "historical_integrity":{
+    "required":["event_chain","source_scene","source_event","snapshot_before","snapshot_after","validation_record"],
+    "rule":"World history is append-only; no silent overwrite or deletion of prior environmental consequences."
+  },
+  "world_memory_hierarchy":{
+    "location":"Authoritative for local geography and environmental state.",
+    "region":"Aggregates validated consequences affecting multiple locations or regional conditions.",
+    "world":"Stores validated global conditions such as war state, climate-scale events or civilization-level changes.",
+    "precedence":"More local state overrides broader state only where the local domain is explicitly defined; otherwise broader state propagates."
+  },
+  "continuity_rules":[
+    "Persistent consequences survive scene boundaries.",
+    "Transient effects may resolve without entering long-term active state.",
+    "Resolved effects remain in history even after disappearance.",
+    "A location re-entry cannot use the original baseline if persistent changes exist.",
+    "Narrative time determines which recovery events have occurred.",
+    "Future environmental events cannot affect earlier scene snapshots.",
+    "Scene-specific temporary VFX do not become permanent world memory unless CSD-025 marks them persistent.",
+    "World memory cannot mutate character identity, anatomy or costume.",
+    "Variant timelines require explicit variant/revision identifiers.",
+    "Every reconstructed state must be traceable to validated source deltas.",
+    "Maximum five active characters remains enforced."
+  ],
+  "memory_pipeline":[
+    "LOAD_CSD011_CANONICAL_LOCATION_STATE",
+    "LOAD_CSD012_STATE_TRANSITIONS",
+    "LOAD_CSD025_WORLD_REACTIONS",
+    "VALIDATE_PERSISTENCE_CLASS",
+    "APPEND_WORLD_MEMORY_DELTA",
+    "UPDATE_LOCATION_STATE_VERSION",
+    "PROCESS_RECOVERY_TRANSITIONS",
+    "RECONCILE_REGION_STATE",
+    "RECONCILE_WORLD_STATE",
+    "RECONSTRUCT_SCENE_REENTRY_STATE",
+    "VALIDATE_CROSS_SCENE_CONTINUITY",
+    "BIND_ENVIRONMENT_TO_CSD002",
+    "EMIT_CMSE011_ASSET_AND_WORLD_MEMORY_CONTEXT"
+  ],
+  "validation":{
+    "hard_failures":[
+      "LOCATION_IDENTITY_MISMATCH",
+      "UNVALIDATED_DELTA_IN_MEMORY",
+      "SILENT_WORLD_STATE_RESET",
+      "FUTURE_EVENT_APPLIED_TO_PAST",
+      "RECOVERY_WITHOUT_SOURCE",
+      "HISTORY_CHAIN_BREAK",
+      "REENTRY_STATE_NOT_RECONSTRUCTABLE",
+      "PERSISTENT_DAMAGE_MISSING",
+      "ACTIVE_EFFECT_STATE_MISMATCH",
+      "REGION_STATE_CONFLICT",
+      "WORLD_STATE_CONFLICT",
+      "CSD011_SNAPSHOT_MISMATCH",
+      "CSD025_REACTION_MISMATCH",
+      "VARIANT_TIMELINE_MIX",
+      "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+    ],
+    "advisories":[
+      "HIGH_PERSISTENT_DAMAGE",
+      "LONG_RECOVERY_CHAIN",
+      "MULTIPLE_LOCATION_DELTAS",
+      "REGIONAL_STATE_PROPAGATION",
+      "WORLD_STATE_RECONCILIATION_REQUIRED"
+    ]
+  },
+  "output_contract":{
+    "location_memory":"authoritative persistent location record",
+    "world_state_snapshot":"reconstructed canonical environment",
+    "historical_delta_chain":"auditable environmental history",
+    "recovery_state":"active and completed recovery transitions",
+    "reentry_context":"scene-ready environmental continuity context",
+    "frame_environment_package":"CSD-002-ready environment state",
+    "production_handoff":"CMSE-011/CMSE-010-ready world memory package"
+  },
+  "demo_test":{
+    "scene_id":"CSD26-RAMAYANA-DEMO-001",
+    "universe_id":"RAMAYANA_UNIVERSE_001",
+    "location_id":"LANKA_CONFRONTATION_GROUND",
+    "location_version_before":"v1.0",
+    "source_delta":"WD-001",
+    "source_scene":"CSD25-RAMAYANA-DEMO-001",
+    "source_event":"E04",
+    "narrative_time":"twilight_T0",
+    "delta":{
+      "domain":"terrain",
+      "before_state":"intact_ground",
+      "after_state":"subtle_vibration_marks_and_disturbed_dust",
+      "persistence":"PERMANENT_UNTIL_REPAIRED"
+    },
+    "location_version_after":"v1.1",
+    "reentry_test":{
+      "next_scene_id":"CSD26-RAMAYANA-REENTRY-001",
+      "requested_narrative_time":"twilight_T0_plus_2h",
+      "intervening_events":["natural_air_recovery"],
+      "reconstructed_state":{
+        "terrain":"subtle_vibration_marks_and_disturbed_dust",
+        "air":"natural_twilight_movement",
+        "primary_vfx":"resolved",
+        "historical_damage":"preserved_in_memory"
+      },
+      "reconstruction_basis":["v1.1","natural_air_recovery"]
+    },
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-007-WORLD-INTELLIGENCE","CMSE-010-PRODUCTION-ORCHESTRATOR","CMSE-011-ASSET-MEMORY","CMSE-012-PRODUCTION-RETRIEVAL"]
+}
