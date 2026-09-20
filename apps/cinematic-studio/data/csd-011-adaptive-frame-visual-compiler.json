@@ -1,0 +1,163 @@
+{
+  "schema_version":"KALP-CSD-011-ADAPTIVE-FRAME-VISUAL-COMPILER-1.0",
+  "engine_id":"KALP-CSD-011",
+  "engine_name":"Adaptive Frame-to-Visual Production Compiler",
+  "status":"LOCKED",
+  "purpose":"Compile validated CSD-010 frame direction into deterministic provider-neutral visual production specifications without losing narrative, identity, perception, emotional or continuity intent.",
+  "core_principle":"Compilation changes representation, never meaning. Every production field must be traceable to an approved upstream scene decision.",
+  "inputs":{
+    "required":["adaptive_frame_plan","validation_result","character_registry","scene_state"],
+    "upstream_dependencies":["CSD-005","CSD-006","CSD-007","CSD-008","CSD-009","CSD-010"],
+    "optional":["visual_style_profile","aspect_ratio","resolution","reference_assets","audio_intent"]
+  },
+  "compilation_layers":[
+    "FRAME_INTENT",
+    "CHARACTER_IDENTITY_LOCKS",
+    "PERFORMANCE_STATE",
+    "KNOWLEDGE_AND_PERCEPTION_STATE",
+    "ACTION_AND_BLOCKING",
+    "ENVIRONMENT_AND_WORLD",
+    "CAMERA_AND_COMPOSITION",
+    "LIGHTING_AND_ATMOSPHERE",
+    "VFX_AND_PHYSICAL_EFFECTS",
+    "CONTINUITY_CONSTRAINTS",
+    "NEGATIVE_CONSTRAINTS",
+    "OUTPUT_REQUIREMENTS",
+    "PROVENANCE_AND_LINEAGE"
+  ],
+  "provider_neutral_contract":{
+    "required_fields":[
+      "job_id",
+      "scene_id",
+      "frame_id",
+      "frame_purpose",
+      "perspective",
+      "canonical_reality",
+      "characters",
+      "performance",
+      "perception",
+      "action",
+      "environment",
+      "camera",
+      "lighting",
+      "atmosphere",
+      "vfx",
+      "continuity_locks",
+      "negative_constraints",
+      "output",
+      "source_lineage"
+    ],
+    "provider_selection":"DEFERRED_TO_CMSE-014",
+    "prompt_translation":"DEFERRED_TO_CMSE-013",
+    "execution":"DEFERRED_TO_CMSE-010/015"
+  },
+  "identity_compilation_rules":[
+    "Canonical identity is immutable.",
+    "Visual locks must be copied by identifier, not rewritten by the compiler.",
+    "Performance state may change while identity remains unchanged.",
+    "Costume, anatomy, face, voice and canonical props remain locked unless an upstream scene state explicitly authorizes a continuity change.",
+    "Unknown visual details must not be invented as canonical identity."
+  ],
+  "perception_compilation_rules":[
+    "Perspective determines attention and camera intent.",
+    "Knowledge boundaries determine what may be visually revealed through subjective framing.",
+    "Belief influences interpretation and performance, not physical reality.",
+    "Blind spots may be encoded through framing, occlusion, focus, negative space or omission.",
+    "Audience-only information must remain explicitly marked.",
+    "A character's internal state may be expressed visually only through supported performance cues."
+  ],
+  "continuity_compilation_rules":[
+    "Preserve spatial relationships from the canonical scene.",
+    "Preserve temporal state and scene phase.",
+    "Carry CSD-006 emotional consequences into performance.",
+    "Carry CSD-007 information constraints into subjective framing.",
+    "Carry CSD-008 perception constraints into attention and composition.",
+    "Carry CSD-009 validation fingerprint into production lineage.",
+    "F01 trusted references may be inherited only through explicit reference lineage.",
+    "Compiler must not promote derived storyboard imagery to independent asset status."
+  ],
+  "negative_constraint_classes":[
+    "IDENTITY_DRIFT",
+    "FACE_DRIFT",
+    "BODY_ANATOMY_DRIFT",
+    "COSTUME_DRIFT",
+    "PROP_DRIFT",
+    "SPATIAL_CONTINUITY_BREAK",
+    "TIME_CONTINUITY_BREAK",
+    "UNAUTHORIZED_CHARACTER",
+    "UNAUTHORIZED_ACTION",
+    "KNOWLEDGE_LEAK",
+    "PERCEPTION_CONTRADICTION",
+    "UNSUPPORTED_VFX",
+    "UNSUPPORTED_CAMERA_BEHAVIOR",
+    "STYLE_DRIFT"
+  ],
+  "resolution_pipeline":[
+    "UPSTREAM_VALIDATION_CHECK",
+    "LOAD_ADAPTIVE_FRAME_PLAN",
+    "RESOLVE_CHARACTER_LOCKS",
+    "RESOLVE_EMOTIONAL_PERFORMANCE",
+    "RESOLVE_KNOWLEDGE_AND_PERCEPTION",
+    "RESOLVE_ACTION_BLOCKING",
+    "RESOLVE_WORLD_AND_ENVIRONMENT",
+    "RESOLVE_CAMERA_COMPOSITION",
+    "RESOLVE_LIGHTING_ATMOSPHERE",
+    "RESOLVE_VFX",
+    "GENERATE_CONTINUITY_LOCKS",
+    "GENERATE_NEGATIVE_CONSTRAINTS",
+    "ATTACH_PROVENANCE",
+    "EMIT_PROVIDER_NEUTRAL_VISUAL_SPEC",
+    "CSD003_HANDOFF"
+  ],
+  "validation":{
+    "hard_failures":[
+      "UPSTREAM_VALIDATION_NOT_PASSED",
+      "MISSING_FRAME_INTENT",
+      "MISSING_CHARACTER_LOCK",
+      "MISSING_PERSPECTIVE",
+      "CANONICAL_REALITY_UNDEFINED",
+      "UNAUTHORIZED_CHARACTER",
+      "KNOWLEDGE_BOUNDARY_LOST",
+      "PERCEPTION_STATE_LOST",
+      "CONTINUITY_LOCK_MISSING",
+      "PROVENANCE_MISSING",
+      "FRAME_COUNT_NOT_8"
+    ],
+    "pass_conditions":[
+      "eight provider-neutral frame specs compiled",
+      "every field traceable to upstream input or explicit production default",
+      "identity locks preserved",
+      "perception and knowledge constraints preserved",
+      "continuity constraints explicit",
+      "negative constraints generated",
+      "provider selection deferred",
+      "CSD-003 handoff complete"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD11-RAMAYANA-DEMO-001",
+    "source_gate":"CSD-010",
+    "validation_fingerprint":"INHERITED_FROM_CSD-009",
+    "frames":[
+      {
+        "frame_id":"F02",
+        "perspective":"RAVAN_001",
+        "visual_compilation":{
+          "frame_intent":"Ravana studies Rama's unchanged composure after choosing restraint.",
+          "character_locks":["RAVAN_CHARACTER_PACKAGE_v1.0","RAM_001_IDENTITY_LOCK_v1.0"],
+          "performance":{"RAVAN_001":"contained intensity; challenged curiosity","RAM_001":"calm composure"},
+          "perception":{"attention_target":"Rama's unbroken composure","blind_spot":"Rama's complete internal reasoning"},
+          "action":"Ravana studies Rama without escalating.",
+          "camera":"subjective medium-close perspective aligned to Ravana's attention",
+          "composition":"Rama remains visually stable while Ravana's attention controls emphasis",
+          "lighting":"preserve established scene lighting; no emotional lighting invention",
+          "continuity_locks":["same scene geography","Ravana restrained power","Rama canonical appearance"],
+          "negative_constraints":["no face drift","no costume drift","no new characters","no power escalation","no omniscient reveal of Rama's thoughts"]
+        }
+      }
+    ],
+    "compiler_result":"PASS",
+    "downstream":"CSD-003"
+  },
+  "downstream":["CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-012-CONTEXT-ASSEMBLY","CMSE-013-PROMPT-COMPILATION","CMSE-014-PROVIDER-ROUTING","CMSE-010-PRODUCTION-EXECUTION"]
+}
