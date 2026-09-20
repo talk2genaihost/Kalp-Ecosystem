@@ -34,7 +34,7 @@
 <section><div class="head"><div class="headrow"><div><div class="ey">KALP CINEMATIC CONTROL TOWER</div><div class="title">CSD-002 — 8-Frame Perspective Storyboard Engine</div><div class="muted">Every frame owns its perspective, camera language, emotional state, action, dialogue and continuity contract.</div></div><div class="pills"><span class="pill">Create</span><span class="pill">8 Frames</span></div></div></div><div class="frames" id="frames"></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">SCENE VALIDATION</div><div class="checks" id="checks"></div></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">PRODUCTION PIPELINE</div><div class="flow"><div class="node"><b>CSD-002</b><small>Storyboard</small></div>→<div class="node"><b>CSD-003</b><small>Visual Gen</small></div>→<div class="node"><b>CMSE-012</b><small>Context</small></div>→<div class="node"><b>CMSE-013</b><small>Compile</small></div>→<div class="node"><b>CMSE-014</b><small>Route</small></div>→<div class="node"><b>CMSE-015</b><small>Schedule</small></div>→<div class="node"><b>QA</b><small>Quality</small></div>→<div class="node"><b>FINAL</b><small>Render</small></div></div></div></section>
-<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">Not compiled</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY LOCK</div><div class="muted" id="identityStatus">Not validated</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div></div><button class="secondary" id="identity">◉ Validate Identity Lock</button><button class="secondary" id="regen">↻ Compile Visual Job</button><button class="secondary" id="analyze">✦ Gemini Intelligence Analysis</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">LIVE BACKEND · KALP INTELLIGENCE GATEWAY</div><div class="muted" id="analysisStatus">Not requested</div><div class="muted" id="analysisMeta" style="font-size:9px;margin-top:4px"></div></div><div class="workflow"><b id="workflowState">DRAFT · Generate storyboard to begin approval</b><small id="workflowMeta">Production is gated until storyboard approval.</small></div><button class="primary" id="approve" disabled>✓ Approve Storyboard</button><button class="secondary" id="prod" disabled>▶ Send to Production</button></aside>
+<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">READY TO COMPILE</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div><div class="kv" style="margin-top:7px"><div><small>JOB</small><strong id="visualJobId">Not created</strong></div><div><small>TYPE</small><strong id="visualType">IMAGE</strong></div><div><small>CAMERA</small><strong id="visualCamera">—</strong></div><div><small>FORMAT</small><strong id="visualFormat">16:9 · Provider-neutral</strong></div></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY / LOOK</div><div class="muted" id="identityStatus">NOT VALIDATED</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div><div class="muted" id="identityLook" style="font-size:9px;margin-top:6px"></div></div><button class="secondary" id="identity">◉ Validate Identity</button><button class="secondary" id="identityLock">🔒 Lock Identity / Look</button><button class="secondary" id="regen">↻ Compile Visual Job</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">DIALOGUE / VOICE / PERFORMANCE</div><div class="muted" id="dialogueDetail">No dialogue selected.</div></div><button class="secondary" id="analyze">✦ Gemini Intelligence Analysis</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">LIVE BACKEND · KALP INTELLIGENCE GATEWAY</div><div class="muted" id="analysisStatus">Not requested</div><div class="muted" id="analysisMeta" style="font-size:9px;margin-top:4px"></div></div><div class="workflow"><b id="workflowState">DRAFT · Generate storyboard to begin approval</b><small id="workflowMeta">Production is gated until storyboard approval.</small></div><button class="primary" id="approve" disabled>✓ Approve Storyboard</button><button class="secondary" id="prod" disabled>▶ Send to Production</button></aside>
 </main><section class="view" data-view="characters"><div class="appview">
 <div class="viewhead"><div class="ey">CHARACTER REGISTRY</div><div class="title">Canonical Characters</div><div class="muted">Browse the active registry without leaving the Cinematic Studio.</div></div>
 <div class="viewgrid"><div class="viewcard"><h3 id="charCount">Registry</h3><p>Canonical identity, status and visual-lock state.</p><button class="actionlink" data-nav="create">Open Scene Director</button></div><div class="viewcard"><h3>Scene Constraint</h3><p>Maximum 5 active characters per scene.</p><p id="charSceneState">Loading scene state…</p></div></div>
@@ -61,6 +61,7 @@ const KALP_INTELLIGENCE_ALIGNMENT = {
 };
 
 let registry=null, scene=null, selected=[], active=0, storyboardGenerated=false, storyboardApproved=false;
+let identityValidated={}, identityLocked={}, visualJobs={};
 let executionMode='gemini';
 const INTEL_MODE_LABELS={mcp:['MCP ACTIVE · INSPIRATION / RETRIEVAL','Context retrieval layer selected.'],gemini:['GEMINI ACTIVE · ANALYSIS / EXECUTION','Gemini is the selected intelligence layer.'],governor:['KALP GOVERNOR ACTIVE · GOVERNANCE','Canonical identity, continuity and readiness governance selected.'],provider:['PROVIDER LAYER ACTIVE · GENERATION','Provider-neutral generation layer selected.']};
 function setExecutionMode(mode){executionMode=mode;document.querySelectorAll('.intel-tab').forEach(b=>b.classList.toggle('active',b.dataset.intel===mode));const s=INTEL_MODE_LABELS[mode];document.getElementById('intelState').textContent=s[0]+' · '+s[1];toast(s[0]);}
@@ -93,7 +94,8 @@ async function boot(){
   try{
     registry=await api('/api/cinematic?type=characters');
     scene=await api('/api/cinematic');
-    selected=scene.selected_characters.slice(0,5); storyboardGenerated=false; storyboardApproved=false; updateWorkflow();
+    selected=scene.selected_characters.slice(0,5);
+    identityValidated={}; identityLocked={}; visualJobs={}; storyboardGenerated=false; storyboardApproved=false; updateWorkflow();
     renderChars(); renderChecks(); renderFrames(); selectFrame(0);
     toast('KALP runtime connected.');
   }catch(e){
@@ -135,7 +137,7 @@ function buildLocalSceneFromDescription(){
     'Ram and Hanuman walk together into the forest.'
   ]:Array.from({length:8},(_,i)=>i===0?names+' enter the scene.':i===7?names+' move into the next story beat.':names+' respond to the developing situation.');
   const dialogues=meeting?['','आप कौन हैं, प्रभु?','तुम्हारे शब्दों में सच्चाई है।','मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।','उठो हनुमान। आज से हम साथ हैं।','हमें सीता की खोज करनी है।','प्रभु, आपका कार्य ही मेरा जीवन है।','चलो, हनुमान।']:Array(8).fill('');
-  scene={...scene,scene_id:'LOCAL-'+Date.now(),scene_title:title,objective,selected_characters:[...selected],runtime_status:'GENERATED_FROM_SCENE_DESCRIPTION',frames:titles.map((t,i)=>({frame_id:'F0'+(i+1),title:t,perspective:i===0||i===7?'AUDIENCE':(meeting?(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':'SHARED'):selected[i%selected.length]),purpose:'Advance the scene described by the creator.',emotion:emotions[i],action:actions[i],dialogue:dialogues[i]||null,camera:['35mm extreme wide, slow push-in','85mm close-up, gentle push-in','50mm over-shoulder','50mm two-shot, slow lateral dolly','65mm intimate medium shot','50mm over-shoulder','35mm low-angle hero push-in','35mm wide, slow pull-back'][i]}))};
+  scene={...scene,scene_id:'LOCAL-'+Date.now(),scene_title:title,objective,selected_characters:[...selected],runtime_status:'GENERATED_FROM_SCENE_DESCRIPTION',frames:titles.map((t,i)=>({frame_id:'F0'+(i+1),title:t,perspective:i===0||i===7?'AUDIENCE':(meeting?(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':'SHARED'):selected[i%selected.length]),purpose:'Advance the scene described by the creator.',emotion:emotions[i],action:actions[i],dialogue:dialogues[i]||null,delivery:dialogues[i]?'emotion-led conversational performance':'silent visual performance',voice_persona:dialogues[i]?(charById(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':selected[0])?.display_name||'canonical character voice persona'):'not required',camera:['35mm extreme wide, slow push-in','85mm close-up, gentle push-in','50mm over-shoulder','50mm two-shot, slow lateral dolly','65mm intimate medium shot','50mm over-shoulder','35mm low-angle hero push-in','35mm wide, slow pull-back'][i]}))};
   document.getElementById('title').value=title; renderChars(); renderFrames(); renderChecks(); selectFrame(0);
 }
 function renderChars(){
@@ -170,11 +172,31 @@ function selectFrame(i){
   document.getElementById('it').textContent='FRAME 0'+(i+1)+' — '+f.title.toUpperCase();
   document.getElementById('preview').innerHTML=art(i);
   document.getElementById('pers').value=f.perspective==='AUDIENCE'?'Audience':f.perspective==='SHARED'?'Shared':charById(f.perspective)?.display_name||'Audience';
-  document.getElementById('purpose').textContent=f.purpose;
-  document.getElementById('emotion').textContent=f.emotion;
-  document.getElementById('action').textContent=f.action;
+  document.getElementById('purpose').textContent=f.purpose||'—';
+  document.getElementById('emotion').textContent=f.emotion||'—';
+  document.getElementById('action').textContent=f.action||'—';
   document.getElementById('dialogue').textContent=f.dialogue||'None';
-  document.getElementById('camera').textContent=f.camera;
+  document.getElementById('camera').textContent=f.camera||'—';
+
+  const ids=selected.map(id=>charById(id)?.display_name||id).join(' · ');
+  const lockState=identityLocked[f.frame_id]?'LOCKED':identityValidated[f.frame_id]?'VALIDATED · READY TO LOCK':'NOT VALIDATED';
+  document.getElementById('identityStatus').textContent=lockState;
+  document.getElementById('identityMeta').textContent='Characters · '+(ids||'None')+' · Canonical visual-lock registry checked.';
+  document.getElementById('identityLook').textContent='Look · canonical face + anatomy + costume + hair/ornaments + props + expression + emotional state + pose continuity.';
+  document.getElementById('identityLock').disabled=!identityValidated[f.frame_id]||identityLocked[f.frame_id];
+  document.getElementById('identityLock').textContent=identityLocked[f.frame_id]?'🔒 Identity / Look Locked':'🔒 Lock Identity / Look';
+
+  const job=visualJobs[f.frame_id];
+  document.getElementById('visualStatus').textContent=job?'READY · '+job.job_id:'READY TO COMPILE';
+  document.getElementById('visualJobId').textContent=job?.job_id||'Not created';
+  document.getElementById('visualType').textContent=job?.output_type||'IMAGE';
+  document.getElementById('visualCamera').textContent=f.camera||'—';
+  document.getElementById('visualFormat').textContent=(job?.aspect_ratio||'16:9')+' · Provider-neutral';
+  document.getElementById('regen').disabled=!identityLocked[f.frame_id];
+
+  document.getElementById('dialogueDetail').textContent=f.dialogue
+    ? 'Speaker · '+(f.perspective==='SHARED'?'Shared':charById(f.perspective)?.display_name||f.perspective)+' · Line · '+f.dialogue+' · Delivery · '+(f.delivery||'emotion-led conversational performance')+' · Voice · '+(f.voice_persona||'canonical character voice persona')
+    : 'No dialogue in this frame · Performance · '+(f.emotion||'scene-driven')+' · Voice not required.';
 }
 document.getElementById('pers').onchange=e=>{
   const value=e.target.value;
@@ -186,11 +208,11 @@ document.getElementById('generate').onclick=async()=>{
   try{
     const body={character_ids:selected,scene_id:scene.scene_id,scene_title:document.getElementById('title').value.trim(),objective:document.querySelector('textarea').value.trim()};
     const result=await api('/api/cinematic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    scene=result; selected=scene.selected_characters.slice(0,5); storyboardGenerated=true; storyboardApproved=false;
+    scene=result; selected=scene.selected_characters.slice(0,5); storyboardGenerated=true; storyboardApproved=false; identityValidated={}; identityLocked={}; visualJobs={};
     renderFrames();renderChars();renderChecks();selectFrame(0);updateWorkflow();
     toast('CSD-002 generated from your scene description.');
   }catch(e){
-    buildLocalSceneFromDescription(); storyboardGenerated=true; storyboardApproved=false; updateWorkflow();
+    buildLocalSceneFromDescription(); storyboardGenerated=true; storyboardApproved=false; identityValidated={}; identityLocked={}; visualJobs={}; updateWorkflow();
     toast('CSD-002 generated locally from your scene description.');
   }finally{
     button.disabled=false;button.textContent='✦ Generate Storyboard';
@@ -201,26 +223,46 @@ document.getElementById('identity').onclick=async()=>{
     const result=await api('/api/identity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_id:scene.frames[active].frame_id})});
     document.getElementById('identityStatus').textContent=result.result.status;
     document.getElementById('identityMeta').textContent=(result.result.missing_visual_locks?.length?('Missing locks · '+result.result.missing_visual_locks.join(', ')):'All selected characters have canonical visual locks');
+    identityValidated[scene.frames[active].frame_id]=result.result.status==='PASS';
+    identityLocked[scene.frames[active].frame_id]=false;
+    selectFrame(active);
     toast('CSD-003.2 '+result.result.status+'.');
   }catch(e){
     const missing=selected.map(id=>charById(id)).filter(c=>!c.visual_lock).map(c=>c.character_id);
     const status=missing.length?'REVIEW_REQUIRED':'PASS';
     document.getElementById('identityStatus').textContent=status;
     document.getElementById('identityMeta').textContent=missing.length?'Missing visual locks · '+missing.join(', '):'All selected characters have canonical visual locks';
+    identityValidated[scene.frames[active].frame_id]=status==='PASS';
+    identityLocked[scene.frames[active].frame_id]=false;
+    selectFrame(active);
     toast('GitHub test mode: CSD-003.2 '+status+'.');
   }
 };
+document.getElementById('identityLock').onclick=()=>{
+  const f=scene?.frames?.[active]; if(!f)return;
+  if(!identityValidated[f.frame_id]) return toast('Validate Identity first.');
+  identityLocked[f.frame_id]=true;
+  f.identity_lock={status:'LOCKED',characters:[...selected],look:'Canonical face, anatomy, costume, hair/ornaments, props, expression, emotion and pose continuity.'};
+  selectFrame(active);
+  toast('CSD-003.2 Identity / Look LOCKED for '+f.frame_id+'.');
+};
 document.getElementById('regen').onclick=async()=>{
+  const f=scene?.frames?.[active]; if(!f)return;
+  if(!identityLocked[f.frame_id]) return toast('Lock CSD-003.2 Identity / Look before compiling the visual job.');
   try{
     const result=await api('/api/visual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_ids:[scene.frames[active].frame_id]})});
     const job=result.jobs[0];
+    visualJobs[f.frame_id]=job;
     document.getElementById('visualStatus').textContent='READY · '+job.job_id;
     document.getElementById('visualMeta').textContent='Perspective locked · '+job.aspect_ratio+' · '+job.output_type+' · Provider-neutral';
+    selectFrame(active);
     toast('CSD-003 visual job compiled for '+job.frame_id+'.');
   }catch(e){
-    document.getElementById('visualStatus').textContent='READY · GITHUB TEST JOB';
+    visualJobs[f.frame_id]={job_id:'GITHUB-CSD003-'+f.frame_id,frame_id:f.frame_id,aspect_ratio:'16:9',output_type:'IMAGE'};
+    document.getElementById('visualStatus').textContent='READY · GITHUB-CSD003-'+f.frame_id;
     document.getElementById('visualMeta').textContent='Perspective locked · 16:9 · IMAGE · Provider-neutral · static validation mode';
-    toast('GitHub test mode: visual job compiled locally.');
+    selectFrame(active);
+    toast('GitHub test mode: CSD-003 visual job compiled locally.');
   }
 };
 document.getElementById('analyze').onclick=async()=>{ if(executionMode!=='gemini'){setExecutionMode('gemini');} 
@@ -251,7 +293,7 @@ document.getElementById('analyze').onclick=async()=>{ if(executionMode!=='gemini
 document.getElementById('approve').onclick=()=>{if(!storyboardGenerated)return toast('Generate the storyboard first.');storyboardApproved=true;updateWorkflow();toast('Storyboard APPROVED · ready for production.');};
 document.getElementById('prod').onclick=async()=>{
   if(!storyboardApproved){toast('Approve the storyboard before production.');return;}
-  const productionPackage={contract:'KALP-PRODUCTION-PACKAGE-1.0',created_at:new Date().toISOString(),source:'KALP Cinematic Studio',status:'APPROVED',scene_id:scene.scene_id,scene_title:scene.scene_title,objective:scene.objective,selected_characters:selected,frames:scene.frames,render_defaults:{target:'gemini',aspect_ratio:'16:9',output:'video'},governance:{identity:'canonical',continuity:'locked',approval:'APPROVED'}};
+  const productionPackage={contract:'KALP-PRODUCTION-PACKAGE-1.0',created_at:new Date().toISOString(),source:'KALP Cinematic Studio',status:'APPROVED',scene_id:scene.scene_id,scene_title:scene.scene_title,objective:scene.objective,selected_characters:selected,frames:scene.frames.map(f=>({...f,visual_job:visualJobs[f.frame_id]||null,identity_lock:identityLocked[f.frame_id]||false,identity_look:{characters:[...selected],canonical:true},dialogue_contract:{line:f.dialogue||null,speaker:f.perspective==='SHARED'?'SHARED':charById(f.perspective)?.display_name||f.perspective,delivery:f.delivery||'emotion-led conversational performance',voice_persona:f.voice_persona||'canonical character voice persona'}})),render_defaults:{target:'gemini',aspect_ratio:'16:9',output:'video'},governance:{identity:'canonical',continuity:'locked',approval:'APPROVED'}};
   localStorage.setItem('KALP_PRODUCTION_PACKAGE',JSON.stringify(productionPackage));
   toast('Approved story sent to KALP Production Control Tower.');
   setTimeout(()=>{location.href='../production/?v=1';},250);
@@ -263,7 +305,7 @@ document.getElementById('reset').onclick=async()=>{
     document.getElementById('title').value=scene.scene_title;
     renderChars();selectFrame(0);toast('Scene reset from canonical runtime.');
   }catch(e){
-    await staticFallback(); storyboardGenerated=false; storyboardApproved=false; updateWorkflow();
+    await staticFallback(); storyboardGenerated=false; storyboardApproved=false; identityValidated={}; identityLocked={}; visualJobs={}; updateWorkflow();
     toast('GitHub test mode: scene reset from canonical JSON.');
   }
 };
