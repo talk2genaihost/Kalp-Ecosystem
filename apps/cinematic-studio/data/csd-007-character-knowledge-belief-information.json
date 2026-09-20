@@ -1,0 +1,172 @@
+{
+  "schema_version":"KALP-CSD-007-KNOWLEDGE-BELIEF-INFORMATION-1.0",
+  "engine_id":"KALP-CSD-007",
+  "engine_name":"Character Knowledge, Belief & Information State Director",
+  "status":"LOCKED",
+  "purpose":"Determine exactly what each active character knows, believes, suspects, misunderstands, has been told, has witnessed, and does not know at a specific narrative point.",
+  "core_principle":"Perspective is constrained by information access. A character cannot perceive, believe, react to, or intentionally act on information they have not legitimately acquired.",
+  "inputs":{
+    "required":["character_ids","scene_state"],
+    "optional":["story_arc_id","previous_scene_id","previous_scene_ending_snapshot","knowledge_events","relationship_state","narrative_intent","time_marker"]
+  },
+  "information_classes":[
+    "KNOWN_FACT",
+    "INFERRED_BELIEF",
+    "SUSPECTED_FACT",
+    "MISBELIEF",
+    "UNKNOWN_FACT",
+    "FORGOTTEN_OR_UNCERTAIN",
+    "WITNESSED_EVENT",
+    "HEARD_REPORT",
+    "DISCLOSED_INFORMATION",
+    "WITHHELD_INFORMATION"
+  ],
+  "provenance_model":{
+    "required_fields":["fact_id","content","source_type","source_actor","acquisition_event","narrative_timestamp","confidence","status"],
+    "source_types":["DIRECT_WITNESS","DIRECT_EXPERIENCE","TRUSTED_CHARACTER","UNTRUSTED_CHARACTER","PUBLIC_KNOWLEDGE","INFERENCE","RUMOR","DIVINE_OR_SUPERNATURAL_REVELATION","NARRATOR_ONLY"],
+    "principle":"Narrator/audience knowledge never automatically becomes character knowledge.",
+    "confidence_states":["CERTAIN","HIGH","MEDIUM","LOW","CONTESTED"]
+  },
+  "belief_model":{
+    "fields":["belief_id","proposition","basis","confidence","emotional_investment","contradicting_evidence","revision_pressure","behavioral_consequence"],
+    "rule":"Belief is an interpretation held by a character, not a synonym for objective truth.",
+    "misbelief_rule":"A misbelief may remain behaviorally active even when contradictory evidence exists until the character accepts or experiences sufficient corrective evidence."
+  },
+  "knowledge_reconciliation":[
+    "LOAD_CHARACTER_BASELINE",
+    "LOAD_PREVIOUS_KNOWLEDGE_STATE",
+    "INGEST_NEW_INFORMATION_EVENTS",
+    "VERIFY_SOURCE_AND_ACCESS",
+    "SEPARATE_FACT_FROM_BELIEF",
+    "RESOLVE_DUPLICATES_AND_CONTRADICTIONS",
+    "UPDATE_CONFIDENCE",
+    "REGISTER_UNKNOWN_AND_WITHHELD_INFORMATION",
+    "CALCULATE_SUSPECTED_FACTS",
+    "CALCULATE_BELIEF_REVISION_PRESSURE",
+    "GENERATE_BEHAVIORAL_INFORMATION_CONSTRAINTS",
+    "GENERATE_PERSPECTIVE_STATE",
+    "CSD-002_HANDOFF"
+  ],
+  "director_rules":[
+    "Never grant a character audience-only knowledge.",
+    "Direct witnessing outranks hearsay for event knowledge.",
+    "A report may create belief without creating certainty.",
+    "Inference must remain distinguishable from witnessed fact.",
+    "Contradictory information must preserve competing beliefs until resolved.",
+    "A character may know a fact but misinterpret its meaning.",
+    "A character may correctly infer an event without directly witnessing it; label it as inference.",
+    "Unknown information remains unknown until an acquisition event occurs.",
+    "Information can be intentionally withheld by another character.",
+    "Knowledge state is time-indexed and must not leak across narrative chronology.",
+    "Perspective must use the character's knowledge state together with CSD-006 emotional state.",
+    "Maximum five active characters."
+  ],
+  "resolution_output":{
+    "scene_id":"resolved scene",
+    "character_information_states":"per-character knowledge/belief/suspicion/misbelief/unknown",
+    "knowledge_events":"source-qualified information acquisitions",
+    "belief_updates":"belief changes and revision pressure",
+    "information_conflicts":"contradictory or contested propositions",
+    "unknowns":"facts deliberately unavailable to the character",
+    "withheld_information":"known by another actor/audience but inaccessible here",
+    "behavioral_constraints":"what the character can reasonably infer, say, intend or do",
+    "perspective_state":"what the character sees, knows, believes, suspects, misunderstands and is unaware of",
+    "csd002_handoff":"information-constrained perspective package"
+  },
+  "validation":{
+    "hard_failures":[
+      "knowledge_without_provenance",
+      "audience_knowledge_leaked_to_character",
+      "future_information_leak",
+      "belief_marked_as_objective_fact",
+      "unknown_fact_used_as_action_basis",
+      "active_character_count_above_5"
+    ],
+    "pass_conditions":[
+      "every material knowledge item has provenance",
+      "fact/belief/inference distinctions preserved",
+      "chronology respected",
+      "unknowns explicitly represented where consequential",
+      "behavior is explainable from available information",
+      "CSD-002 perspective handoff complete"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD7-RAMAYANA-DEMO-001",
+    "story_arc_id":"ARC-08",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "trigger_event":"Ravana chooses restraint after Rama's challenge.",
+    "knowledge_states":[
+      {
+        "character_id":"RAVAN_001",
+        "known":[
+          {"content":"Rama deliberately challenged his use of power.","source_type":"DIRECT_EXPERIENCE","confidence":"CERTAIN"},
+          {"content":"He chose to suppress his own escalation.","source_type":"DIRECT_EXPERIENCE","confidence":"CERTAIN"}
+        ],
+        "beliefs":[
+          {"proposition":"Restraint may itself be a form of mastery.","confidence":"MEDIUM","revision_pressure":"HIGH"}
+        ],
+        "suspected":["Rama may have been testing more than raw power."],
+        "misbeliefs":["Immediate dominance is necessary to preserve authority."],
+        "unknowns":["Rama's full intention behind the test."]
+      },
+      {
+        "character_id":"RAM_001",
+        "known":[
+          {"content":"Ravana chose restraint.","source_type":"DIRECT_WITNESS","confidence":"CERTAIN"}
+        ],
+        "beliefs":[
+          {"proposition":"Ravana is capable of recognizing the value of restraint.","confidence":"MEDIUM"}
+        ],
+        "suspected":["Ravana may continue to test the meaning of power."],
+        "unknowns":["Whether Ravana will convert insight into lasting conduct."]
+      },
+      {
+        "character_id":"HANUMAN_001",
+        "known":[
+          {"content":"Rama intentionally avoided escalation.","source_type":"DIRECT_WITNESS","confidence":"CERTAIN"},
+          {"content":"Ravana did not release his full power.","source_type":"DIRECT_WITNESS","confidence":"CERTAIN"}
+        ],
+        "beliefs":[
+          {"proposition":"Rama has deliberately allowed Ravana to confront himself.","confidence":"HIGH"}
+        ],
+        "suspected":["Ravana's restraint may become a temporary or meaningful shift."],
+        "unknowns":["Ravana's private motive for restraint."]
+      }
+    ],
+    "perspective_state":[
+      {
+        "character_id":"RAVAN_001",
+        "sees":"Rama's composure and the aftermath of his own restraint",
+        "knows":"the challenge was deliberate and his own response was voluntary",
+        "believes":"authority may not require constant force",
+        "suspects":"Rama's objective extends beyond winning the moment",
+        "misunderstands":"may still equate visible dominance with lasting authority",
+        "unaware_of":"Rama's complete internal reasoning"
+      },
+      {
+        "character_id":"RAM_001",
+        "sees":"Ravana's contained power and altered posture",
+        "knows":"Ravana consciously chose restraint",
+        "believes":"the choice can reveal character more than force can",
+        "suspects":"Ravana is internally questioning his assumptions",
+        "misunderstands":null,
+        "unaware_of":"the exact conclusion Ravana will privately reach"
+      },
+      {
+        "character_id":"HANUMAN_001",
+        "sees":"both principals remain controlled",
+        "knows":"Rama does not require intervention",
+        "believes":"the encounter has become a test of inner mastery",
+        "suspects":"Ravana's state has shifted",
+        "misunderstands":null,
+        "unaware_of":"Ravana's private motive"
+      }
+    ],
+    "csd002_handoff":{
+      "status":"READY",
+      "rule":"Each frame perspective must be generated from the selected character's information state, not from omniscient scene knowledge."
+    }
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-006-CHARACTER-STATE-EMOTIONAL-CONTINUITY","CSD-008-Perspective-and-Perception-Director","CMSE-003-NARRATIVE-ARC","CMSE-004-CHARACTER-ARC-EMOTIONAL-MEMORY"]
+}
