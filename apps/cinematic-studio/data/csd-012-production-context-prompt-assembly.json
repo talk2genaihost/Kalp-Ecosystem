@@ -1,0 +1,158 @@
+{
+  "schema_version":"KALP-CSD-012-PRODUCTION-CONTEXT-PROMPT-ASSEMBLY-1.0",
+  "engine_id":"KALP-CSD-012",
+  "engine_name":"Production Context & Prompt Assembly Director",
+  "status":"LOCKED",
+  "purpose":"Assemble complete, deterministic, traceable production context from CSD-011 visual specifications for downstream prompt compilation and provider routing.",
+  "core_principle":"Context assembly preserves source intent and lineage; it does not invent narrative meaning, select providers, or silently rewrite identity.",
+  "inputs":{
+    "required":["csd_011_visual_specs","validation_result","scene_context"],
+    "optional":["character_registry","world_context","reference_assets","style_profile","output_profile","audio_intent"],
+    "upstream_dependencies":["CSD-005","CSD-006","CSD-007","CSD-008","CSD-009","CSD-010","CSD-011"]
+  },
+  "assembly_layers":[
+    "SOURCE_LINEAGE",
+    "SCENE_CONTEXT",
+    "FRAME_CONTEXT",
+    "CHARACTER_IDENTITY",
+    "CHARACTER_PERFORMANCE",
+    "KNOWLEDGE_AND_BELIEF",
+    "PERSPECTIVE_AND_PERCEPTION",
+    "ACTION_AND_BLOCKING",
+    "WORLD_AND_ENVIRONMENT",
+    "CAMERA_AND_COMPOSITION",
+    "LIGHTING_AND_ATMOSPHERE",
+    "VFX_AND_SFX_INTENT",
+    "REFERENCE_ASSETS",
+    "CONTINUITY_LOCKS",
+    "POSITIVE_PROMPT_SEMANTICS",
+    "NEGATIVE_CONSTRAINTS",
+    "OUTPUT_CONTRACT"
+  ],
+  "prompt_assembly_contract":{
+    "positive_prompt":"Ordered semantic representation of approved visual intent; not provider syntax.",
+    "negative_prompt":"Explicit prohibited visual outcomes derived from identity, continuity, knowledge, perception and style constraints.",
+    "reference_manifest":"Typed references with role, immutability, source lineage and allowed usage.",
+    "context_priority":"Identity > canonical reality > continuity > performance > perception > action > environment > camera > lighting > style.",
+    "provider_syntax":"DEFERRED_TO_CMSE-013",
+    "provider_selection":"DEFERRED_TO_CMSE-014",
+    "execution":"DEFERRED_TO_CMSE-010/015"
+  },
+  "reference_rules":[
+    "Immutable trusted references must retain their source identity.",
+    "A derived provider proxy cannot silently replace an immutable canonical reference.",
+    "Reference roles must be explicit: IDENTITY, COMPOSITION, ENVIRONMENT, STYLE, CONTINUITY or PERFORMANCE.",
+    "Reference assets cannot introduce facts absent from the approved scene context.",
+    "Reference usage must be traceable to a frame and source asset."
+  ],
+  "assembly_rules":[
+    "Do not create new story facts.",
+    "Do not upgrade belief to fact.",
+    "Do not leak audience-only information into subjective context.",
+    "Do not convert internal emotion into unsupported physical events.",
+    "Do not alter canonical character identity.",
+    "Do not add characters beyond the approved active set.",
+    "Preserve all CSD-011 continuity and negative constraints.",
+    "Positive and negative semantics must not contradict each other.",
+    "Every assembled field must have provenance or be an explicit production default.",
+    "Prompt semantics remain provider-neutral."
+  ],
+  "priority_order":[
+    "IDENTITY",
+    "CANONICAL_REALITY",
+    "CONTINUITY",
+    "PERFORMANCE",
+    "KNOWLEDGE",
+    "PERCEPTION",
+    "ACTION",
+    "ENVIRONMENT",
+    "CAMERA",
+    "LIGHTING",
+    "ATMOSPHERE",
+    "VFX",
+    "STYLE"
+  ],
+  "resolution_pipeline":[
+    "UPSTREAM_GATE_CHECK",
+    "LOAD_CSD011_SPECS",
+    "LOAD_SCENE_CONTEXT",
+    "RESOLVE_REFERENCE_MANIFEST",
+    "RESOLVE_CHARACTER_CONTEXT",
+    "RESOLVE_PERFORMANCE_CONTEXT",
+    "RESOLVE_KNOWLEDGE_BOUNDARIES",
+    "RESOLVE_PERCEPTION_CONTEXT",
+    "RESOLVE_ACTION_AND_BLOCKING",
+    "RESOLVE_WORLD_CONTEXT",
+    "RESOLVE_CAMERA_CONTEXT",
+    "RESOLVE_LIGHTING_AND_ATMOSPHERE",
+    "RESOLVE_VFX_INTENT",
+    "MERGE_CONTINUITY_LOCKS",
+    "BUILD_POSITIVE_PROMPT_SEMANTICS",
+    "BUILD_NEGATIVE_CONSTRAINTS",
+    "VALIDATE_SEMANTIC_CONSISTENCY",
+    "ATTACH_LINEAGE",
+    "EMIT_PRODUCTION_CONTEXT_BUNDLE",
+    "CMSE013_HANDOFF"
+  ],
+  "validation":{
+    "hard_failures":[
+      "UPSTREAM_VALIDATION_NOT_PASSED",
+      "CSD011_SPEC_MISSING",
+      "SCENE_CONTEXT_MISSING",
+      "IDENTITY_CONTEXT_MISSING",
+      "CANONICAL_REALITY_MISSING",
+      "REFERENCE_PROVENANCE_MISSING",
+      "KNOWLEDGE_BOUNDARY_LOST",
+      "PERCEPTION_BOUNDARY_LOST",
+      "CONTINUITY_LOCK_LOST",
+      "POSITIVE_NEGATIVE_CONTRADICTION",
+      "PROVIDER_SYNTAX_INJECTED",
+      "PROVIDER_SELECTED_EARLY",
+      "FRAME_COUNT_NOT_8"
+    ],
+    "pass_conditions":[
+      "eight production context bundles assembled",
+      "all source lineage retained",
+      "identity and continuity locks retained",
+      "knowledge and perception boundaries retained",
+      "reference manifest is typed and traceable",
+      "positive and negative semantics are internally consistent",
+      "provider-neutral prompt semantics emitted",
+      "CMSE-013 handoff ready"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CSD12-RAMAYANA-DEMO-001",
+    "source_gate":"CSD-011",
+    "frame_id":"F02",
+    "context":{
+      "perspective":"RAVAN_001",
+      "attention_target":"Rama's unchanged composure",
+      "performance":"Ravana contained intensity with challenged curiosity; Rama calm and unchanged",
+      "knowledge_boundary":"Ravana does not know Rama's complete internal reasoning",
+      "canonical_reality":"Mount Kailash confrontation; power has been deliberately restrained",
+      "camera_semantics":"subjective medium-close aligned to Ravana's attention",
+      "positive_prompt_semantics":[
+        "canonical Ravan identity",
+        "canonical Rama identity",
+        "same Mount Kailash scene geography",
+        "contained post-escalation energy",
+        "Ravana studying Rama's composure",
+        "subjective attention controlled by Ravana",
+        "cinematic naturalistic lighting"
+      ],
+      "negative_constraints":[
+        "no identity drift",
+        "no face drift",
+        "no costume drift",
+        "no new characters",
+        "no uncontrolled power release",
+        "no omniscient representation of Rama's thoughts",
+        "no spatial continuity break"
+      ]
+    },
+    "result":"PASS",
+    "next_stage":"CMSE-013-PROMPT-COMPILATION"
+  },
+  "downstream":["CMSE-013-PROMPT-COMPILATION","CMSE-014-PROVIDER-ROUTING","CMSE-010-PRODUCTION-EXECUTION","CMSE-015-SCHEDULING"]
+}
