@@ -1,0 +1,85 @@
+{
+  "schema_version":"KALP-CSD-044-PRODUCTION-EXECUTION-RECONCILIATION-RESILIENCE-1.0",
+  "engine_id":"KALP-CSD-044",
+  "engine_name":"Production Execution Reconciliation & Resilience Director",
+  "status":"LOCKED",
+  "purpose":"Reconcile uncertain provider execution states against immutable KALP execution evidence, resolve duplicate or missing callbacks, classify partial outcomes, and initiate safe recovery without duplicate production or canonical mutation.",
+  "core_principle":"Ambiguity is a state to reconcile, not permission to retry; provider truth, KALP evidence and execution lineage must converge before capacity is released or a new attempt is authorized.",
+  "inputs":["CSD-043","CSD-031","CSD-042","CSD-037","CSD-032","CSD-035","CMSE-014","CMSE-015"],
+  "resilience_domains":["CALLBACK_RECONCILIATION","PROVIDER_STATE_LOOKUP","EXECUTION_IDENTITY","DUPLICATE_DETECTION","TIMEOUT_RECOVERY","PARTIAL_RESULT_HANDLING","CAPACITY_RECONCILIATION","RETRY_SAFETY","RESULT_LINEAGE","FAILURE_CLASSIFICATION"],
+  "reconciliation_states":["NOT_REQUIRED","PENDING","EVIDENCE_COLLECTION","PROVIDER_QUERY","MATCHED","PARTIALLY_MATCHED","DUPLICATE_DETECTED","PROVIDER_STATE_UNKNOWN","RESULT_PARTIAL","RESULT_MISSING","RECONCILED","RECONCILIATION_FAILED","QUARANTINED"],
+  "evidence_sources":["DISPATCH_ENVELOPE","CSD-031_EVENT_LEDGER","PROVIDER_CALLBACK","PROVIDER_STATUS_QUERY","PROVIDER_RESULT_METADATA","CAPACITY_LEASE","MASTER_FINGERPRINT","INPUT_FINGERPRINT","CORRELATION_ID","ATTEMPT_ID"],
+  "identity_keys":["logical_job_id","attempt_id","dispatch_id","provider_id","provider_job_id","input_fingerprint","master_fingerprint","correlation_id"],
+  "reconciliation_pipeline":[
+    "INGEST_EXECUTION_EVENT",
+    "LOAD_IMMUTABLE_EXECUTION_LINEAGE",
+    "DETECT_AMBIGUITY_OR_CONFLICT",
+    "COLLECT_PROVIDER_EVIDENCE",
+    "CORRELATE_PROVIDER_AND_KALP_IDENTITIES",
+    "CHECK_DUPLICATE_CALLBACK_OR_RESULT",
+    "VERIFY_MASTER_AND_INPUT_FINGERPRINTS",
+    "CLASSIFY_OUTCOME",
+    "RECONCILE_CAPACITY_STATE",
+    "UPDATE_CSD-031_LIFECYCLE",
+    "HANDOFF_VALID_RESULTS_TO_CSD-032",
+    "AUTHORIZE_OR_BLOCK_RETRY",
+    "ESCALATE_UNRESOLVED_STATE",
+    "WRITE_APPEND_ONLY_RECONCILIATION_RECORD"
+  ],
+  "outcome_classes":["CONFIRMED_SUCCESS","CONFIRMED_FAILURE_RETRYABLE","CONFIRMED_FAILURE_TERMINAL","DUPLICATE_EVENT","PARTIAL_RESULT","MISSING_RESULT","PROVIDER_STATE_UNKNOWN","IDENTITY_CONFLICT","MASTER_CONFLICT","CAPACITY_CONFLICT"],
+  "retry_policy":{
+    "principle":"Never retry solely because a callback is missing or a request timed out.",
+    "safe_retry_requires":["reconciliation_complete","provider_state_not_running_or_unknown","no_valid_result_exists","CSD-037_authorization","new_attempt_id","fresh_master_and_input_fingerprint_validation"],
+    "unknown_state":"Hold capacity and quarantine the logical job until provider state is resolved or explicitly escalated.",
+    "duplicate":"Do not execute a duplicate attempt; attach duplicate evidence to the existing lineage.",
+    "terminal_failure":"Requires an authorized new attempt before retry.",
+    "partial_result":"Do not promote; route to CSD-032 or recovery according to result completeness."
+  },
+  "capacity_reconciliation":{
+    "CONFIRMED_SUCCESS":"release_remaining_capacity",
+    "CONFIRMED_FAILURE_RETRYABLE":"release_or_reallocate_after_authorization",
+    "CONFIRMED_FAILURE_TERMINAL":"release_remaining_capacity",
+    "PROVIDER_STATE_UNKNOWN":"hold_capacity",
+    "PARTIAL_RESULT":"hold_until_classified",
+    "IDENTITY_CONFLICT":"hold_and_quarantine"
+  },
+  "callback_policy":{
+    "idempotency":"Repeated callback with identical identity is recorded once as canonical event and subsequent copies as duplicate evidence.",
+    "late_callback":"A late callback is accepted only if it can be correlated to an immutable attempt lineage.",
+    "out_of_order":"Events are ordered by provider timestamp plus KALP receipt timestamp and cannot regress a terminal lifecycle state without reconciliation.",
+    "missing_callback":"Provider status query is required before retry when supported."
+  },
+  "resilience_actions":["NO_ACTION","QUERY_PROVIDER_STATE","HOLD_CAPACITY","QUARANTINE_RESULT","RELEASE_CAPACITY","REQUEST_AUTHORIZED_RETRY","ESCALATE_RECONCILIATION","ROUTE_TO_CSD-035_RECOVERY"],
+  "governance":{
+    "auto_actions":["DEDUPLICATE_IDENTICAL_CALLBACK","QUERY_PROVIDER_STATE","HOLD_CAPACITY","RELEASE_CONFIRMED_UNUSED_CAPACITY","FORWARD_VALID_RESULT_TO_CSD-032","WRITE_RECONCILIATION_EVIDENCE"],
+    "governor_review":["REQUEST_AUTHORIZED_RETRY","RELEASE_CAPACITY_AFTER_AMBIGUITY","PROVIDER_CHANGE","EXTEND_LEASE"],
+    "operator_review":["MASTER_CONFLICT","IDENTITY_CONFLICT","CANONICAL_RESULT_REPLACEMENT","HISTORICAL_REVISION"],
+    "never_allowed":["BLIND_RETRY","DUPLICATE_DISPATCH","BYPASS_CSD-032","BYPASS_CSD-037","RELEASE_UNKNOWN_CAPACITY","MUTATE_IMMUTABLE_EXECUTION_HISTORY","SILENT_PROVIDER_SWITCH"]
+  },
+  "resilience_sla":{
+    "critical_unknown_state":"ESCALATE_WITHOUT_AUTOMATIC_RETRY",
+    "callback_duplicate":"IDEMPOTENT",
+    "late_callback":"RECONCILE_BEFORE_PROMOTION",
+    "partial_result":"QUARANTINE_UNTIL_CLASSIFIED"
+  },
+  "reconciliation_record":{
+    "required":["reconciliation_id","logical_job_id","attempt_id","dispatch_id","provider_id","provider_job_id","prior_state","observed_state","evidence_refs","outcome_class","capacity_action","retry_decision","created_at"],
+    "immutability":"Reconciliation records are append-only; new evidence creates a new record."
+  },
+  "demo":{
+    "reconciliation_id":"RECON-CSD44-HIGGSFIELD-F03-001",
+    "logical_job_id":"JOB-F03",
+    "attempt_id":"ATTEMPT-1",
+    "dispatch_id":"DISPATCH-CSD43-RAMAYANA-F03-001",
+    "provider_id":"HIGGSFIELD",
+    "provider_job_id":"HF-DEMO-F03-001",
+    "prior_state":"TIMEOUT",
+    "observed_state":"COMPLETED",
+    "outcome_class":"CONFIRMED_SUCCESS",
+    "capacity_action":"release_remaining_capacity",
+    "retry_decision":"NO_RETRY",
+    "handoff":"CSD-032_RESULT_VALIDATION",
+    "creative_gates_unchanged":true
+  },
+  "downstream":["CSD-032-RESULT-VALIDATION","CSD-035-AUTONOMOUS-RECOVERY","CSD-042-CAPACITY-MANAGER","CSD-037-EXECUTION-GOVERNOR","CSD-045-PRODUCTION-RETRY-AND-FAILURE-RESOLUTION-DIRECTOR"]
+}
