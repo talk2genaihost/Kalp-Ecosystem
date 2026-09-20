@@ -74,3 +74,8 @@ F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F
 ## CMSE-010.2 — Production Prompt Compilation
 
 `api/prompt.js` exposes the CMSE-010.2 provider-neutral Prompt Intermediate Representation (PIR). It compiles all eight production context packets into deterministic PIR records containing narrative intent, perspective, canonical character locks, world, composition, performance, dialogue, audio, VFX, hard constraints and negative constraints. Provider/model selection and syntax translation remain deferred to CMSE-014.
+
+
+## CMSE-010.3 — Provider Capability & Production Routing
+
+`api/routing.js` exposes provider-neutral routing decisions. `provider-capability-registry.json` declares capabilities and execution constraints; `cmse-010-3-routing-plan.json` creates QUALITY_FIRST candidate routes for F01-F08. Routing requires a current adapter health check before dispatch and will not weaken hard continuity locks to accommodate provider limitations.
