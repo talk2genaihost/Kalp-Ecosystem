@@ -75,6 +75,8 @@ jobs:
           mkdir -p /tmp/published-site/astro-rashi
           mkdir -p /tmp/published-site/admanthan
           mkdir -p /tmp/published-site/market-to-revenue
+          mkdir -p /tmp/published-site/cinematic-studio
+          cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
           cp -R docs/admanthan-dashboard/. /tmp/published-site/admanthan/
