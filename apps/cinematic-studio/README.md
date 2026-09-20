@@ -21,3 +21,18 @@ The current `index.html` is a self-contained UI prototype. The JSON contracts ar
 ## Runtime API
 
 `api/cinematic.js` exposes the CSD runtime boundary. `GET /api/cinematic?type=characters` returns the registry; `GET /api/cinematic` returns the canonical scene; `POST /api/cinematic` validates 1–5 selected character IDs and returns a generated scene contract. The dashboard calls this API for boot, generation and reset operations.
+
+
+## CSD-003 — Perspective-to-Visual Generation Engine
+
+CSD-003 compiles every CSD-002 storyboard frame into a deterministic, provider-neutral visual generation job. It preserves character identity, performance, world, perspective, camera, emotion, action, lighting, VFX and continuity constraints.
+
+### Runtime
+- GET `/api/visual` — CSD-003 health/contract status
+- POST `/api/visual` with `{ "frame_ids": ["F01"] }` — compile one or more frame visual jobs
+- POST with no frame_ids — compile all storyboard frames
+
+### Output
+Each job contains a stable job ID, frame ID, perspective, aspect ratio, context fingerprint, visual specification, hard continuity constraints, negative constraints, and downstream routing to CMSE-012/013/014/015.
+
+CSD-003 is deliberately provider-neutral. Provider-specific prompt translation belongs to CMSE-013 and provider selection belongs to CMSE-014. Actual execution belongs to CMSE-010/015.
