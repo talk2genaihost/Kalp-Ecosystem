@@ -249,17 +249,12 @@ document.getElementById('analyze').onclick=async()=>{ if(executionMode!=='gemini
   }
 };
 document.getElementById('approve').onclick=()=>{if(!storyboardGenerated)return toast('Generate the storyboard first.');storyboardApproved=true;updateWorkflow();toast('Storyboard APPROVED · ready for production.');};
-document.getElementById('prod').onclick=async()=>{ if(!storyboardApproved){toast('Approve the storyboard before production.');return;} if(executionMode!=='provider'){toast('Select Provider generation layer before production dispatch.');setExecutionMode('provider');return;} 
-  try{
-    const result=await api('/api/visual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_ids:scene.frames.map(f=>f.frame_id)})});
-    document.getElementById('visualStatus').textContent=result.job_count+' visual jobs READY';
-    document.getElementById('visualMeta').textContent='CSD-003 compiled all frames · downstream CMSE-012 → 013 → 014 → 015';
-    toast('CSD-003 compiled all '+result.job_count+' frame jobs.');
-  }catch(e){
-    document.getElementById('visualStatus').textContent=scene.frames.length+' visual jobs READY';
-    document.getElementById('visualMeta').textContent='GitHub test mode · static compile only · no provider dispatch';
-    toast('GitHub test mode: '+scene.frames.length+' frame jobs prepared locally.');
-  }
+document.getElementById('prod').onclick=async()=>{
+  if(!storyboardApproved){toast('Approve the storyboard before production.');return;}
+  const productionPackage={contract:'KALP-PRODUCTION-PACKAGE-1.0',created_at:new Date().toISOString(),source:'KALP Cinematic Studio',status:'APPROVED',scene_id:scene.scene_id,scene_title:scene.scene_title,objective:scene.objective,selected_characters:selected,frames:scene.frames,render_defaults:{target:'gemini',aspect_ratio:'16:9',output:'video'},governance:{identity:'canonical',continuity:'locked',approval:'APPROVED'}};
+  localStorage.setItem('KALP_PRODUCTION_PACKAGE',JSON.stringify(productionPackage));
+  toast('Approved story sent to KALP Production Control Tower.');
+  setTimeout(()=>{location.href='../production/?v=1';},250);
 };
 document.getElementById('reset').onclick=async()=>{
   try{
