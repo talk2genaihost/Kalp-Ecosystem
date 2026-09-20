@@ -122,24 +122,51 @@ function buildLocalSceneFromDescription(){
   if(/shiva|शिव|महादेव/.test(text))preferred.push('SHIVA_001');
   const detected=[...new Set(preferred)];
   if(detected.length>=1) selected=detected.slice(0,5);
-  const meeting=selected.includes('RAM_001')&&selected.includes('HANUMAN_001')&&/(meet|meeting|encounter|milte|milan|भेंट|मिलन|मुलाकात)/i.test(text);
-  const names=selected.map(id=>charById(id)?.display_name||id).join(' and ');
-  const titles=meeting?['The Encounter','Hanuman Recognizes Ram','Ram Sees Hanuman','The Introduction','A Bond Begins','The Mission','Hanuman’s Vow','The Journey Begins']:['The Scene Begins','First Perception','Character Response','The Exchange','Rising Purpose','The Decision','The Commitment','The Next Move'];
-  const emotions=meeting?['Anticipation','Recognition → Devotion','Curiosity → Trust','Warmth','Devotion → Resolve','Purpose','Absolute Devotion','Hope → Determination']:['Anticipation','Awareness','Curiosity','Connection','Tension','Decision','Resolve','Determination'];
-  const actions=meeting?[
-    'Ram and Hanuman see each other across the forest path.',
-    'Hanuman pauses, recognizes Ram and respectfully approaches.',
-    'Ram studies Hanuman and welcomes him.',
-    'Hanuman introduces himself while Ram listens.',
-    'Hanuman bows; Ram raises him with affection.',
-    'Ram explains that Sita must be found.',
-    'Hanuman accepts the mission with unwavering confidence.',
-    'Ram and Hanuman walk together into the forest.'
-  ]:Array.from({length:8},(_,i)=>i===0?names+' enter the scene.':i===7?names+' move into the next story beat.':names+' respond to the developing situation.');
-  const dialogues=meeting?['','आप कौन हैं, प्रभु?','तुम्हारे शब्दों में सच्चाई है।','मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।','उठो हनुमान। आज से हम साथ हैं।','हमें सीता की खोज करनी है।','प्रभु, आपका कार्य ही मेरा जीवन है।','चलो, हनुमान।']:Array(8).fill('');
-  scene={...scene,scene_id:'LOCAL-'+Date.now(),scene_title:title,objective,selected_characters:[...selected],runtime_status:'GENERATED_FROM_SCENE_DESCRIPTION',frames:titles.map((t,i)=>({frame_id:'F0'+(i+1),title:t,perspective:i===0||i===7?'AUDIENCE':(meeting?(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':'SHARED'):selected[i%selected.length]),purpose:'Advance the scene described by the creator.',emotion:emotions[i],action:actions[i],dialogue:dialogues[i]||null,delivery:dialogues[i]?'emotion-led conversational performance':'silent visual performance',voice_persona:dialogues[i]?(charById(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':selected[0])?.display_name||'canonical character voice persona'):'not required',camera:['35mm extreme wide, slow push-in','85mm close-up, gentle push-in','50mm over-shoulder','50mm two-shot, slow lateral dolly','65mm intimate medium shot','50mm over-shoulder','35mm low-angle hero push-in','35mm wide, slow pull-back'][i]}))};
+  const has=id=>selected.includes(id);
+  const name=id=>charById(id)?.display_name||id;
+  const names=selected.map(name);
+  const meeting=/(meet|meeting|encounter|first meeting|mil|भेंट|मिलन|मुलाकात|पहली मुलाकात)/i.test(text);
+  const challenge=/(challenge|test|power|चुनौती|परीक्षा|शक्ति)/i.test(text);
+  let rows;
+  if(has('RAM_001')&&has('HANUMAN_001')&&meeting){
+    rows=[
+      ['The Encounter','AUDIENCE','Establish the first meeting.','Anticipation','Ram and Hanuman see each other across the forest path.',''],
+      ['Hanuman Recognizes Ram','HANUMAN_001','Reveal Hanuman’s recognition.','Recognition → Devotion','Hanuman pauses, studies Ram and respectfully approaches.','आप कौन हैं, प्रभु?'],
+      ['Ram Sees Hanuman','RAM_001','Show Ram recognizing Hanuman’s sincerity.','Curiosity → Trust','Ram looks into Hanuman’s eyes and welcomes him.','तुम्हारे शब्दों में सच्चाई है।'],
+      ['The Introduction','SHARED','Establish their first direct exchange.','Warmth','Hanuman introduces himself while Ram listens.','मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।'],
+      ['A Bond Begins','HANUMAN_001','Show the emotional beginning of their bond.','Devotion → Resolve','Hanuman bows; Ram raises him with affection.','उठो हनुमान। आज से हम साथ हैं।'],
+      ['The Mission','RAM_001','Connect the meeting to the larger mission.','Purpose','Ram explains that Sita must be found.','हमें सीता की खोज करनी है।'],
+      ['Hanuman’s Vow','HANUMAN_001','Establish Hanuman’s commitment.','Absolute Devotion','Hanuman accepts the mission with unwavering confidence.','प्रभु, आपका कार्य ही मेरा जीवन है।'],
+      ['The Journey Begins','AUDIENCE','Launch the next story movement.','Hope → Determination','Ram and Hanuman walk together into the forest.','चलो, हनुमान।']
+    ];
+  } else if(has('RAM_001')&&has('SITA_001')&&meeting){
+    rows=[
+      ['The Garden','AUDIENCE','Establish the peaceful Mithila garden.','Serenity','Ram enters the garden while Sita is nearby.',''],
+      ['Sita Notices Ram','SITA_001','Show Sita’s first perception of Ram.','Curiosity → Wonder','Sita looks toward Ram and pauses.',''],
+      ['Ram Notices Sita','RAM_001','Show Ram seeing Sita for the first time.','Wonder → Affection','Ram turns and sees Sita across the garden.',''],
+      ['First Eye Contact','SHARED','Create the first silent connection.','Tenderness','Ram and Sita exchange a meaningful glance.',''],
+      ['A Quiet Moment','RAM_001','Show Ram’s emotional response.','Admiration','Ram remains composed but visibly moved.',''],
+      ['Lakshman Observes','LAKSHMAN_001','Add an outside perspective when Lakshman is active.','Warm Curiosity','Lakshman notices Ram’s changed expression.',''],
+      ['Sita’s Shy Response','SITA_001','Show Sita’s restrained emotion.','Shyness → Hope','Sita lowers her gaze with a gentle smile.',''],
+      ['The Moment Passes','AUDIENCE','End the first encounter.','Destiny','Ram and Sita move apart as the garden returns to calm.','']
+    ];
+  } else {
+    const primary=names[0]||'the main character', secondary=names[1]||'the other character';
+    rows=[
+      ['Establish the Situation','AUDIENCE','Introduce the situation described by the creator.','Anticipation',primary+' enters the situation: '+objective+'.',''],
+      ['First Reaction',selected[0]||'AUDIENCE','Show the first meaningful reaction.','Awareness',primary+' reacts to the central situation.',''],
+      ['Counter-Reaction',selected[1]||selected[0]||'AUDIENCE','Show another participant’s response.','Curiosity',secondary+' responds to '+primary+'.',''],
+      ['The Exchange','SHARED','Turn the setup into meaningful interaction.','Connection',names.join(' and ')+' engage with the central situation.',''],
+      ['Rising Purpose','SHARED','Increase the stakes described by the creator.','Tension',names.join(' and ')+' confront the main objective: '+objective+'.',''],
+      ['The Decision',selected[0]||'AUDIENCE','Show a concrete choice.','Decision',primary+' makes a decision that advances the story.',''],
+      ['The Commitment',selected[1]||selected[0]||'AUDIENCE','Show commitment to the next action.','Resolve',secondary+' commits to the next step.',''],
+      ['Next Story Beat','AUDIENCE','Pay off the scene and establish the next movement.','Determination',names.join(' and ')+' move into the next story beat.','']
+    ];
+  }
+  scene={...scene,scene_id:'LOCAL-'+Date.now(),scene_title:title,objective,selected_characters:[...selected],runtime_status:'GENERATED_FROM_SCENE_DESCRIPTION',frames:rows.map((x,i)=>({frame_id:'F0'+(i+1),title:x[0],perspective:x[1],purpose:x[2],emotion:x[3],action:x[4],dialogue:x[5]||null,delivery:x[5]?'emotion-led conversational performance':'silent visual performance',voice_persona:x[5]?(name(x[1])||'canonical character voice persona'):'not required',camera:['35mm extreme wide, slow push-in','85mm close-up, gentle push-in','50mm over-shoulder','50mm two-shot, slow lateral dolly','65mm intimate medium shot','50mm over-shoulder, restrained push','35mm low-angle hero push-in','35mm wide, slow pull-back'][i]}))};
   document.getElementById('title').value=title; renderChars(); renderFrames(); renderChecks(); selectFrame(0);
 }
+
 function renderChars(){
   document.getElementById('chars').innerHTML=selected.map(id=>{
     const c=charById(id);
