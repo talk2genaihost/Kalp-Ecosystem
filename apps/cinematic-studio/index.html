@@ -34,7 +34,7 @@ function renderChars(){
   document.getElementById('chars').innerHTML=selected.map(id=>{
     const c=charById(id);
     const icon=c.display_name==='Dragon'?'🐉':c.display_name==='Ram'?'राम':c.display_name==='Sita'?'सीता':c.display_name==='Lakshman'?'लक्ष्मण':c.display_name==='Hanuman'?'हनु':'ॐ';
-    return '<div class="char"><div class="av">'+icon+'</div><span>'+c.display_name+'<small style="display:block;color:#667e8a;font-size:8px">'+c.character_id+'</small></span><em class="lock">'+c.status+'</em><button onclick="removeChar(\\''+id+'\\')">×</button></div>';
+    return '<div class="char"><div class="av">'+icon+'</div><span>'+c.display_name+'<small style="display:block;color:#667e8a;font-size:8px">'+c.character_id+'</small></span><em class="lock">'+c.status+'</em><button data-remove="'+id+'">×</button></div>';
   }).join('');
 }
 function removeChar(id){
@@ -70,7 +70,7 @@ function selectFrame(i){
 }
 document.getElementById('pers').onchange=e=>{
   const value=e.target.value;
-  scene.frames[active].perspective=value==='Audience'?'AUDIENCE':value==='Shared'?'SHARED':charById(value+'_001')?.character_id||value;
+  const match=registry.characters.find(c=>c.display_name===value); scene.frames[active].perspective=value==='Audience'?'AUDIENCE':value==='Shared'?'SHARED':match?.character_id||value;
   renderFrames();selectFrame(active);toast('Perspective updated locally. Generate to persist.');
 };
 document.getElementById('generate').onclick=async()=>{
