@@ -19,6 +19,17 @@ let registry=null, scene=null, selected=[], active=0;
 function toast(s){const x=document.getElementById('toast');x.textContent=s;x.className='toast show';setTimeout(()=>x.className='toast',1800)}
 async function api(url,options){const r=await fetch(url,options);const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Runtime API error');return j.data}
 
+async function staticFallback(){
+  const [cr,sr]=await Promise.all([
+    fetch('data/character-registry.json').then(r=>r.json()),
+    fetch('data/scene-contract.json').then(r=>r.json())
+  ]);
+  registry=cr;
+  scene={...sr,frames:sr.frames||[]};
+  selected=scene.selected_characters.slice(0,5);
+  document.getElementById('title').value=scene.scene_title;
+  renderChars(); renderChecks(); renderFrames(); selectFrame(0);
+}
 async function boot(){
   try{
     registry=await api('/api/cinematic?type=characters');
@@ -26,7 +37,14 @@ async function boot(){
     selected=scene.selected_characters.slice(0,5);
     renderChars(); renderChecks(); renderFrames(); selectFrame(0);
     toast('KALP runtime connected.');
-  }catch(e){toast('Runtime connection failed: '+e.message)}
+  }catch(e){
+    try{
+      await staticFallback();
+      toast('GitHub test mode connected · canonical data loaded.');
+    }catch(staticError){
+      toast('Dashboard data load failed: '+staticError.message);
+    }
+  }
 }
 
 function charById(id){return registry.characters.find(c=>c.character_id===id)}
@@ -78,9 +96,28 @@ document.getElementById('generate').onclick=async()=>{
     const body={character_ids:selected,scene_id:scene.scene_id,scene_title:document.getElementById('title').value,objective:document.querySelector('textarea').value};
     scene=await api('/api/cinematic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     renderFrames();renderChars();selectFrame(0);toast('CSD-002 generated from runtime contract.');
-  }catch(e){toast('Generation failed: '+e.message)}
+  }catch(e){
+    scene.selected_characters=[...selected];
+    scene.scene_title=body.scene_title;
+    scene.objective=body.objective;
+    renderChars();renderFrames();selectFrame(0);
+    toast('GitHub test mode: storyboard updated locally.');
+  }
 };
-document.getElementById('identity').onclick=async()=>{try{const result=await api('/api/identity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_id:scene.frames[active].frame_id})});document.getElementById('identityStatus').textContent=result.result.status;document.getElementById('identityMeta').textContent=(result.result.missing_visual_locks?.length?('Missing locks · '+result.result.missing_visual_locks.join(', ')):'All selected characters have canonical visual locks');toast('CSD-003.2 '+result.result.status+'.');}catch(e){toast('Identity validation failed: '+e.message)}};
+document.getElementById('identity').onclick=async()=>{
+  try{
+    const result=await api('/api/identity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_id:scene.frames[active].frame_id})});
+    document.getElementById('identityStatus').textContent=result.result.status;
+    document.getElementById('identityMeta').textContent=(result.result.missing_visual_locks?.length?('Missing locks · '+result.result.missing_visual_locks.join(', ')):'All selected characters have canonical visual locks');
+    toast('CSD-003.2 '+result.result.status+'.');
+  }catch(e){
+    const missing=selected.map(id=>charById(id)).filter(c=>!c.visual_lock).map(c=>c.character_id);
+    const status=missing.length?'REVIEW_REQUIRED':'PASS';
+    document.getElementById('identityStatus').textContent=status;
+    document.getElementById('identityMeta').textContent=missing.length?'Missing visual locks · '+missing.join(', '):'All selected characters have canonical visual locks';
+    toast('GitHub test mode: CSD-003.2 '+status+'.');
+  }
+};
 document.getElementById('regen').onclick=async()=>{
   try{
     const result=await api('/api/visual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_ids:[scene.frames[active].frame_id]})});
@@ -88,7 +125,11 @@ document.getElementById('regen').onclick=async()=>{
     document.getElementById('visualStatus').textContent='READY · '+job.job_id;
     document.getElementById('visualMeta').textContent='Perspective locked · '+job.aspect_ratio+' · '+job.output_type+' · Provider-neutral';
     toast('CSD-003 visual job compiled for '+job.frame_id+'.');
-  }catch(e){toast('CSD-003 failed: '+e.message)}
+  }catch(e){
+    document.getElementById('visualStatus').textContent='READY · GITHUB TEST JOB';
+    document.getElementById('visualMeta').textContent='Perspective locked · 16:9 · IMAGE · Provider-neutral · static validation mode';
+    toast('GitHub test mode: visual job compiled locally.');
+  }
 };
 document.getElementById('approve').onclick=()=>{toast('Storyboard approval recorded. Identity lock status remains authoritative.');};
 document.getElementById('prod').onclick=async()=>{
@@ -97,9 +138,23 @@ document.getElementById('prod').onclick=async()=>{
     document.getElementById('visualStatus').textContent=result.job_count+' visual jobs READY';
     document.getElementById('visualMeta').textContent='CSD-003 compiled all frames · downstream CMSE-012 → 013 → 014 → 015';
     toast('CSD-003 compiled all '+result.job_count+' frame jobs.');
-  }catch(e){toast('Visual compilation failed: '+e.message)}
+  }catch(e){
+    document.getElementById('visualStatus').textContent=scene.frames.length+' visual jobs READY';
+    document.getElementById('visualMeta').textContent='GitHub test mode · static compile only · no provider dispatch';
+    toast('GitHub test mode: '+scene.frames.length+' frame jobs prepared locally.');
+  }
 };
-document.getElementById('reset').onclick=async()=>{try{scene=await api('/api/cinematic');selected=scene.selected_characters.slice(0,5);document.getElementById('title').value=scene.scene_title;renderChars();selectFrame(0);toast('Scene reset from canonical runtime.')}catch(e){toast(e.message)}};
+document.getElementById('reset').onclick=async()=>{
+  try{
+    scene=await api('/api/cinematic');
+    selected=scene.selected_characters.slice(0,5);
+    document.getElementById('title').value=scene.scene_title;
+    renderChars();selectFrame(0);toast('Scene reset from canonical runtime.');
+  }catch(e){
+    await staticFallback();
+    toast('GitHub test mode: scene reset from canonical JSON.');
+  }
+};
 function renderChecks(){
   const checks=scene.validation_rules||[];
   document.getElementById('checks').innerHTML=checks.map(x=>'<div class="check"><b>✓ PASS</b><small>'+x.replaceAll('_',' ')+'</small></div>').join('');
