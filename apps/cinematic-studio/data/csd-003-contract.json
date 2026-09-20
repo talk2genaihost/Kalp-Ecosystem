@@ -1,0 +1,57 @@
+{
+  "schema_version": "KALP-CSD-VISUAL-1.0",
+  "engine_id": "KALP-CSD-003",
+  "engine_name": "Perspective-to-Visual Generation Engine",
+  "purpose": "Compile each approved CSD-002 frame into a deterministic, provider-neutral visual generation job without weakening character, world, perspective, or continuity locks.",
+  "input_contract": "KALP-CSD-SCENE-1.0",
+  "output_contract": "KALP-CSD-VISUAL-JOB-1.0",
+  "hard_locks": [
+    "CHARACTER_IDENTITY",
+    "FACE_AND_BODY_IDENTITY",
+    "COSTUME_IDENTITY",
+    "WORLD_LOCATION",
+    "TIME_OF_DAY",
+    "SPATIAL_CONTINUITY",
+    "PERSPECTIVE",
+    "FRAME_ASPECT_RATIO"
+  ],
+  "generation_layers": [
+    "IDENTITY",
+    "PERFORMANCE",
+    "ACTION",
+    "ENVIRONMENT",
+    "COMPOSITION",
+    "CAMERA",
+    "LIGHTING",
+    "ATMOSPHERE",
+    "VFX",
+    "CONTINUITY",
+    "NEGATIVE_CONSTRAINTS"
+  ],
+  "job_states": [
+    "CREATED",
+    "CONTEXT_ASSEMBLED",
+    "COMPILED",
+    "READY",
+    "GENERATING",
+    "GENERATED",
+    "VALIDATING",
+    "PASS",
+    "REWORK",
+    "FAILED"
+  ],
+  "quality_gates": [
+    "IDENTITY_LOCK",
+    "PERSPECTIVE_LOCK",
+    "WORLD_LOCK",
+    "COMPOSITION_LOCK",
+    "CONTINUITY_LOCK",
+    "GENERATION_READINESS"
+  ],
+  "downstream": [
+    "CMSE-012",
+    "CMSE-013",
+    "CMSE-014",
+    "CMSE-015"
+  ]
+}
