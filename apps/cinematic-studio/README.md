@@ -69,3 +69,8 @@ F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F
 ## CMSE-010.1 — Production Context Assembly
 
 `api/context.js` assembles deterministic `KALP-PRODUCTION-CONTEXT-PACKET-1.0` packets for all eight shot jobs. Packets combine canonical character locks, F01 reference lineage, world state, frame perspective, performance/action/dialogue, camera, audio/VFX state, hard continuity locks, and negative constraints. The bundle is the direct input boundary for CMSE-013 prompt compilation, CMSE-014 routing, and CMSE-015 scheduling.
+
+
+## CMSE-010.2 — Production Prompt Compilation
+
+`api/prompt.js` exposes the CMSE-010.2 provider-neutral Prompt Intermediate Representation (PIR). It compiles all eight production context packets into deterministic PIR records containing narrative intent, perspective, canonical character locks, world, composition, performance, dialogue, audio, VFX, hard constraints and negative constraints. Provider/model selection and syntax translation remain deferred to CMSE-014.
