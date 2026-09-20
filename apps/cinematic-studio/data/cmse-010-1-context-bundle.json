@@ -1,0 +1,1010 @@
+{
+  "schema_version": "KALP-CMSE-010.1-CONTEXT-ASSEMBLY-1.0",
+  "engine_id": "KALP-CMSE-010.1",
+  "scene_id": "CSD-DEMO-001",
+  "packet_count": 8,
+  "assembly_status": "PASS",
+  "assembly_policy": "Deterministic context assembly; hard locks inherited from canonical registry and F01; frame-specific narrative/performance/camera remain mutable.",
+  "packets": [
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F01-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F01",
+      "shot_job_id": "SHOT-F01",
+      "status": "ASSEMBLED",
+      "provenance": "INDEPENDENT",
+      "source_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "AUDIENCE",
+        "audience_information": "Establish the three-character relationship."
+      },
+      "performance": {
+        "emotion": "Anticipation",
+        "action": "Ravan approaches Shiva.",
+        "dialogue": null
+      },
+      "camera": {
+        "spec": "Extreme wide, slow push-in, 35mm",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": null,
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F02-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F02",
+      "shot_job_id": "SHOT-F02",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F02-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "SHIVA_001",
+        "audience_information": "Reveal Shiva's perception of Ravan."
+      },
+      "performance": {
+        "emotion": "Stillness → Awareness",
+        "action": "Shiva opens his eyes.",
+        "dialogue": null
+      },
+      "camera": {
+        "spec": "85mm close-up, subtle push-in",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": null,
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F03-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F03",
+      "shot_job_id": "SHOT-F03",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F03-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "RAM_001",
+        "audience_information": "Give Ram's interpretation of the encounter."
+      },
+      "performance": {
+        "emotion": "Calm observation",
+        "action": "Ram watches Shiva and Ravan.",
+        "dialogue": "शक्ति का मूल्य उसके प्रयोग में नहीं… उसके संयम में है।"
+      },
+      "camera": {
+        "spec": "50mm over-shoulder",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": "शक्ति का मूल्य उसके प्रयोग में नहीं… उसके संयम में है।",
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F04-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F04",
+      "shot_job_id": "SHOT-F04",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F04-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        },
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "RAVAN_001",
+        "audience_information": "Enter Ravan's internal conflict."
+      },
+      "performance": {
+        "emotion": "Confidence → Uncertainty",
+        "action": "Ravan questions Shiva.",
+        "dialogue": "यदि शक्ति को साधना है… तो स्वयं को कैसे जीतूँ?"
+      },
+      "camera": {
+        "spec": "85mm Ravan OTS",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": "यदि शक्ति को साधना है… तो स्वयं को कैसे जीतूँ?",
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F05-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F05",
+      "shot_job_id": "SHOT-F05",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F05-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "SHARED",
+        "audience_information": "Expose relationship geometry."
+      },
+      "performance": {
+        "emotion": "Conflict",
+        "action": "All three confront the idea of power.",
+        "dialogue": "Shared dialogue"
+      },
+      "camera": {
+        "spec": "50mm lateral dolly",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": "Shared dialogue",
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F06-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F06",
+      "shot_job_id": "SHOT-F06",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F06-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        },
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "RAVAN_001",
+        "audience_information": "Force Ravan to make the choice."
+      },
+      "performance": {
+        "emotion": "Temptation",
+        "action": "Ravan's energy begins to manifest.",
+        "dialogue": null
+      },
+      "camera": {
+        "spec": "Low angle, 35mm push-in",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": null,
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "EMERGING_CONTROLLED_POWER"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F07-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F07",
+      "shot_job_id": "SHOT-F07",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F07-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "SHIVA_001",
+        "audience_information": "Create the decisive test."
+      },
+      "performance": {
+        "emotion": "Absolute control",
+        "action": "Shiva stops Ravan's power.",
+        "dialogue": "शक्ति को रोकना सरल है, रावण…"
+      },
+      "camera": {
+        "spec": "50mm low angle",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": "शक्ति को रोकना सरल है, रावण…",
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "PRECISE_DIVINE_SUPPRESSION"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    },
+    {
+      "packet_id": "PCP-CSD-DEMO-001-F08-v1",
+      "schema_version": "KALP-PRODUCTION-CONTEXT-PACKET-1.0",
+      "scene_id": "CSD-DEMO-001",
+      "frame_id": "F08",
+      "shot_job_id": "SHOT-F08",
+      "status": "ASSEMBLED",
+      "provenance": "DERIVED_FROM_STORYBOARD",
+      "source_asset": "KALP-DERIVED-F08-CSD003",
+      "reference_anchor": {
+        "frame_id": "F01",
+        "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+        "trusted": true
+      },
+      "world": {
+        "location_id": "KAILASH_WORLD_001",
+        "location": "Mount Kailash",
+        "time_of_day": "TWILIGHT",
+        "environment_lock": true
+      },
+      "characters": [
+        {
+          "character_id": "SHIVA_001",
+          "display_name": "Shiva",
+          "status": "CANONICAL",
+          "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+          "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+          "master_dna": null,
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": null
+        },
+        {
+          "character_id": "RAM_001",
+          "display_name": "Ram",
+          "status": "CANONICAL",
+          "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+          "performance_lock": null,
+          "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+          "anatomy_lock": null,
+          "costume_lock": null,
+          "continuity_lock": null,
+          "canonical_invariants": {
+            "age": "~28–32",
+            "face": "long-oval face, deep focused eyes, strong natural brows, straight refined nose",
+            "hair": "dark shoulder-length hair, neatly tied",
+            "body": "tall athletic, broad-shouldered, defined non-bulky warrior anatomy",
+            "costume": "saffron/earth-tone forest attire or refined Ayodhya royal attire",
+            "accessories": "minimal purposeful ornaments; no modern elements",
+            "weapon": "canonical bow and arrows",
+            "aura": "warm golden aura",
+            "continuity": "face, body proportions, costume logic, bow, voice, performance and emotional continuity locked"
+          }
+        },
+        {
+          "character_id": "RAVAN_001",
+          "display_name": "Ravan",
+          "status": "CANONICAL",
+          "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+          "performance_lock": null,
+          "master_dna": null,
+          "anatomy_lock": "RAVAN_ANATOMY_001",
+          "costume_lock": "RAVAN_COSTUME_001",
+          "continuity_lock": "RAVAN_CONTINUITY_001",
+          "canonical_invariants": {
+            "face": "mature, sharp, commanding face; intense intelligent eyes",
+            "hair": "long dark hair",
+            "body": "tall, broad, powerful human-derived warrior anatomy",
+            "complexion": "warm bronze/dark cinematic complexion",
+            "costume": "royal/warrior/devotional costume families",
+            "crown": "canonical royal crown architecture",
+            "ornaments": "gold/bronze royal ornaments",
+            "weapon": "canonical weapon identity",
+            "identity_mode": "king first, demon second",
+            "form_modes": "controlled single/triple/ten-head modes",
+            "continuity": "identity, anatomy, movement, pose, camera, performance, voice, sound, VFX and continuity locked"
+          }
+        }
+      ],
+      "perspective": {
+        "mode": "CHARACTER_AWARE",
+        "anchor": "AUDIENCE",
+        "audience_information": "Pay off restraint and transformation."
+      },
+      "performance": {
+        "emotion": "Recognition → Restraint",
+        "action": "Ravan lowers his hand.",
+        "dialogue": "मैं समझ गया, महादेव।"
+      },
+      "camera": {
+        "spec": "35mm wide, slow pull-back",
+        "aspect_ratio": "16:9"
+      },
+      "continuity": {
+        "identity": "HARD_LOCK",
+        "world": "HARD_LOCK",
+        "spatial": "HARD_LOCK",
+        "environment": "HARD_LOCK",
+        "perspective": "FRAME_LOCK",
+        "performance": "FRAME_LOCK"
+      },
+      "audio": {
+        "dialogue": "मैं समझ गया, महादेव।",
+        "music_state": "INHERIT_SCENE",
+        "sfx_state": "FRAME_DERIVED"
+      },
+      "vfx": {
+        "state": "INHERIT_SCENE"
+      },
+      "negative_constraints": [
+        "No identity change",
+        "No costume/anatomy/hair/crown/ornament/weapon mutation",
+        "No modern objects or text artifacts",
+        "No Mount Kailash/twilight change",
+        "No extra principal characters",
+        "No perspective override",
+        "No uncontrolled F06 power discharge"
+      ],
+      "downstream": [
+        "CMSE-013",
+        "CMSE-014",
+        "CMSE-015"
+      ]
+    }
+  ]
+}
