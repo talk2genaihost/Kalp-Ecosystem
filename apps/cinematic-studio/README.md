@@ -16,3 +16,8 @@ Character Registry → CSD-001 Scene Director → CSD-002 Perspective Storyboard
 The storyboard is a projection of the scene contract. A frame may change perspective, camera, emotion, action or dialogue, but must preserve active character/world identity locks and continuity constraints.
 
 The current `index.html` is a self-contained UI prototype. The JSON contracts are intentionally separated so the next runtime step can replace demo state with API-backed retrieval without redesigning the dashboard.
+
+
+## Runtime API
+
+`api/cinematic.js` exposes the CSD runtime boundary. `GET /api/cinematic?type=characters` returns the registry; `GET /api/cinematic` returns the canonical scene; `POST /api/cinematic` validates 1–5 selected character IDs and returns a generated scene contract. The dashboard calls this API for boot, generation and reset operations.
