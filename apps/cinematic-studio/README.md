@@ -59,3 +59,8 @@ Registered existing canonical identity artifacts for `RAM_001` and `RAVAN_001` i
 ### CSD-003.3 — Reference Propagation & F02–F08
 
 F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F02–F08 jobs that inherit F01 identity, world, spatial, and environment locks while preserving frame-specific perspective, emotion, action, camera, and VFX state.
+
+
+## CMSE-010 — Production Execution
+
+`api/production.js` exposes the CMSE-010 orchestration boundary. The current demo runs in `PROVISIONAL_VISUAL_ASSET_EXECUTION` mode: F01 is independently generated; F02-F08 retain `DERIVED_FROM_STORYBOARD` provenance because of the current provider/UI generation limitation. The orchestrator preserves this lineage while planning eight shot jobs and routing context through CMSE-012/013/014/015.
