@@ -81,7 +81,9 @@ jobs:
           mkdir -p /tmp/published-site/admanthan
           mkdir -p /tmp/published-site/market-to-revenue
           mkdir -p /tmp/published-site/cinematic-studio
+          mkdir -p /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
+          cp -R apps/production/. /tmp/published-site/production/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
           cp -R docs/admanthan-dashboard/. /tmp/published-site/admanthan/
@@ -106,7 +108,7 @@ jobs:
           cat > /tmp/published-site/index.html <<'EOF'
           <!doctype html>
           <html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>KALP Applications</title></head>
-          <body><h1>KALP Applications</h1><ul><li><a href="./weather-dashboard/">Weather Dashboard</a></li><li><a href="./astro-rashi/">Astro Rashi Dashboard</a></li><li><a href="./admanthan/">KALP AdManthan</a></li><li><a href="./admanthan/research.html">AdManthan Research</a></li><li><a href="./market-to-revenue/">Market Manthan → Market-to-Revenue</a></li><li><a href="./cinematic-studio/">KALP Cinematic Studio</a></li></ul></body></html>
+          <body><h1>KALP Applications</h1><ul><li><a href="./weather-dashboard/">Weather Dashboard</a></li><li><a href="./astro-rashi/">Astro Rashi Dashboard</a></li><li><a href="./admanthan/">KALP AdManthan</a></li><li><a href="./admanthan/research.html">AdManthan Research</a></li><li><a href="./market-to-revenue/">Market Manthan → Market-to-Revenue</a></li><li><a href="./cinematic-studio/">KALP Cinematic Studio</a></li><li><a href="./production/">KALP Production Control Tower</a></li></ul></body></html>
           EOF
           cat > /tmp/published-site/astro-rashi.html <<'EOF'
           <!doctype html><meta http-equiv="refresh" content="0; url=./astro-rashi/" /><link rel="canonical" href="./astro-rashi/" /><title>Astro Rashi Dashboard</title>
