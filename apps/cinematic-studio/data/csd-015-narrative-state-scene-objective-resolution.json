@@ -1,0 +1,144 @@
+{
+  "schema_version":"KALP-CSD-015-NARRATIVE-STATE-SCENE-OBJECTIVE-RESOLUTION-1.0",
+  "engine_id":"KALP-CSD-015",
+  "engine_name":"Narrative State & Scene Objective Resolution Engine",
+  "status":"LOCKED",
+  "purpose":"Resolve the active narrative purpose of a scene into one coherent objective contract spanning story, character, conflict, emotion, audience information, turning point and end state.",
+  "core_principle":"A scene earns its cinematic form by knowing what it must accomplish, what must change, and what state it must hand to the next scene.",
+  "objective_model":"narrative_context + canonical_state + character_state + knowledge_state + relationship_state + selected_branch + event_graph → scene_objective_contract",
+  "objective_domains":{
+    "scene_objective":"The primary dramatic work the scene must accomplish.",
+    "character_objectives":"What each active character is trying to achieve now.",
+    "conflict_objective":"The opposing force preventing immediate resolution.",
+    "emotional_objective":"The emotional movement the scene should produce.",
+    "audience_objective":"What the audience should know, feel, suspect or question.",
+    "turning_point_objective":"The specific change that shifts the scene trajectory.",
+    "end_state_objective":"The canonical state that must exist when the scene resolves.",
+    "next_scene_hook":"The unresolved consequence or question handed forward."
+  },
+  "character_objective_schema":{
+    "required":["character_id","scene_role","objective","obstacle","stakes","desired_state","failure_condition"],
+    "scene_roles":["DRIVER","COUNTERFORCE","ALLY","WITNESS","CATALYST","DECIDER","TARGET","REACTOR"]
+  },
+  "objective_resolution_pipeline":[
+    "LOAD_CANONICAL_SCENE_STATE",
+    "LOAD_SELECTED_BRANCH_STATE",
+    "LOAD_CSD005_SCENE_INTELLIGENCE",
+    "LOAD_CSD006_CHARACTER_STATE",
+    "LOAD_CSD007_KNOWLEDGE_STATE",
+    "LOAD_CSD013_EVENT_GRAPH",
+    "RESOLVE_PRIMARY_SCENE_OBJECTIVE",
+    "RESOLVE_CHARACTER_OBJECTIVES",
+    "RESOLVE_CONFLICT_OBJECTIVE",
+    "RESOLVE_EMOTIONAL_TRAJECTORY",
+    "RESOLVE_AUDIENCE_INFORMATION_GOAL",
+    "RESOLVE_TURNING_POINT",
+    "RESOLVE_REQUIRED_END_STATE",
+    "RESOLVE_NEXT_SCENE_HOOK",
+    "CHECK_OBJECTIVE_CONFLICTS",
+    "CHECK_CAUSAL_ALIGNMENT",
+    "CHECK_KNOWLEDGE_BOUNDARIES",
+    "BUILD_CSD002_FRAME_OBJECTIVE_MAP",
+    "EMIT_CSD010_ORCHESTRATION_PACKAGE"
+  ],
+  "objective_rules":[
+    "Exactly one PRIMARY scene objective is promoted for a scene version.",
+    "Every active character must have a scene function and objective or explicitly be marked WITNESS with a defined observation purpose.",
+    "Character objectives must be compatible with CSD-006 state and CSD-007 knowledge.",
+    "The scene objective cannot require information unavailable to the active characters.",
+    "Conflict must be causally connected to at least one character objective or external scene condition.",
+    "The emotional objective describes intended dramatic movement, not a forced audience reaction.",
+    "The audience objective must distinguish KNOW, FEEL, SUSPECT and QUESTION.",
+    "The turning point must be represented by a CSD-012 event or CSD-014 selected consequence.",
+    "The end state must be representable in CSD-011 canonical state.",
+    "The next-scene hook must originate from an unresolved causal consequence, decision, question or state change.",
+    "No objective may mutate immutable identity.",
+    "Maximum five active characters remains enforced."
+  ],
+  "objective_conflict_model":{
+    "types":["DIRECT","COMPETING","HIDDEN","VALUE","INFORMATION","RELATIONAL","INTERNAL"],
+    "resolution_rule":"Conflicts are surfaced, not silently removed; the director resolves them through causality and selected narrative path.",
+    "hard_conflict":"Two objectives require mutually exclusive canonical outcomes at the same decision point.",
+    "soft_conflict":"Objectives can coexist but create tension or tradeoff."
+  },
+  "emotional_trajectory":{
+    "required":["entry_state","pressure","turning_point_state","exit_state"],
+    "rule":"Emotion must be causally supported by character state, events and relationships."
+  },
+  "audience_objective":{
+    "required":["know","feel","suspect","question"],
+    "rule":"Audience information may exceed a character's knowledge only when explicitly authorized by the narrative information boundary."
+  },
+  "frame_objective_map":{
+    "rule":"Each of the eight CSD-002 frames must serve a declared narrative objective without inventing a new scene purpose.",
+    "default_mapping":{
+      "F01":"establish scene objective and canonical stakes",
+      "F02":"expose DRIVER objective",
+      "F03":"expose COUNTERFORCE or WITNESS perception",
+      "F04":"escalate objective collision",
+      "F05":"make relationship/conflict visible",
+      "F06":"execute turning-point pressure",
+      "F07":"show decision/consequence",
+      "F08":"establish end state and next-scene hook"
+    }
+  },
+  "hard_failures":[
+    "MISSING_PRIMARY_OBJECTIVE",
+    "MULTIPLE_PRIMARY_OBJECTIVES",
+    "ACTIVE_CHARACTER_WITHOUT_FUNCTION",
+    "OBJECTIVE_REQUIRES_UNAVAILABLE_INFORMATION",
+    "CONFLICT_WITHOUT_CAUSAL_BASIS",
+    "TURNING_POINT_WITHOUT_EVENT",
+    "END_STATE_NOT_REPRESENTABLE",
+    "NEXT_HOOK_WITHOUT_CAUSAL_SOURCE",
+    "CSD013_GRAPH_MISMATCH",
+    "CSD011_STATE_MISMATCH",
+    "IMMUTABLE_IDENTITY_MUTATION",
+    "ACTIVE_CHARACTER_COUNT_ABOVE_5"
+  ],
+  "output_contract":{
+    "scene_objective_contract":"authoritative narrative objective package",
+    "character_objectives":"objective map for active characters",
+    "conflict_map":"objective collision structure",
+    "emotional_trajectory":"entry to exit movement",
+    "audience_objective":"know/feel/suspect/question",
+    "turning_point":"causal event and intended state change",
+    "required_end_state":"CSD-011 compatible target",
+    "next_scene_hook":"causal continuation",
+    "frame_objective_map":"CSD-002 eight-frame objective binding",
+    "orchestration_handoff":"CSD-010-ready package"
+  },
+  "demo_test":{
+    "scene_id":"CSD15-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "primary_objective":"Expose the difference between raw power and controlled mastery through Ravan's decision.",
+    "character_objectives":[
+      {"character_id":"RAVAN_001","scene_role":"DRIVER","objective":"Demonstrate superiority without surrendering authority","obstacle":"Rama refuses to be intimidated","stakes":"Ravan's self-concept as master of power","desired_state":"Either proves mastery through control or escalates","failure_condition":"Loses control or abandons his stated test"},
+      {"character_id":"RAM_001","scene_role":"COUNTERFORCE","objective":"Hold the challenge without escalating it","obstacle":"Ravan's rising power and need for validation","stakes":"Whether the confrontation becomes destructive","desired_state":"Ravan recognizes restraint as a meaningful choice","failure_condition":"Ravan escalates into uncontrolled force"},
+      {"character_id":"HANUMAN_001","scene_role":"WITNESS","objective":"Protect Rama while discerning the true intent behind Ravan's display","obstacle":"Ravan's motives remain partly uncertain","stakes":"Readiness to intervene without prematurely escalating","desired_state":"Maintain protective readiness while recognizing reduced threat","failure_condition":"Intervenes without sufficient cause"}
+    ],
+    "conflict_map":[
+      {"type":"DIRECT","between":["RAVAN_001","RAM_001"],"conflict":"Ravan seeks validation through power; Rama refuses intimidation."},
+      {"type":"INTERNAL","between":["RAVAN_001","RAVAN_001"],"conflict":"Dominance versus self-control."},
+      {"type":"INFORMATION","between":["HANUMAN_001","RAVAN_001"],"conflict":"Hanuman cannot know Ravan's private motive without evidence."}
+    ],
+    "emotional_trajectory":{
+      "entry_state":"controlled confrontation",
+      "pressure":"Ravan increases power while Rama remains composed",
+      "turning_point_state":"Ravan recognizes the choice to restrain",
+      "exit_state":"controlled introspection with unresolved mastery question"
+    },
+    "audience_objective":{
+      "know":"Ravan has chosen restraint after testing Rama.",
+      "feel":"tension followed by reflective uncertainty.",
+      "suspect":"Ravan's restraint may be more difficult than escalation.",
+      "question":"Will Ravan treat restraint as mastery or return to domination?"
+    },
+    "turning_point":{"event_id":"E04","source_branch":"BRANCH_RESTRAIN","state_change":"power_field elevated → contained"},
+    "required_end_state":"Ravan remains powerful and composed; Rama remains calm; Hanuman remains protective; no physical escalation; the mastery question remains unresolved.",
+    "next_scene_hook":"Ravan's unresolved question about mastery becomes pressure for the next scene.",
+    "validation":"PASS",
+    "production_handoff":"READY"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-008-PERSPECTIVE-PERCEPTION","CSD-009-PERCEPTION-VALIDATION","CSD-010-ADAPTIVE-ORCHESTRATOR","CSD-016-SCENE-DRAMATIC-BEAT-AND-PACING-DIRECTOR"]
+}
