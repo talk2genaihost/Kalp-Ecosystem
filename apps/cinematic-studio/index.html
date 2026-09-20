@@ -14,21 +14,79 @@
 <aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><button class="secondary" id="regen">↻ Regenerate Frame</button><button class="primary" id="approve">✓ Approve Storyboard</button><button class="secondary" id="prod">▶ Send to Production</button></aside>
 </main><div class="toast" id="toast"></div>
 <script>
-const chars=[['SHIVA_001','Shiva','ॐ'],['RAM_001','Ram','राम'],['RAVAN_001','Ravan','ॐ'],['HANUMAN_001','Hanuman','हनु'],['DRAGON_001','Dragon','🐉'],['SITA_001','Sita','सीता'],['LAKSHMAN_001','Lakshman','लक्ष्मण']];let selected=['SHIVA_001','RAM_001','RAVAN_001'],active=0;
-const data=[['The Test Begins','Audience','Establish the three-character relationship.','Anticipation','Ravan approaches Shiva.','None','Extreme wide, slow push-in (35mm)'],['Shiva Sees the Intention','Shiva','Reveal Shiva’s perception of Ravan.','Stillness → Awareness','Shiva opens his eyes.','None','85mm close-up, subtle push-in'],['Ram Understands','Ram','Give Ram’s interpretation.','Calm observation','Ram watches Shiva and Ravan.','शक्ति का मूल्य उसके प्रयोग में नहीं…','50mm over-shoulder'],['Ravan’s Question','Ravan','Enter Ravan’s internal conflict.','Confidence → Uncertainty','Ravan questions Shiva.','यदि शक्ति को साधना है…','85mm Ravan OTS'],['Three Minds, One Moment','Shared','Expose relationship geometry.','Conflict','All three confront power.','Shared dialogue','50mm lateral dolly'],['Power Rises','Ravan','Force Ravan to make the choice.','Temptation','Energy begins to manifest.','None','Low angle, 35mm push-in'],['Shiva’s Test','Shiva','Create the decisive test.','Absolute control','Shiva stops Ravan’s power.','शक्ति को रोकना सरल है, रावण…','50mm low angle'],['The Choice','Audience','Pay off restraint and transformation.','Recognition → Restraint','Ravan lowers his hand.','मैं समझ गया, महादेव।','35mm wide, slow pull-back']];
-function toast(s){let x=document.getElementById('toast');x.textContent=s;x.className='toast show';setTimeout(()=>x.className='toast',1600)}
-function renderChars(){document.getElementById('chars').innerHTML=selected.map(id=>{let c=chars.find(x=>x[0]===id);return '<div class="char"><div class="av">'+c[2]+'</div><span>'+c[1]+'<small style="display:block;color:#667e8a;font-size:8px">'+id+'</small></span><em class="lock">LOCKED</em><button onclick="removeChar(\''+id+'\')">×</button></div>'}).join('')}
-function removeChar(id){if(selected.length===1)return toast('At least one character is required.');selected=selected.filter(x=>x!==id);renderChars();toast('Character removed.')}
-document.getElementById('add').onclick=()=>{let c=chars.find(x=>!selected.includes(x[0]));if(selected.length>=5)return toast('Maximum 5 characters per scene.');selected.push(c[0]);renderChars();toast(c[1]+' added.')}
+let registry=null, scene=null, selected=[], active=0;
+
+function toast(s){const x=document.getElementById('toast');x.textContent=s;x.className='toast show';setTimeout(()=>x.className='toast',1800)}
+async function api(url,options){const r=await fetch(url,options);const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Runtime API error');return j.data}
+
+async function boot(){
+  try{
+    registry=await api('/api/cinematic?type=characters');
+    scene=await api('/api/cinematic');
+    selected=scene.selected_characters.slice(0,5);
+    renderChars(); renderChecks(); renderFrames(); selectFrame(0);
+    toast('KALP runtime connected.');
+  }catch(e){toast('Runtime connection failed: '+e.message)}
+}
+
+function charById(id){return registry.characters.find(c=>c.character_id===id)}
+function renderChars(){
+  document.getElementById('chars').innerHTML=selected.map(id=>{
+    const c=charById(id);
+    const icon=c.display_name==='Dragon'?'🐉':c.display_name==='Ram'?'राम':c.display_name==='Sita'?'सीता':c.display_name==='Lakshman'?'लक्ष्मण':c.display_name==='Hanuman'?'हनु':'ॐ';
+    return '<div class="char"><div class="av">'+icon+'</div><span>'+c.display_name+'<small style="display:block;color:#667e8a;font-size:8px">'+c.character_id+'</small></span><em class="lock">'+c.status+'</em><button onclick="removeChar(\\''+id+'\\')">×</button></div>';
+  }).join('');
+}
+function removeChar(id){
+  if(selected.length===1)return toast('At least one character is required.');
+  selected=selected.filter(x=>x!==id);renderChars();toast('Character removed.');
+}
+document.getElementById('add').onclick=()=>{
+  if(selected.length>=5)return toast('Maximum 5 characters per scene.');
+  const next=registry.characters.find(c=>!selected.includes(c.character_id));
+  if(next){selected.push(next.character_id);renderChars();toast(next.display_name+' added.')}
+};
+
 function art(i){return '<div class="pic"><div class="fig a"></div><div class="fig b"></div><div class="fig c"></div>'+(i===5||i===6?'<div class="power"></div>':'')+'</div>'}
-function render(){document.getElementById('frames').innerHTML=data.map((f,i)=>'<article class="frame '+(i===active?'sel':'')+'" onclick="selectFrame('+i+')">'+art(i)+'<div class="fh"><span class="num">0'+(i+1)+'</span><span class="ft">'+f[0]+'</span></div><div class="fm">◉ <b>'+f[1]+'</b> Perspective<br>'+f[2]+'</div><div class="pass">● Continuity Ready</div></article>').join('')}
-function selectFrame(i){active=i;let f=data[i];render();document.getElementById('it').textContent='FRAME 0'+(i+1)+' — '+f[0].toUpperCase();document.getElementById('preview').innerHTML=art(i);document.getElementById('pers').value=f[1];document.getElementById('purpose').textContent=f[2];document.getElementById('emotion').textContent=f[3];document.getElementById('action').textContent=f[4];document.getElementById('dialogue').textContent=f[5];document.getElementById('camera').textContent=f[6]}
-document.getElementById('pers').onchange=e=>{data[active][1]=e.target.value;selectFrame(active);toast('Perspective updated.')}
-document.getElementById('generate').onclick=()=>{render();selectFrame(0);toast('CSD-002 generated 8 frames.')}
+function renderFrames(){
+  const frames=scene.frames;
+  document.getElementById('frames').innerHTML=frames.map((f,i)=>
+    '<article class="frame '+(i===active?'sel':'')+'" onclick="selectFrame('+i+')">'+art(i)+
+    '<div class="fh"><span class="num">0'+(i+1)+'</span><span class="ft">'+f.title+'</span></div>'+
+    '<div class="fm">◉ <b>'+f.perspective+'</b> Perspective<br>'+f.purpose+'</div>'+
+    '<div class="pass">● Continuity Ready</div></article>'
+  ).join('');
+}
+function selectFrame(i){
+  active=i; const f=scene.frames[i]; renderFrames();
+  document.getElementById('it').textContent='FRAME 0'+(i+1)+' — '+f.title.toUpperCase();
+  document.getElementById('preview').innerHTML=art(i);
+  document.getElementById('pers').value=f.perspective==='AUDIENCE'?'Audience':f.perspective==='SHARED'?'Shared':charById(f.perspective)?.display_name||'Audience';
+  document.getElementById('purpose').textContent=f.purpose;
+  document.getElementById('emotion').textContent=f.emotion;
+  document.getElementById('action').textContent=f.action;
+  document.getElementById('dialogue').textContent=f.dialogue||'None';
+  document.getElementById('camera').textContent=f.camera;
+}
+document.getElementById('pers').onchange=e=>{
+  const value=e.target.value;
+  scene.frames[active].perspective=value==='Audience'?'AUDIENCE':value==='Shared'?'SHARED':charById(value+'_001')?.character_id||value;
+  renderFrames();selectFrame(active);toast('Perspective updated locally. Generate to persist.');
+};
+document.getElementById('generate').onclick=async()=>{
+  try{
+    const body={character_ids:selected,scene_id:scene.scene_id,scene_title:document.getElementById('title').value,objective:document.querySelector('textarea').value};
+    scene=await api('/api/cinematic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    renderFrames();renderChars();selectFrame(0);toast('CSD-002 generated from runtime contract.');
+  }catch(e){toast('Generation failed: '+e.message)}
+};
 document.getElementById('regen').onclick=()=>toast('Frame 0'+(active+1)+' queued for targeted regeneration.');
 document.getElementById('approve').onclick=()=>toast('Storyboard approved. Production unlocked.');
 document.getElementById('prod').onclick=()=>toast('Production job created: CSD-002 → CMSE-012.');
-document.getElementById('reset').onclick=()=>{selected=['SHIVA_001','RAM_001','RAVAN_001'];renderChars();selectFrame(0);toast('Scene reset.')}
-document.getElementById('checks').innerHTML=['Character Identity','Visual Continuity','Perspective Logic','Emotional Progression','Dialogue Alignment','World Consistency','Generation Ready'].map(x=>'<div class="check"><b>✓ PASS</b><small>'+x+'</small></div>').join('');
-renderChars();selectFrame(0);
+document.getElementById('reset').onclick=async()=>{try{scene=await api('/api/cinematic');selected=scene.selected_characters.slice(0,5);document.getElementById('title').value=scene.scene_title;renderChars();selectFrame(0);toast('Scene reset from canonical runtime.')}catch(e){toast(e.message)}};
+function renderChecks(){
+  const checks=scene.validation_rules||[];
+  document.getElementById('checks').innerHTML=checks.map(x=>'<div class="check"><b>✓ PASS</b><small>'+x.replaceAll('_',' ')+'</small></div>').join('');
+}
+boot();
 </script></body></html>
