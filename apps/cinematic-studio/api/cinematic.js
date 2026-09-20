@@ -8,7 +8,7 @@ function json(res,status,payload){
   res.end(JSON.stringify(payload));
 }
 function load(name){
-  const file=path.join(process.cwd(),"data",name);
+  const file=path.join(__dirname,"..","data",name);
   return JSON.parse(fs.readFileSync(file,"utf8"));
 }
 module.exports=async function handler(req,res){
