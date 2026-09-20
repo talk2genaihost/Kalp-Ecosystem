@@ -1,0 +1,48 @@
+{
+  "schema_version": "KALP-CHARACTER-REGISTRY-1.0",
+  "registry_id": "KALP_CHARACTER_REGISTRY_001",
+  "selection_limit": {
+    "min": 1,
+    "max": 5
+  },
+  "characters": [
+    {
+      "character_id": "SHIVA_001",
+      "display_name": "Shiva",
+      "status": "CANONICAL",
+      "visual_lock": "SHIVA_001_VISUAL_LOCK_v1.0",
+      "performance_lock": "SHIVA_001_PERFORMANCE_v1.0",
+      "voice_profile": "SHIVA_VOICE_001"
+    },
+    {
+      "character_id": "RAM_001",
+      "display_name": "Ram",
+      "status": "CANONICAL"
+    },
+    {
+      "character_id": "RAVAN_001",
+      "display_name": "Ravan",
+      "status": "CANONICAL"
+    },
+    {
+      "character_id": "HANUMAN_001",
+      "display_name": "Hanuman",
+      "status": "REGISTERED"
+    },
+    {
+      "character_id": "DRAGON_001",
+      "display_name": "Dragon",
+      "status": "REGISTERED"
+    },
+    {
+      "character_id": "SITA_001",
+      "display_name": "Sita",
+      "status": "REGISTERED"
+    },
+    {
+      "character_id": "LAKSHMAN_001",
+      "display_name": "Lakshman",
+      "status": "REGISTERED"
+    }
+  ]
+}
