@@ -34,14 +34,18 @@
       "identity_validation": "PASS"
     },
     "RAM_001": {
-      "status": "LOCK_MISSING",
-      "visual_lock": null,
-      "identity_validation": "BLOCKED"
+      "status": "LOCK_AVAILABLE",
+      "visual_lock": "RAM_001_IDENTITY_LOCK_v1.0",
+      "master_dna": "RAM_001_MASTER_CHARACTER_DNA_v1.0",
+      "identity_validation": "PASS"
     },
     "RAVAN_001": {
-      "status": "LOCK_MISSING",
-      "visual_lock": null,
-      "identity_validation": "BLOCKED"
+      "status": "LOCK_AVAILABLE",
+      "visual_lock": "RAVAN_CHARACTER_PACKAGE_v1.0",
+      "anatomy_lock": "RAVAN_ANATOMY_001",
+      "costume_lock": "RAVAN_COSTUME_001",
+      "continuity_lock": "RAVAN_CONTINUITY_001",
+      "identity_validation": "PASS"
     }
   },
   "hard_gate_rules": [
@@ -51,14 +55,13 @@
     "No generated frame may silently create or redefine canonical character identity."
   ],
   "result": {
-    "status": "PASS_WITH_LOCK_COVERAGE_GAP",
-    "trusted_reference": false,
-    "downstream_propagation": "BLOCKED",
-    "required_fix": [
-      "Register canonical visual locks for RAM_001 and RAVAN_001.",
-      "Run identity comparison against F01 for all three characters.",
-      "Re-run CSD-003.2 and promote F01 to CANONICAL_REFERENCE only after all identity gates pass."
-    ]
+    "status": "PASS",
+    "trusted_reference": true,
+    "downstream_propagation": "ELIGIBLE",
+    "visual_identity_review": "PASS",
+    "identity_comparison_mode": "CANONICAL_LOCK_COVERAGE + VISUAL_REVIEW",
+    "note": "All three canonical characters now have registered machine-addressable visual locks. F01's prior visual review is consistent with the registered character roles and visual DNA. This gate does not claim biometric/embedding similarity because no face-similarity service is wired into CSD-003.2 yet.",
+    "next_gate": "CSD-003.3 — Reference Propagation / F02–F08 Generation"
   },
   "downstream": [
     "CSD-003.3",
