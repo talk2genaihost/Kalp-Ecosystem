@@ -63,7 +63,24 @@ module.exports=async function handler(req,res){
         scene_title:title,
         objective,
         selected_characters:ids,
-        frames:generateFrames(ids,title,objective),
+        frames:generateFrames(ids,title,objective).map((f,i)=>({
+          ...f,
+          delivery:f.dialogue?((f.dialogue.length>35)?"measured, emotionally grounded delivery":"natural conversational delivery"):"silent visual performance",
+          voice_persona:f.dialogue?(f.perspective==="HANUMAN_001"?"Hanuman canonical voice persona":f.perspective==="RAM_001"?"Ram canonical voice persona":"canonical speaker voice persona"):"not required",
+          identity_look:{
+            character_ids:ids,
+            canonical:true,
+            visual_lock_required:true,
+            fields:["face","anatomy","age","costume","hair","ornaments","props","expression","emotion","pose","body_language"]
+          },
+          dialogue_contract:{
+            speaker:f.dialogue?(f.perspective==="SHARED"?"SHARED":f.perspective):null,
+            line:f.dialogue||null,
+            language:f.dialogue?"Hindi":null,
+            delivery:f.dialogue?((f.dialogue.length>35)?"measured, emotionally grounded delivery":"natural conversational delivery"):"not required",
+            voice_persona:f.dialogue?(f.perspective==="HANUMAN_001"?"Hanuman canonical voice persona":f.perspective==="RAM_001"?"Ram canonical voice persona":"canonical speaker voice persona"):"not required"
+          }
+        })),
         storyboard:{...scene.storyboard,frame_count:8},
         generated_at:new Date().toISOString(),
         runtime_status:"GENERATED_FROM_SCENE_DESCRIPTION"
