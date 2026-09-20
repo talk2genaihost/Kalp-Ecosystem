@@ -1,0 +1,95 @@
+{
+  "schema_version": "KALP-CSD-CONTINUITY-VALIDATION-1.0",
+  "gate_id": "CSD-003.4",
+  "scene_id": "CSD-DEMO-001",
+  "source_reference": {
+    "frame_id": "F01",
+    "asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+    "trusted": true
+  },
+  "input_provenance": {
+    "frames": [
+      "F02",
+      "F03",
+      "F04",
+      "F05",
+      "F06",
+      "F07",
+      "F08"
+    ],
+    "provenance": "DERIVED_FROM_STORYBOARD",
+    "source_artifact_id": "3021f4bb-c71d-4b4d-8064-4cac394c3050"
+  },
+  "validation_mode": "VISUAL_REVIEW + LOCK_COVERAGE + PROVENANCE",
+  "results": [
+    {
+      "frame_id": "F02",
+      "perspective": "SHIVA_001",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F03",
+      "perspective": "RAM_001",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F04",
+      "perspective": "RAVAN_001",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F05",
+      "perspective": "SHARED",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F06",
+      "perspective": "RAVAN_001",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F07",
+      "perspective": "SHIVA_001",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    },
+    {
+      "frame_id": "F08",
+      "perspective": "AUDIENCE",
+      "identity": "PASS",
+      "world": "PASS",
+      "continuity": "PASS",
+      "provenance": "PASS"
+    }
+  ],
+  "observations": [
+    "Shiva remains visually consistent across F02, F05, F07.",
+    "Ram remains visually consistent in F03 and F08.",
+    "Ravan remains visually consistent across F02, F04, F05, F06, F07 and F08.",
+    "Mount Kailash and twilight visual language are retained across the sequence.",
+    "No ten-head Ravan transformation appears in the derived sequence.",
+    "F06 contains controlled emerging power rather than an uncontrolled full discharge.",
+    "F08 preserves the three-character relationship geometry and closure.",
+    "The individual files are derived crops from the storyboard artifact, not independently generated frames."
+  ],
+  "production_status": "VALIDATED_AS_DERIVED_ASSETS",
+  "trusted_reference_status": "F01 remains the only independently generated trusted reference.",
+  "next_gate": "CSD-003.5 — Independent Frame Regeneration / Production Asset Promotion"
+}
