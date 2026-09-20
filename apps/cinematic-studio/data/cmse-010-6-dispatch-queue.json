@@ -3,14 +3,16 @@
   "engine_id": "KALP-CMSE-010.6",
   "engine_name": "Production Job Dispatch & Scheduling",
   "scene_id": "CSD-DEMO-001",
-  "status": "BLOCKED_REFERENCE_RESOLUTION",
-  "scheduler_state": "WAITING_DEPENDENCY",
+  "status": "WAITING_PROVIDER_CONCURRENCY",
+  "scheduler_state": "QUEUED",
   "execution_profile": "QUALITY_FIRST",
   "dependency_gate": {
     "required": "F01 provider-accessible reference handle",
     "registry_asset_id": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
-    "resolved_provider_handle": null,
-    "reason": "F01 was generated in the ChatGPT image-generation runtime and its registry UUID is not a Higgsfield media/job UUID or importable URL."
+    "resolved_provider_handle": "de8480a9-c186-47a7-ad53-5d96664fd926",
+    "reason": "F01 was generated in the ChatGPT image-generation runtime and its registry UUID is not a Higgsfield media/job UUID or importable URL.",
+    "resolved_provider_reference_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3Ffje1lF8yBOo1lu9uOKR5RYhv6/hf_20260920_010232_de8480a9-c186-47a7-ad53-5d96664fd926.png",
+    "reference_proxy_job_id": "de8480a9-c186-47a7-ad53-5d96664fd926"
   },
   "queue": [
     {
@@ -21,65 +23,72 @@
     {
       "frame_id": "F02",
       "queue_position": 1,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F03",
       "queue_position": 2,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F04",
       "queue_position": 3,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F05",
       "queue_position": 4,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F06",
       "queue_position": 5,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F07",
       "queue_position": 6,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     },
     {
       "frame_id": "F08",
       "queue_position": 7,
-      "state": "WAITING_DEPENDENCY",
+      "state": "QUEUED",
       "dispatch": false,
       "provider": "HIGGSFIELD",
       "model": "cinematic_studio_2_5",
-      "reference_required": "F01"
+      "reference_required": "F01",
+      "release_condition": "PROVIDER_CONCURRENCY_AVAILABLE"
     }
   ],
   "state_machine": [
@@ -108,6 +117,12 @@
       "attempt": "HIGGSFIELD_BATCH_F02_F07",
       "result": "0/6 submitted",
       "reason": "Media input not found",
+      "provider": "HIGGSFIELD"
+    },
+    {
+      "attempt": "HIGGSFIELD_BATCH_F02_F07_RETRY",
+      "result": "0/6 submitted",
+      "reason": "Rate limit: max 1 concurrent job on current plan",
       "provider": "HIGGSFIELD"
     }
   ]
