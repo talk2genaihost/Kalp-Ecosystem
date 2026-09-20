@@ -64,3 +64,8 @@ F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F
 ## CMSE-010 — Production Execution
 
 `api/production.js` exposes the CMSE-010 orchestration boundary. The current demo runs in `PROVISIONAL_VISUAL_ASSET_EXECUTION` mode: F01 is independently generated; F02-F08 retain `DERIVED_FROM_STORYBOARD` provenance because of the current provider/UI generation limitation. The orchestrator preserves this lineage while planning eight shot jobs and routing context through CMSE-012/013/014/015.
+
+
+## CMSE-010.1 — Production Context Assembly
+
+`api/context.js` assembles deterministic `KALP-PRODUCTION-CONTEXT-PACKET-1.0` packets for all eight shot jobs. Packets combine canonical character locks, F01 reference lineage, world state, frame perspective, performance/action/dialogue, camera, audio/VFX state, hard continuity locks, and negative constraints. The bundle is the direct input boundary for CMSE-013 prompt compilation, CMSE-014 routing, and CMSE-015 scheduling.
