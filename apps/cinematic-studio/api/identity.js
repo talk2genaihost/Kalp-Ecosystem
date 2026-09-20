@@ -15,10 +15,11 @@ function validate(scene,registry,frameId){
 module.exports=async function handler(req,res){
   try{
     const registry=load("character-registry.json");
-    const scene=load("scene-contract.json");
+    const canonicalScene=load("scene-contract.json");
     if(req.method==="GET")return json(res,200,{ok:true,engine:"KALP-CSD-003.2",status:"READY",contract:"KALP-CSD-IDENTITY-VALIDATION-1.0",hard_gate:"Missing canonical visual lock blocks identity PASS."});
     if(req.method==="POST"){
       let body=req.body||{}; if(typeof body==="string")body=JSON.parse(body||"{}");
+      const scene=body.scene && Array.isArray(body.scene.frames) ? body.scene : canonicalScene;
       return json(res,200,validate(scene,registry,body.frame_id||"F01"));
     }
     res.setHeader("Allow","GET, POST"); return json(res,405,{ok:false,error:"Method not allowed"});
