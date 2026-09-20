@@ -4,7 +4,9 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -107,49 +109,14 @@ jobs:
           <!doctype html><meta http-equiv="refresh" content="0; url=./astro-rashi/" /><link rel="canonical" href="./astro-rashi/" /><title>Astro Rashi Dashboard</title>
           EOF
           touch /tmp/published-site/.nojekyll
-      - name: Publish static site to gh-pages
-        working-directory: repo
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euxo pipefail
-          rm -rf /tmp/deploy-repo
-          mkdir -p /tmp/deploy-repo
-          test -d /tmp/published-site
-          test -f /tmp/published-site/admanthan/admanthan_browser.py
-          test -f /tmp/published-site/market-to-revenue/index.html
-          cd /tmp/deploy-repo
-          git init --initial-branch=gh-pages
-          echo "Publication repository initialized"
-          cp -R /tmp/published-site/. .
-          echo "Published site copied"
-          test -f admanthan/admanthan_browser.py
-          grep -q 'VERSION = "0.8.9-semantic-production-fit"' admanthan/admanthan_browser.py
-          grep -q 'KALP_V089_SEMANTIC_INTEGRATED = True' admanthan/admanthan_browser.py
-          find . -type d -name '__pycache__' -prune -exec rm -rf {} +
-          find . -type f -name '*.pyc' -delete
-          test ! -d admanthan/__pycache__
-          test -z "$(find . -type f -name '*.pyc' -print -quit)"
-          python -m py_compile admanthan/admanthan_browser.py
-          rm -rf admanthan/__pycache__
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Deploy KALP Applications to GitHub Pages"
-          PUSHED_SHA="$(git rev-parse HEAD)"
-          echo "Prepared publication commit: $PUSHED_SHA"
-          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin gh-pages
-          echo "Force-push completed"
-          git fetch origin gh-pages
-          PUBLISHED_SHA="$(git rev-parse FETCH_HEAD)"
-          echo "Remote publication commit: $PUBLISHED_SHA"
-          test "$PUSHED_SHA" = "$PUBLISHED_SHA"
-          test "$(git show FETCH_HEAD:admanthan/admanthan_browser.py | grep -c 'VERSION = \"0.8.9-semantic-production-fit\"')" -ge 1
-          git show FETCH_HEAD:admanthan/admanthan_browser.py | grep -q 'KALP_V089_SEMANTIC_INTEGRATED = True'
-          test -z "$(git ls-tree -r --name-only FETCH_HEAD | grep -E '(^|/)(__pycache__/|[^/]+\.pyc$)' || true)"
-          git show FETCH_HEAD:admanthan/admanthan_browser.py > /tmp/published-admanthan-browser.py
-          python -m py_compile /tmp/published-admanthan-browser.py
-          rm -f /tmp/published-admanthan-browser.py
-          echo "gh-pages AdManthan v0.8.9 read-back verification: PASS"
-          echo "Published gh-pages commit: $PUBLISHED_SHA"
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload KALP Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: /tmp/published-site
+
+      - name: Deploy KALP Ecosystem to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
