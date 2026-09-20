@@ -49,3 +49,8 @@ Runtime endpoint: `POST /api/identity`
 - Visual presence is intentionally separate from canonical identity match.
 
 F01 real-visual evidence is recorded in `data/csd-003-2-f01-validation.json` with asset id `5234a294-ed5a-4dfc-a048-54fe84b6d537`.
+
+
+### CSD-003.2A — Canonical Visual Lock Registration
+
+Registered existing canonical identity artifacts for `RAM_001` and `RAVAN_001` in `data/canonical-visual-locks.json` and attached the lock identifiers to `data/character-registry.json`. F01 CSD-003.2 validation now returns `PASS`, `trusted_reference: true`, and `downstream_propagation: ELIGIBLE` after lock coverage completion.
