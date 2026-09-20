@@ -1,0 +1,126 @@
+{
+  "schema_version":"KALP-CSD-010-ADAPTIVE-MULTI-CHARACTER-SCENE-ORCHESTRATOR-1.0",
+  "engine_id":"KALP-CSD-010",
+  "engine_name":"Adaptive Multi-Character Scene Orchestrator",
+  "status":"LOCKED",
+  "purpose":"Coordinate CSD-005 through CSD-009 as one dependency-aware scene intelligence pipeline and determine when a multi-character scene is ready for CSD-002 storyboard production.",
+  "core_principle":"The orchestrator selects and orders intelligence work from scene requirements; downstream modules never bypass their required upstream state.",
+  "orchestration_graph":{
+    "CSD-005":"SCENE_INTELLIGENCE",
+    "CSD-006":"EMOTIONAL_CONTINUITY",
+    "CSD-007":"KNOWLEDGE_BELIEF_INFORMATION",
+    "CSD-008":"PERSPECTIVE_PERCEPTION",
+    "CSD-009":"PERCEPTION_VALIDATION",
+    "CSD-002":"EIGHT_FRAME_DIRECTOR"
+  },
+  "dependency_graph":[
+    {"from":"INPUT","to":"CSD-005","requires":[]},
+    {"from":"CSD-005","to":"CSD-006","requires":["character_selection","scene_intelligence"]},
+    {"from":"CSD-005","to":"CSD-007","requires":["character_selection","scene_intelligence"]},
+    {"from":"CSD-006","to":"CSD-008","requires":["emotional_state"]},
+    {"from":"CSD-007","to":"CSD-008","requires":["knowledge_state"]},
+    {"from":"CSD-005","to":"CSD-008","requires":["objective","relationship_state"]},
+    {"from":"CSD-008","to":"CSD-009","requires":["perception_state"]},
+    {"from":"CSD-006","to":"CSD-009","requires":["emotional_state"]},
+    {"from":"CSD-007","to":"CSD-009","requires":["knowledge_state"]},
+    {"from":"CSD-009","to":"CSD-002","requires":["validated_perception"]}
+  ],
+  "adaptive_policy":{
+    "principle":"Run every mandatory gate, but adapt optional work according to scene complexity and detected state changes.",
+    "complexity_signals":{
+      "character_count":"1-5",
+      "relationship_density":"LOW|MEDIUM|HIGH",
+      "knowledge_conflict":"NONE|LOW|HIGH",
+      "emotional_transition":"NONE|LOW|HIGH",
+      "perspective_count":"1|MULTIPLE",
+      "audience_information_complexity":"LOW|HIGH",
+      "continuity_risk":"LOW|MEDIUM|HIGH"
+    },
+    "adaptive_actions":{
+      "single_character_low_complexity":"CSD-005 may use simplified relationship resolution while CSD-006 through CSD-009 remain validation-capable.",
+      "high_relationship_density":"prioritize CSD-005 relationship and power analysis before state propagation.",
+      "high_emotional_transition":"force full CSD-006 resolution before perception.",
+      "high_knowledge_conflict":"force full CSD-007 reconciliation and contradiction tracking.",
+      "multiple_perspectives":"require full CSD-008 and CSD-009 differentiation validation.",
+      "high_continuity_risk":"require explicit continuity checks before CSD-009 promotion."
+    }
+  },
+  "execution_policy":[
+    "Validate 1–5 registered active characters before orchestration.",
+    "Resolve CSD-005 before downstream state modules.",
+    "CSD-006 and CSD-007 may execute independently after CSD-005 when their inputs are available.",
+    "CSD-008 cannot execute until emotional and knowledge states are resolved.",
+    "CSD-009 cannot execute until perception plus upstream emotional/knowledge states are available.",
+    "Any BLOCKER short-circuits downstream production promotion.",
+    "Rework returns to the earliest failed causal layer rather than regenerating the entire scene blindly.",
+    "Advisories may proceed but remain attached to the production handoff.",
+    "CSD-002 receives one consolidated orchestration package, not disconnected module outputs.",
+    "Identity locks remain immutable throughout orchestration."
+  ],
+  "rework_router":{
+    "CSD-005":"REWORK_SCENE_INTELLIGENCE",
+    "CSD-006":"REWORK_EMOTIONAL_CONTINUITY",
+    "CSD-007":"REWORK_KNOWLEDGE_STATE",
+    "CSD-008":"REWORK_PERCEPTION",
+    "CSD-009":"REWORK_PERCEPTION_VALIDATION",
+    "default":"REWORK_FROM_FIRST_FAILED_DEPENDENCY"
+  },
+  "orchestration_output":{
+    "orchestration_id":"stable run identifier",
+    "scene_id":"canonical scene ID",
+    "execution_plan":"ordered module execution with dependencies",
+    "complexity_profile":"detected scene complexity",
+    "module_states":"READY|RUNNING|PASS|ADVISORY|BLOCKED|REWORK",
+    "consolidated_scene_state":"merged validated state",
+    "handoff":"CSD-002 package",
+    "production_readiness":"READY_FOR_CSD002|REWORK_REQUIRED|BLOCKED"
+  },
+  "validation":{
+    "hard_failures":[
+      "active_character_count_above_5",
+      "unknown_character",
+      "missing_required_dependency",
+      "downstream_module_bypassed",
+      "identity_lock_mutation",
+      "blocked_gate_promoted",
+      "inconsistent_scene_id_across_modules"
+    ],
+    "pass_conditions":[
+      "dependency order satisfied",
+      "all mandatory gates resolved",
+      "no blocker remains",
+      "consolidated state is internally consistent",
+      "CSD-002 handoff complete"
+    ]
+  },
+  "demo_test":{
+    "orchestration_id":"CSD10-RAMAYANA-DEMO-001",
+    "scene_id":"CSD5-RAMAYANA-DEMO-001",
+    "active_characters":["RAM_001","RAVAN_001","HANUMAN_001"],
+    "complexity_profile":{
+      "character_count":3,
+      "relationship_density":"HIGH",
+      "knowledge_conflict":"MEDIUM",
+      "emotional_transition":"HIGH",
+      "perspective_count":"MULTIPLE",
+      "audience_information_complexity":"MEDIUM",
+      "continuity_risk":"MEDIUM"
+    },
+    "execution_plan":[
+      {"step":1,"module":"CSD-005","state":"PASS"},
+      {"step":2,"module":"CSD-006","state":"PASS","depends_on":["CSD-005"]},
+      {"step":3,"module":"CSD-007","state":"PASS","depends_on":["CSD-005"]},
+      {"step":4,"module":"CSD-008","state":"PASS","depends_on":["CSD-005","CSD-006","CSD-007"]},
+      {"step":5,"module":"CSD-009","state":"PASS","depends_on":["CSD-006","CSD-007","CSD-008"]},
+      {"step":6,"module":"CSD-002","state":"READY","depends_on":["CSD-009"]}
+    ],
+    "rework_example":{
+      "failure":"CSD-009 detects unknown-information leak in RAVAN_001 perspective",
+      "router":"CSD-008",
+      "action":"recalculate perception using CSD-007 information boundary",
+      "then":"rerun CSD-009 only; do not discard valid CSD-005/CSD-006/CSD-007 state"
+    },
+    "production_readiness":"READY_FOR_CSD002"
+  },
+  "downstream":["CSD-002-8-FRAME-DIRECTOR","CSD-003-PERSPECTIVE-TO-VISUAL-GENERATION","CMSE-010-PRODUCTION-EXECUTION"]
+}
