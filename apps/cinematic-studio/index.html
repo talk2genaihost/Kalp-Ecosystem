@@ -34,7 +34,7 @@
 <section><div class="head"><div class="headrow"><div><div class="ey">KALP CINEMATIC CONTROL TOWER</div><div class="title">CSD-002 — 8-Frame Perspective Storyboard Engine</div><div class="muted">Every frame owns its perspective, camera language, emotional state, action, dialogue and continuity contract.</div></div><div class="pills"><span class="pill">Create</span><span class="pill">8 Frames</span></div></div></div><div class="frames" id="frames"></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">SCENE VALIDATION</div><div class="checks" id="checks"></div></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">PRODUCTION PIPELINE</div><div class="flow"><div class="node"><b>CSD-002</b><small>Storyboard</small></div>→<div class="node"><b>CSD-003</b><small>Visual Gen</small></div>→<div class="node"><b>CMSE-012</b><small>Context</small></div>→<div class="node"><b>CMSE-013</b><small>Compile</small></div>→<div class="node"><b>CMSE-014</b><small>Route</small></div>→<div class="node"><b>CMSE-015</b><small>Schedule</small></div>→<div class="node"><b>QA</b><small>Quality</small></div>→<div class="node"><b>FINAL</b><small>Render</small></div></div></div></section>
-<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">READY TO COMPILE</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div><div class="kv" style="margin-top:7px"><div><small>JOB</small><strong id="visualJobId">Not created</strong></div><div><small>TYPE</small><strong id="visualType">IMAGE</strong></div><div><small>CAMERA</small><strong id="visualCamera">—</strong></div><div><small>FORMAT</small><strong id="visualFormat">16:9 · Provider-neutral</strong></div></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY / LOOK</div><div class="muted" id="identityStatus">NOT VALIDATED</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div><div class="muted" id="identityLook" style="font-size:9px;margin-top:6px"></div></div><button class="secondary" id="identity">◉ Validate Identity</button><button class="secondary" id="identityLock">🔒 Lock Identity / Look</button><button class="secondary" id="regen">↻ Compile Visual Job</button><button class="secondary" id="compileAll">⧉ Compile All 8 Visual Jobs</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">DIALOGUE / VOICE / PERFORMANCE</div><div class="muted" id="dialogueDetail">No dialogue selected.</div></div><button class="secondary" id="analyze">✦ Gemini Intelligence Analysis</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">LIVE BACKEND · KALP INTELLIGENCE GATEWAY</div><div class="muted" id="analysisStatus">Not requested</div><div class="muted" id="analysisMeta" style="font-size:9px;margin-top:4px"></div></div><div class="workflow"><b id="workflowState">DRAFT · Generate storyboard to begin approval</b><small id="workflowMeta">Production is gated until storyboard approval.</small></div><button class="primary" id="approve" disabled>✓ Approve Storyboard</button><button class="secondary" id="prod" disabled>▶ Send to Production</button></aside>
+<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">READY TO COMPILE</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div><div class="kv" style="margin-top:7px"><div><small>JOB</small><strong id="visualJobId">Not created</strong></div><div><small>TYPE</small><strong id="visualType">IMAGE</strong></div><div><small>CAMERA</small><strong id="visualCamera">—</strong></div><div><small>FORMAT</small><strong id="visualFormat">16:9 · Provider-neutral</strong></div></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY / LOOK</div><div class="muted" id="identityStatus">NOT VALIDATED</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div><div class="muted" id="identityLook" style="font-size:9px;margin-top:6px"></div></div><button class="secondary" id="identity">◉ Validate Identity</button><button class="secondary" id="identityLock">🔒 Lock Identity / Look</button><button class="secondary" id="regen">↻ Compile Visual Job</button><button class="secondary" id="compileAll">⧉ Compile All 8 Visual Jobs</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">DIALOGUE / VOICE / PERFORMANCE</div><div class="muted" id="dialogueDetail">No dialogue selected.</div></div><button class="secondary" id="analyze">✦ Gemini Intelligence Analysis</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">LIVE BACKEND · KALP INTELLIGENCE GATEWAY</div><div class="muted" id="analysisStatus">Not requested</div><div class="muted" id="analysisMeta" style="font-size:9px;margin-top:4px"></div></div><div class="workflow"><b id="workflowState">DRAFT · Generate storyboard to begin approval</b><small id="workflowMeta">Production is gated until storyboard approval.</small></div><button class="primary" id="approve" disabled>✓ Approve Storyboard</button><button class="secondary" id="prod" disabled>⬇ Export 8 Scenes JSON</button></aside>
 </main><section class="view" data-view="characters"><div class="appview">
 <div class="viewhead"><div class="ey">CHARACTER REGISTRY</div><div class="title">Canonical Characters</div><div class="muted">Browse the active registry without leaving the Cinematic Studio.</div></div>
 <div class="viewgrid"><div class="viewcard"><h3 id="charCount">Registry</h3><p>Canonical identity, status and visual-lock state.</p><button class="actionlink" data-nav="create">Open Scene Director</button></div><div class="viewcard"><h3>Scene Constraint</h3><p>Maximum 5 active characters per scene.</p><p id="charSceneState">Loading scene state…</p></div></div>
@@ -71,9 +71,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('.intel-tab');if(
 function updateWorkflow(){
   const approve=document.getElementById('approve'), prod=document.getElementById('prod');
   approve.disabled=!storyboardGenerated||storyboardApproved;
-  prod.disabled=!storyboardApproved;
-  document.getElementById('workflowState').textContent=storyboardApproved?'APPROVED · READY FOR PRODUCTION':storyboardGenerated?'GENERATED · AWAITING APPROVAL':'DRAFT · Generate storyboard to begin approval';
-  document.getElementById('workflowMeta').textContent=storyboardApproved?'Select Provider to compile production jobs.':storyboardGenerated?'Review the 8 frames, then approve the storyboard.':'Production is gated until storyboard approval.';
+  prod.disabled=!storyboardGenerated;
+  document.getElementById('workflowState').textContent=storyboardApproved?'APPROVED · READY TO EXPORT':storyboardGenerated?'GENERATED · READY TO EXPORT':'DRAFT · Generate storyboard to begin';
+  document.getElementById('workflowMeta').textContent=storyboardGenerated?'Export the simple 8-scene JSON for Gemini Studio or YouTube Create.':'Generate the storyboard first.';
 }
 
 function toast(s){const x=document.getElementById('toast');x.textContent=s;x.className='toast show';setTimeout(()=>x.className='toast',1800)}
@@ -334,15 +334,32 @@ document.getElementById('analyze').onclick=async()=>{ if(executionMode!=='gemini
     toast('Gemini backend request failed.');
   }
 };
-document.getElementById('approve').onclick=()=>{if(!storyboardGenerated)return toast('Generate the storyboard first.');storyboardApproved=true;updateWorkflow();toast('Storyboard APPROVED · ready for production.');};
-document.getElementById('prod').onclick=async()=>{
-  if(!storyboardApproved){toast('Approve the storyboard before production.');return;}
-  if(scene.frames.some(f=>!visualJobs[f.frame_id])){toast('Compile all 8 CSD-003 visual jobs before production.');return;}
-  const productionPackage={contract:'KALP-PRODUCTION-PACKAGE-1.0',created_at:new Date().toISOString(),source:'KALP Cinematic Studio',status:'APPROVED',scene_id:scene.scene_id,scene_title:scene.scene_title,objective:scene.objective,selected_characters:selected,frames:scene.frames.map(f=>({...f,visual_job:visualJobs[f.frame_id]||null,identity_lock:identityLocked[f.frame_id]||false,identity_look:{characters:[...selected],canonical:true},dialogue_contract:{line:f.dialogue||null,speaker:f.perspective==='SHARED'?'SHARED':charById(f.perspective)?.display_name||f.perspective,delivery:f.delivery||'emotion-led conversational performance',voice_persona:f.voice_persona||'canonical character voice persona'}})),visual_jobs:Object.values(visualJobs),shot_count:scene.frames.length,render_strategy:'ONE_RENDER_JOB_PER_STORYBOARD_FRAME',render_defaults:{target:'gemini',aspect_ratio:'16:9',output:'video'},governance:{identity:'canonical',continuity:'locked',approval:'APPROVED'}};
-  localStorage.setItem('KALP_PRODUCTION_PACKAGE',JSON.stringify(productionPackage));
-  toast('Approved story sent to KALP Production Control Tower.');
-  setTimeout(()=>{location.href='../production/?v=1';},250);
-};
+document.getElementById('approve').onclick=()=>{if(!storyboardGenerated)return toast('Generate the storyboard first.');storyboardApproved=true;updateWorkflow();toast('Storyboard APPROVED · ready to export.');};
+function exportSimpleStoryboardJSON(){
+  if(!storyboardGenerated || !scene?.frames?.length){toast('Generate the 8-scene storyboard first.');return;}
+  const payload={
+    title:scene.scene_title||document.getElementById('title').value.trim(),
+    format:'16:9',
+    scenes:scene.frames.slice(0,8).map((f,i)=>({
+      scene:i+1,
+      title:f.title||('Scene '+(i+1)),
+      description:f.purpose||f.action||'',
+      visual:f.action||'',
+      camera:f.camera||'',
+      emotion:f.emotion||'',
+      action:f.action||'',
+      dialogue:f.dialogue||'',
+      sound:f.sound||''
+    }))
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  const safe=(payload.title||'KALP-Storyboard').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase();
+  a.href=url;a.download=(safe||'kalp-storyboard')+'-8-scenes.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('Simple 8-scene JSON exported — ready for Gemini Studio or YouTube Create.');
+}
+document.getElementById('prod').onclick=exportSimpleStoryboardJSON;
 document.getElementById('reset').onclick=async()=>{
   try{
     scene=await api('/api/cinematic');
