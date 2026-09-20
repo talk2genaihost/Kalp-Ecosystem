@@ -11,9 +11,10 @@
 <section><div class="head"><div class="headrow"><div><div class="ey">KALP CINEMATIC CONTROL TOWER</div><div class="title">CSD-002 — 8-Frame Perspective Storyboard Engine</div><div class="muted">Every frame owns its perspective, camera language, emotional state, action, dialogue and continuity contract.</div></div><div class="pills"><span class="pill">Create</span><span class="pill">8 Frames</span></div></div></div><div class="frames" id="frames"></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">SCENE VALIDATION</div><div class="checks" id="checks"></div></div>
 <div class="panel bar" style="margin-top:10px"><div class="ey">PRODUCTION PIPELINE</div><div class="flow"><div class="node"><b>CSD-002</b><small>Storyboard</small></div>→<div class="node"><b>CSD-003</b><small>Visual Gen</small></div>→<div class="node"><b>CMSE-012</b><small>Context</small></div>→<div class="node"><b>CMSE-013</b><small>Compile</small></div>→<div class="node"><b>CMSE-014</b><small>Route</small></div>→<div class="node"><b>CMSE-015</b><small>Schedule</small></div>→<div class="node"><b>QA</b><small>Quality</small></div>→<div class="node"><b>FINAL</b><small>Render</small></div></div></div></section>
-<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">Not compiled</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY LOCK</div><div class="muted" id="identityStatus">Not validated</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div></div><button class="secondary" id="identity">◉ Validate Identity Lock</button><button class="secondary" id="regen">↻ Compile Visual Job</button><button class="primary" id="approve">✓ Approve Storyboard</button><button class="secondary" id="prod">▶ Send to Production</button></aside>
+<aside class="panel inspect"><div class="ey">FRAME INSPECTOR</div><div class="title" id="it">FRAME 01 — THE TEST BEGINS</div><div class="preview" id="preview"></div><div class="field"><label>PERSPECTIVE</label><select id="pers"><option>Audience</option><option>Shiva</option><option>Ram</option><option>Ravan</option><option>Shared</option></select></div><div class="kv"><div><small>PURPOSE</small><strong id="purpose"></strong></div><div><small>EMOTION</small><strong id="emotion"></strong></div><div><small>ACTION</small><strong id="action"></strong></div><div><small>DIALOGUE</small><strong id="dialogue"></strong></div><div><small>CAMERA</small><strong id="camera"></strong></div><div><small>CONTINUITY</small><strong>Identity + world locked</strong></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003 VISUAL JOB</div><div class="muted" id="visualStatus">Not compiled</div><div class="muted" id="visualMeta" style="font-size:9px;margin-top:4px"></div></div><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">CSD-003.2 IDENTITY LOCK</div><div class="muted" id="identityStatus">Not validated</div><div class="muted" id="identityMeta" style="font-size:9px;margin-top:4px"></div></div><button class="secondary" id="identity">◉ Validate Identity Lock</button><button class="secondary" id="regen">↻ Compile Visual Job</button><button class="secondary" id="analyze">✦ Gemini Intelligence Analysis</button><div class="panel" style="padding:9px;margin-top:7px;background:#07131d"><div class="ey">LIVE BACKEND · KALP INTELLIGENCE GATEWAY</div><div class="muted" id="analysisStatus">Not requested</div><div class="muted" id="analysisMeta" style="font-size:9px;margin-top:4px"></div></div><button class="primary" id="approve">✓ Approve Storyboard</button><button class="secondary" id="prod">▶ Send to Production</button></aside>
 </main><div class="toast" id="toast"></div>
 <script>
+const KALP_BACKEND = { endpoint: "https://cfwrgalgscieddkcrtde.supabase.co/functions/v1/kalp-intelligence-gateway", authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmd3JnYWxnc2NpZWRka2NydGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDQyNzYsImV4cCI6MjEwNDE4MDI3Nn0.TwAdY3JdepMp5IFmmogcXJI4VyhN9Yx5iLxqQG7wqrw" };
 const KALP_INTELLIGENCE_ALIGNMENT = {
   inspiration: { provider: "MCP", context: "1.5B-token inspiration/design repository", role: "retrieval" },
   reasoning: { provider: "Gemini Free", modes: ["ANALYSIS","EXECUTION"], role: "analysis and execution intelligence" },
@@ -136,6 +137,31 @@ document.getElementById('regen').onclick=async()=>{
     document.getElementById('visualStatus').textContent='READY · GITHUB TEST JOB';
     document.getElementById('visualMeta').textContent='Perspective locked · 16:9 · IMAGE · Provider-neutral · static validation mode';
     toast('GitHub test mode: visual job compiled locally.');
+  }
+};
+document.getElementById('analyze').onclick=async()=>{
+  const f=scene.frames[active];
+  const prompt={
+    task:'KALP Cinematic Studio scene intelligence analysis',
+    scene:{scene_id:scene.scene_id,title:scene.scene_title,objective:scene.objective,selected_characters:selected},
+    frame:{frame_id:f.frame_id,title:f.title,perspective:f.perspective,purpose:f.purpose,emotion:f.emotion,action:f.action,dialogue:f.dialogue,camera:f.camera},
+    canonical_rule:'KALP canonical identity and continuity are authoritative. Do not invent missing character facts.',
+    requested_output:['production risks','continuity observations','visual direction','provider-neutral execution notes']
+  };
+  document.getElementById('analysisStatus').textContent='RUNNING · Gemini backend';
+  document.getElementById('analysisMeta').textContent='Supabase Edge Function · KALP Intelligence Gateway';
+  try{
+    const r=await fetch(KALP_BACKEND.endpoint,{method:'POST',headers:{'content-type':'application/json','apikey':KALP_BACKEND.authorization,'Authorization':'Bearer '+KALP_BACKEND.authorization},body:JSON.stringify({provider:'gemini',prompt:JSON.stringify(prompt)})});
+    const j=await r.json();
+    if(!r.ok||j.status!=='COMPLETED') throw new Error(j.message||j.error||'Backend analysis failed');
+    const out=String(j.output||'').replace(/\\s+/g,' ').trim();
+    document.getElementById('analysisStatus').textContent='COMPLETED · '+j.model;
+    document.getElementById('analysisMeta').textContent=out.slice(0,700)+(out.length>700?'…':'');
+    toast('Gemini analysis completed through KALP backend.');
+  }catch(e){
+    document.getElementById('analysisStatus').textContent='BACKEND ERROR';
+    document.getElementById('analysisMeta').textContent=e.message;
+    toast('Gemini backend request failed.');
   }
 };
 document.getElementById('approve').onclick=()=>{toast('Storyboard approval recorded. Identity lock status remains authoritative.');};
