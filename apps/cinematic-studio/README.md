@@ -79,3 +79,8 @@ F01 is the trusted reference after CSD-003.2. `POST /api/propagation` compiles F
 ## CMSE-010.3 — Provider Capability & Production Routing
 
 `api/routing.js` exposes provider-neutral routing decisions. `provider-capability-registry.json` declares capabilities and execution constraints; `cmse-010-3-routing-plan.json` creates QUALITY_FIRST candidate routes for F01-F08. Routing requires a current adapter health check before dispatch and will not weaken hard continuity locks to accommodate provider limitations.
+
+
+## CMSE-010.4 — Provider Job Specification & Translation
+
+`api/job-spec.js` translates all eight KALP-PIR-1.0 records into `KALP-PROVIDER-JOB-SPECIFICATION-1.0` contracts. Each job carries provider candidates, F01 reference lineage, positive/negative prompt semantics, hard locks, output requirements, retry/fallback policy and adapter-defined parameters. Provider model names and unsupported parameters are intentionally unresolved until adapter health/capability resolution.
