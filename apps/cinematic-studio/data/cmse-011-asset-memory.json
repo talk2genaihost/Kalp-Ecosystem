@@ -1,0 +1,94 @@
+{
+  "schema_version":"KALP-CMSE-011-ASSET-MEMORY-VERSIONING-CONTINUITY-1.0",
+  "engine_id":"CMSE-011",
+  "engine_name":"Production Asset Memory, Versioning & Continuity Registry",
+  "status":"LOCKED",
+  "purpose":"Persist validated cinematic production outputs as traceable, versioned assets with canonical/derived classification and continuity relationships.",
+  "core_principle":"Asset memory records what was produced, how it was produced, what it derives from, and where it may safely be reused; it never silently changes canonical identity.",
+  "inputs":["CMSE-010 validated execution results","CSD-009 validation lineage","CMSE-013/014/015 production lineage"],
+  "outputs":["asset_record","version_record","continuity_links","reference_handles","retrieval_metadata","master_candidate_state"],
+  "asset_classes":[
+    "CANONICAL_TRUSTED_REFERENCE",
+    "MASTER_ASSET",
+    "DERIVED_ASSET",
+    "PROVIDER_VARIANT",
+    "PREVIEW_ASSET",
+    "FAILED_ASSET",
+    "REJECTED_ASSET"
+  ],
+  "versioning_rules":[
+    "Every accepted asset receives immutable asset_id and version_id.",
+    "A new production result creates a new version; it never overwrites an existing asset.",
+    "Canonical trusted references are immutable.",
+    "Provider variants remain linked to their source master/canonical reference.",
+    "Rejected or failed assets remain auditable but cannot become MASTER.",
+    "Version lineage must include execution_job_id, route_fingerprint and translation/assembly lineage.",
+    "Master promotion requires validation PASS or explicitly governed PASS_WITH_ADVISORIES.",
+    "Promotion cannot mutate source files or prior versions."
+  ],
+  "continuity_model":{
+    "link_types":[
+      "SAME_CHARACTER",
+      "SAME_SCENE",
+      "SAME_WORLD_LOCATION",
+      "TEMPORAL_PREDECESSOR",
+      "TEMPORAL_SUCCESSOR",
+      "REFERENCE_SOURCE",
+      "COMPOSITION_REFERENCE",
+      "COSTUME_CONTINUITY",
+      "PROP_CONTINUITY",
+      "EMOTIONAL_STATE_CONTINUITY",
+      "PERSPECTIVE_CONTINUITY",
+      "PROVIDER_VARIANT_OF"
+    ],
+    "rules":[
+      "Continuity links are explicit and directional where chronology matters.",
+      "A derived asset cannot become a reference source without explicit promotion.",
+      "Reference lineage must identify immutable versus derived sources.",
+      "Continuity retrieval must respect narrative timestamp and scene state.",
+      "Identity continuity outranks stylistic similarity.",
+      "A visually similar asset is not automatically a continuity match."
+    ]
+  },
+  "retrieval_contract":{
+    "required_filters":["asset_class","character_ids","scene_id","frame_id","story_arc_id"],
+    "optional_filters":["world_location","temporal_state","version","provider_id","model_id","continuity_link_type","validation_status"],
+    "ranking_principle":"Constraint-compatible lineage first; similarity second.",
+    "never_return_as_master":["FAILED_ASSET","REJECTED_ASSET","unvalidated output"]
+  },
+  "master_promotion":{
+    "states":["CANDIDATE","VALIDATED","MASTER","SUPERSEDED","REJECTED"],
+    "requirements":["terminal_provider_success","asset_presence","identity_validation","continuity_validation","source_lineage"],
+    "supersession":"A newer approved master may supersede an older master without deleting it."
+  },
+  "validation":{
+    "hard_failures":[
+      "EXECUTION_RESULT_MISSING",
+      "TERMINAL_SUCCESS_MISSING",
+      "ASSET_LOCATION_MISSING",
+      "SOURCE_LINEAGE_MISSING",
+      "ASSET_ID_COLLISION",
+      "VERSION_ID_COLLISION",
+      "INVALID_MASTER_PROMOTION",
+      "INVALID_CONTINUITY_LINK",
+      "IMMUTABLE_REFERENCE_MUTATION"
+    ],
+    "pass_conditions":[
+      "asset record persisted",
+      "version lineage complete",
+      "asset class assigned",
+      "continuity links explicit",
+      "retrieval metadata emitted",
+      "master state governed by validation"
+    ]
+  },
+  "demo_test":{
+    "scene_id":"CMSE11-RAMAYANA-DEMO-001",
+    "frame_id":"F01",
+    "source_execution":"CMSE-010",
+    "asset_class":"MASTER_ASSET",
+    "canonical_reference_policy":"F01 canonical trusted reference remains immutable; provider output is a provider variant unless explicitly promoted.",
+    "result":"REGISTERED"
+  },
+  "downstream":["CMSE-012-INTELLIGENT-PRODUCTION-RETRIEVAL","CSD-002-CONTINUITY","CSD-003-VISUAL-GENERATION","ASSET-REGISTRY"]
+}
