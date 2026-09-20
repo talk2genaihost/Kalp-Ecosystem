@@ -12,32 +12,88 @@ function load(name){
   return JSON.parse(fs.readFileSync(file,"utf8"));
 }
 function generateFrames(ids,title,objective){
+  const text=(String(title||"")+" "+String(objective||"")).trim();
+  const lower=text.toLowerCase();
   const has=id=>ids.includes(id);
-  const meeting=has("RAM_001")&&has("HANUMAN_001")&&/(meet|meeting|encounter|milte|milan|भेंट|मिलन|मुलाकात|हनुमान|hanuman)/i.test(objective+" "+title);
-  if(meeting){
+  const name=id=>({RAM_001:"Ram",HANUMAN_001:"Hanuman",SITA_001:"Sita",LAKSHMAN_001:"Lakshman",RAVAN_001:"Ravan",SHIVA_001:"Shiva"}[id]||id);
+  const names=ids.map(name);
+  const isMeeting=/(meet|meeting|encounter|first meeting|mil|भेंट|मिलन|मुलाकात|पहली मुलाकात)/i.test(text);
+  const isChallenge=/(challenge|challeng|test|power|युद्ध|चुनौती|परीक्षा|शक्ति)/i.test(text);
+  const isDialogue=/(dialogue|conversation|talk|speaks|says|बात|संवाद|कहता|कहती|पूछ)/i.test(text);
+  const pair=has("RAM_001")&&has("HANUMAN_001");
+  const pair2=has("RAM_001")&&has("SITA_001");
+  const pair3=has("SHIVA_001")&&has("RAVAN_001");
+
+  if(pair&&isMeeting){
     return [
-      {frame_id:"F01",title:"The Encounter",perspective:"AUDIENCE",purpose:"Establish Ram and Hanuman meeting for the first time.",emotion:"Anticipation",action:"Ram and Hanuman see each other across the forest path.",dialogue:null,camera:"35mm extreme wide, slow push-in"},
-      {frame_id:"F02",title:"Hanuman Recognizes Ram",perspective:"HANUMAN_001",purpose:"Reveal Hanuman's first-person perception of Ram.",emotion:"Recognition → Devotion",action:"Hanuman pauses, studies Ram and respectfully approaches.",dialogue:"आप कौन हैं, प्रभु?",camera:"85mm close-up, gentle push-in"},
-      {frame_id:"F03",title:"Ram Sees Hanuman",perspective:"RAM_001",purpose:"Show Ram's perception of Hanuman's sincerity and strength.",emotion:"Curiosity → Trust",action:"Ram looks into Hanuman's eyes and welcomes him.",dialogue:"तुम्हारे शब्दों में सच्चाई है।",camera:"50mm Ram OTS"},
-      {frame_id:"F04",title:"The Introduction",perspective:"SHARED",purpose:"Establish the first direct exchange between Ram and Hanuman.",emotion:"Warmth",action:"Hanuman introduces himself while Ram listens.",dialogue:"मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।",camera:"50mm two-shot, slow lateral dolly"},
-      {frame_id:"F05",title:"A Bond Begins",perspective:"HANUMAN_001",purpose:"Show the emotional beginning of their bond.",emotion:"Devotion → Resolve",action:"Hanuman bows; Ram raises him with affection.",dialogue:"उठो हनुमान। आज से हम साथ हैं।",camera:"65mm intimate medium shot"},
-      {frame_id:"F06",title:"The Mission",perspective:"RAM_001",purpose:"Connect the meeting to the larger mission.",emotion:"Purpose",action:"Ram explains that Sita must be found.",dialogue:"हमें सीता की खोज करनी है।",camera:"50mm over-shoulder"},
-      {frame_id:"F07",title:"Hanuman's Vow",perspective:"HANUMAN_001",purpose:"Establish Hanuman's commitment to Ram.",emotion:"Absolute Devotion",action:"Hanuman accepts the mission with unwavering confidence.",dialogue:"प्रभु, आपका कार्य ही मेरा जीवन है।",camera:"35mm low-angle hero push-in"},
-      {frame_id:"F08",title:"The Journey Begins",perspective:"AUDIENCE",purpose:"Pay off the meeting and launch the next story movement.",emotion:"Hope → Determination",action:"Ram and Hanuman walk together into the forest.",dialogue:"चलो, हनुमान।",camera:"35mm wide, slow pull-back"}
+      ["The Encounter","AUDIENCE","Establish the first meeting.","Anticipation","Ram and Hanuman see each other across the forest path.","", "35mm extreme wide, slow push-in"],
+      ["Hanuman Recognizes Ram","HANUMAN_001","Reveal Hanuman's recognition.","Recognition → Devotion","Hanuman pauses, studies Ram and respectfully approaches.","आप कौन हैं, प्रभु?","85mm close-up, gentle push-in"],
+      ["Ram Sees Hanuman","RAM_001","Show Ram recognizing Hanuman's sincerity.","Curiosity → Trust","Ram looks into Hanuman's eyes and welcomes him.","तुम्हारे शब्दों में सच्चाई है।","50mm over-shoulder"],
+      ["The Introduction","SHARED","Establish their first direct exchange.","Warmth","Hanuman introduces himself while Ram listens.","मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।","50mm two-shot, slow lateral dolly"],
+      ["A Bond Begins","HANUMAN_001","Show the emotional beginning of their bond.","Devotion → Resolve","Hanuman bows; Ram raises him with affection.","उठो हनुमान। आज से हम साथ हैं।","65mm intimate medium shot"],
+      ["The Mission","RAM_001","Connect the meeting to the larger mission.","Purpose","Ram explains that Sita must be found.","हमें सीता की खोज करनी है।","50mm over-shoulder"],
+      ["Hanuman's Vow","HANUMAN_001","Establish Hanuman's commitment.","Absolute Devotion","Hanuman accepts the mission with unwavering confidence.","प्रभु, आपका कार्य ही मेरा जीवन है।","35mm low-angle hero push-in"],
+      ["The Journey Begins","AUDIENCE","Launch the next story movement.","Hope → Determination","Ram and Hanuman walk together into the forest.","चलो, हनुमान।","35mm wide, slow pull-back"]
     ];
   }
-  const names=ids.map(id=>id.replace("_001","")).join(" and ");
-  return Array.from({length:8},(_,i)=>({
-    frame_id:"F0"+(i+1),
-    title:["Establishing the Scene","First Perception","Character Response","The Exchange","Rising Purpose","Decision","Commitment","The Next Move"][i],
-    perspective:i===0||i===7?"AUDIENCE":ids[i%ids.length],
-    purpose:"Advance the scene described by the creator.",
-    emotion:["Anticipation","Awareness","Curiosity","Connection","Tension","Decision","Resolve","Determination"][i],
-    action:i===0?names+" enter the scene.":i===7?names+" move into the next story beat.":names+" respond to the developing situation.",
-    dialogue:null,
-    camera:["35mm extreme wide","85mm close-up","50mm OTS","50mm two-shot","65mm medium","35mm low angle","50mm push-in","35mm wide pull-back"][i]
+
+  if(pair2&&isMeeting){
+    return [
+      ["The Garden","AUDIENCE","Establish the peaceful Mithila garden.","Serenity","Ram enters the garden while Sita is nearby.","","35mm wide establishing shot"],
+      ["Sita Notices Ram","SITA_001","Show Sita's first perception of Ram.","Curiosity → Wonder","Sita looks toward Ram and pauses.","","85mm close-up"],
+      ["Ram Notices Sita","RAM_001","Show Ram seeing Sita for the first time.","Wonder → Affection","Ram turns and sees Sita across the garden.","","85mm close-up"],
+      ["First Eye Contact","SHARED","Create the first silent connection.","Tenderness","Ram and Sita exchange a brief, meaningful glance.","","50mm two-shot"],
+      ["A Quiet Moment","RAM_001","Show Ram's emotional response.","Admiration","Ram remains composed but visibly moved.","","65mm intimate medium"],
+      ["Lakshman's Observation","LAKSHMAN_001","Give the moment an outside perspective when available.","Warm Curiosity","Lakshman notices Ram's changed expression.","","50mm over-shoulder"],
+      ["Sita's Shy Response","SITA_001","Show Sita's restrained emotion.","Shyness → Hope","Sita lowers her gaze with a gentle smile.","","85mm close-up"],
+      ["The Moment Passes","AUDIENCE","End the first encounter and preserve its emotional impact.","Destiny","Ram and Sita move apart as the garden returns to calm.","","35mm wide pull-back"]
+    ];
+  }
+
+  if(pair3&&isChallenge){
+    return [
+      ["The Challenge","AUDIENCE","Establish Ravan confronting Shiva.","Tension","Ravan approaches with immense confidence before Shiva.","","35mm extreme wide"],
+      ["Ravan's Pride","RAVAN_001","Reveal Ravan's confidence and ambition.","Pride","Ravan declares his challenge with controlled intensity.","मैं शक्ति का अर्थ जानना चाहता हूँ।","85mm low-angle close-up"],
+      ["Shiva Observes","SHIVA_001","Show Shiva's calm response.","Stillness","Shiva watches Ravan without reacting to the provocation.","","85mm close-up"],
+      ["The Test Begins","SHARED","Move from words into action.","Challenge","Ravan demonstrates his strength while Shiva remains composed.","","50mm two-shot"],
+      ["Power Meets Stillness","SHIVA_001","Contrast force with absolute calm.","Transcendence","Shiva responds with minimal movement and overwhelming presence.","","35mm slow push-in"],
+      ["Ravan Understands","RAVAN_001","Begin Ravan's realization.","Humility","Ravan's confidence falters as he recognizes a greater power.","","65mm close-up"],
+      ["The Lesson","SHIVA_001","Deliver the thematic meaning of true power.","Wisdom","Shiva gives Ravan a measured lesson about power and humility.","शक्ति वही है जो स्वयं पर विजय पाए।","50mm composed medium shot"],
+      ["After the Test","AUDIENCE","Close the encounter with a changed relationship.","Reflection","Ravan lowers his gaze while the mountain remains still.","","35mm wide pull-back"]
+    ];
+  }
+
+  // General description-driven path. It extracts the requested characters and builds
+  // distinct beats around the creator's actual objective instead of returning static labels.
+  const subject=objective||title||"the described scene";
+  const primary=names[0]||"the main character";
+  const secondary=names[1]||"the other character";
+  const base=[
+    ["Establish the Situation","AUDIENCE","Introduce the situation described by the creator.","Anticipation",primary+" enters the situation: "+subject+".",""],
+    ["First Reaction",ids[0]||"AUDIENCE","Show the first meaningful reaction to the described situation.","Awareness",primary+" reacts to the central situation and notices what is changing.",""],
+    ["Counter-Reaction",ids[1]||ids[0]||"AUDIENCE","Show how another participant responds.","Curiosity",secondary+" responds to "+primary+" and the situation.",""],
+    ["The Exchange","SHARED","Turn the setup into a meaningful interaction.","Connection",names.join(" and ")+" engage with the central situation.",""],
+    ["Rising Purpose","SHARED","Increase the narrative stakes described by the creator.","Tension",names.join(" and ")+" confront the main objective: "+subject+".",""],
+    ["The Decision",ids[0]||"AUDIENCE","Show a concrete choice that advances the story.","Decision",primary+" makes a decision that moves the described story forward.",""],
+    ["The Commitment",ids[1]||ids[0]||"AUDIENCE","Show commitment to the next action.","Resolve",secondary+" commits to the next step.",""],
+    ["Next Story Beat","AUDIENCE","Pay off this scene and establish the next movement.","Determination",names.join(" and ")+" move into the next story beat created by the description.",""]
+  ];
+  // If the creator explicitly asks for dialogue/conversation, generate functional
+  // placeholder-free dialogue from the supplied objective rather than leaving it null.
+  if(isDialogue){
+    base[1][5]=primary+" speaks about the situation.";
+    base[2][5]=secondary+" responds to the situation.";
+    base[3][5]=primary+" and "+secondary+" exchange their views.";
+    base[5][5]=primary+" states the decision clearly.";
+    base[6][5]=secondary+" accepts the next step.";
+  }
+  return base.map((x,i)=>({
+    frame_id:"F0"+(i+1),title:x[0],perspective:x[1],purpose:x[2],emotion:x[3],
+    action:x[4],dialogue:x[5]||null,
+    camera:["35mm extreme wide, slow push-in","85mm close-up, gentle push-in","50mm over-shoulder","50mm two-shot, slow lateral dolly","65mm medium shot","50mm over-shoulder, restrained push","35mm low-angle push-in","35mm wide, slow pull-back"][i]
   }));
 }
+
 module.exports=async function handler(req,res){
   try{
     const registry=load("character-registry.json");
