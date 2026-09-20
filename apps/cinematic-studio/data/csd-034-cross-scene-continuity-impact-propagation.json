@@ -1,0 +1,107 @@
+{
+  "schema_version":"KALP-CSD-034-CROSS-SCENE-CONTINUITY-IMPACT-PROPAGATION-1.0",
+  "engine_id":"KALP-CSD-034",
+  "engine_name":"Cross-Scene Continuity Graph & Impact Propagation Director",
+  "status":"LOCKED",
+  "purpose":"Build and traverse the canonical dependency graph across scenes, characters, events, assets and world state so any approved change produces a deterministic impact set, invalidation scope and revalidation/regeneration plan.",
+  "core_principle":"A canonical change propagates through causally dependent nodes, never through arbitrary similarity.",
+  "inputs":["CSD-033","CSD-011","CSD-012","CSD-013","CSD-014","CSD-026","CSD-027","CSD-028"],
+  "node_types":["SCENE","SCENE_VERSION","CHARACTER","CHARACTER_STATE","EVENT","EVENT_STATE","BRANCH","ASSET","ASSET_VERSION","WORLD_STATE","LOCATION","COSTUME","PROP","FRAME","PRODUCTION_JOB","MASTER"],
+  "edge_types":["PRECEDES","CAUSES","DEPENDS_ON","OCCURS_IN","AFFECTS","USES","INHERITS_STATE_FROM","REQUIRES","INVALIDATES","DERIVES_FROM","BRANCHES_TO","CONVERGES_WITH","LOCATED_AT","PERSISTS_TO","REENTERS","PROMOTED_FROM"],
+  "change_classes":{
+    "IDENTITY_CHANGE":"Character immutable identity or visual identity change.",
+    "STATE_CHANGE":"Character emotional, knowledge, relationship or behavioral state change.",
+    "EVENT_CHANGE":"Canonical event transition or causal outcome change.",
+    "BRANCH_CHANGE":"Active narrative branch decision changes.",
+    "WORLD_CHANGE":"Persistent environmental, spatial or world-state change.",
+    "ASSET_CHANGE":"Asset master, costume, prop, VFX or continuity asset changes.",
+    "SCENE_MASTER_CHANGE":"Canonical scene master revision changes."
+  },
+  "impact_levels":["DIRECT","CAUSAL","STATE_DEPENDENT","ASSET_DEPENDENT","BRANCH_DEPENDENT","TEMPORAL_DEPENDENT","WORLD_DEPENDENT"],
+  "propagation_pipeline":[
+    "REGISTER_CANONICAL_CHANGE",
+    "RESOLVE_SOURCE_NODE",
+    "TRAVERSE_DIRECT_DEPENDENCIES",
+    "EXPAND_CAUSAL_DEPENDENCIES",
+    "EXPAND_PERSISTENT_STATE_DEPENDENCIES",
+    "EXPAND_ASSET_AND_PRODUCTION_DEPENDENCIES",
+    "FILTER_INACTIVE_BRANCHES",
+    "COLLAPSE_DUPLICATE_IMPACTS",
+    "CLASSIFY_IMPACT_SEVERITY",
+    "BUILD_REVALIDATION_FRONTIER",
+    "BUILD_REGENERATION_FRONTIER",
+    "ORDER_BY_DEPENDENCY_AND_CRITICAL_PATH",
+    "FREEZE_INVALIDATED_DERIVATIVES",
+    "ISSUE_IMPACT_PLAN"
+  ],
+  "impact_actions":["NO_ACTION","REVALIDATE","REGENERATE","REASSEMBLE","REEXECUTE","QUARANTINE","BLOCK"],
+  "invalidation_policy":[
+    "Canonical source nodes are never deleted by propagation.",
+    "Derived nodes become INVALIDATED only when their dependency fingerprint no longer matches.",
+    "Historical scene versions remain immutable.",
+    "Inactive narrative branches remain preserved but are not promoted into the active impact frontier.",
+    "A changed master asset invalidates dependent derivatives, not unrelated assets.",
+    "A state change propagates only to scenes whose canonical state derives from that state.",
+    "A world-state change propagates through persistent locations and re-entry scenes.",
+    "An event change propagates through downstream causal events and dependent scene masters.",
+    "Impact propagation must be deterministic and auditable."
+  ],
+  "severity_rules":{
+    "CRITICAL":"Canonical identity, branch, timeline, causal event or master fingerprint change affects production truth.",
+    "HIGH":"Persistent character/world state or trusted master asset affects dependent scenes.",
+    "MEDIUM":"Frame, costume, prop, VFX, audio or camera derivative requires revalidation or regeneration.",
+    "LOW":"Non-canonical production metadata or presentation-only derivative."
+  },
+  "revalidation_frontier":{
+    "required_fields":["node_id","node_type","impact_level","severity","source_change_id","current_fingerprint","expected_fingerprint","action","dependency_path"],
+    "ordering":"Topological dependency order; critical-path nodes first."
+  },
+  "graph_integrity":{
+    "rules":[
+      "No orphaned active production jobs.",
+      "No active derivative may depend on a superseded canonical node.",
+      "No cycle may exist in causal dependency edges.",
+      "Every propagated impact must have a source change and dependency path.",
+      "Every invalidated derivative must have an explicit recovery action.",
+      "Branch-inactive nodes cannot create active production work.",
+      "Scene active-character constraints remain maximum five."
+    ]
+  },
+  "demo":{
+    "change_id":"CHANGE-CSD34-RAVAN-COSTUME-001",
+    "source_node":"ASSET-RAVAN-COSTUME-v1.1",
+    "change_class":"ASSET_CHANGE",
+    "severity":"HIGH",
+    "impact_summary":{
+      "direct_scenes":1,
+      "causal_scenes":2,
+      "state_dependent_scenes":1,
+      "asset_dependent_frames":4,
+      "production_jobs":3
+    },
+    "impact_frontier":[
+      {"node_id":"SCENE-KAILASH-CONFRONTATION","action":"REVALIDATE","severity":"HIGH"},
+      {"node_id":"SCENE-AFTER-CONFRONTATION","action":"REVALIDATE","severity":"HIGH"},
+      {"node_id":"SCENE-LANKA-RETURN","action":"REVALIDATE","severity":"MEDIUM"},
+      {"node_id":"FRAME-F04","action":"REGENERATE","severity":"MEDIUM"},
+      {"node_id":"FRAME-F06","action":"REGENERATE","severity":"MEDIUM"},
+      {"node_id":"JOB-F04","action":"REEXECUTE","severity":"MEDIUM"},
+      {"node_id":"JOB-F06","action":"REEXECUTE","severity":"MEDIUM"}
+    ],
+    "inactive_branch_impacts":"PRESERVED_BUT_NOT_ACTIVATED",
+    "canonical_history_mutated":false
+  },
+  "rework_routing":{
+    "scene_state":"CSD-011",
+    "event_transition":"CSD-012",
+    "event_graph":"CSD-013",
+    "branching":"CSD-014",
+    "environment_memory":"CSD-026",
+    "asset_dependency":"CSD-027",
+    "asset_registry":"CSD-028",
+    "cross_scene_qa":"CSD-033",
+    "execution":"CSD-031",
+    "result_validation":"CSD-032"
+  },
+  "downstream":["CSD-035-Continuity-Reconciliation-and-Autonomous-Recovery","CMSE-002","CMSE-004","CMSE-009","CMSE-011","CMSE-015"]
+}
