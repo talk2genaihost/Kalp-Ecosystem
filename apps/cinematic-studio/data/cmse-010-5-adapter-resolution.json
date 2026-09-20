@@ -1,0 +1,129 @@
+{
+  "schema_version": "KALP-CMSE-010.5-ADAPTER-RESOLUTION-1.0",
+  "engine_id": "KALP-CMSE-010.5",
+  "scene_id": "CSD-DEMO-001",
+  "status": "EXECUTION_READY_WITH_PROVENANCE_CAVEAT",
+  "adapter": {
+    "provider": "HIGGSFIELD",
+    "model": "cinematic_studio_2_5",
+    "model_name": "Cinema Studio Image 2.5",
+    "output": "image",
+    "aspect_ratio": "16:9",
+    "resolution": "4k",
+    "reference_role": "image",
+    "capability_verified": [
+      "image_generation",
+      "reference_image",
+      "16:9",
+      "cinematic_stills",
+      "4k"
+    ],
+    "health": "SUBMISSION_PATH_AVAILABLE",
+    "limitation": "This adapter/model supports one generic image reference per job; canonical character identity remains enforced in prompt constraints and F01 reference lineage."
+  },
+  "jobs": [
+    {
+      "frame_id": "F01",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F02",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F03",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F04",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F05",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F06",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F07",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    },
+    {
+      "frame_id": "F08",
+      "provider": "HIGGSFIELD",
+      "model": "cinematic_studio_2_5",
+      "status": "READY_FOR_DISPATCH",
+      "reference_asset": "5234a294-ed5a-4dfc-a048-54fe84b6d537",
+      "parameters": {
+        "resolution": "4k",
+        "aspect_ratio": "16:9"
+      },
+      "execution_authorization": "READY"
+    }
+  ],
+  "policy": [
+    "Provider capability verified against live model catalog.",
+    "No unsupported parameters invented.",
+    "F01 remains immutable reference anchor.",
+    "F02-F08 provenance remains DERIVED_FROM_STORYBOARD until a genuinely independent generation job replaces each provisional asset.",
+    "Dispatch may create new independent job IDs; current state is readiness, not completed generation."
+  ]
+}
