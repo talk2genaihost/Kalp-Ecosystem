@@ -99,6 +99,37 @@ async function boot(){
 }
 
 function charById(id){return registry.characters.find(c=>c.character_id===id)}
+function buildLocalSceneFromDescription(){
+  const title=document.getElementById('title').value.trim()||'Untitled Scene';
+  const objective=document.querySelector('textarea').value.trim()||'Develop the described scene.';
+  const text=(title+' '+objective).toLowerCase();
+  const preferred=[];
+  if(/hanuman|हनुमान/.test(text))preferred.push('HANUMAN_001');
+  if(/ram|राम/.test(text))preferred.push('RAM_001');
+  if(/sita|सीता/.test(text))preferred.push('SITA_001');
+  if(/lakshman|लक्ष्मण/.test(text))preferred.push('LAKSHMAN_001');
+  if(/ravan|रावण/.test(text))preferred.push('RAVAN_001');
+  if(/shiva|शिव|महादेव/.test(text))preferred.push('SHIVA_001');
+  const detected=[...new Set(preferred)];
+  if(detected.length>=1) selected=detected.slice(0,5);
+  const meeting=selected.includes('RAM_001')&&selected.includes('HANUMAN_001')&&/(meet|meeting|encounter|milte|milan|भेंट|मिलन|मुलाकात)/i.test(text);
+  const names=selected.map(id=>charById(id)?.display_name||id).join(' and ');
+  const titles=meeting?['The Encounter','Hanuman Recognizes Ram','Ram Sees Hanuman','The Introduction','A Bond Begins','The Mission','Hanuman’s Vow','The Journey Begins']:['The Scene Begins','First Perception','Character Response','The Exchange','Rising Purpose','The Decision','The Commitment','The Next Move'];
+  const emotions=meeting?['Anticipation','Recognition → Devotion','Curiosity → Trust','Warmth','Devotion → Resolve','Purpose','Absolute Devotion','Hope → Determination']:['Anticipation','Awareness','Curiosity','Connection','Tension','Decision','Resolve','Determination'];
+  const actions=meeting?[
+    'Ram and Hanuman see each other across the forest path.',
+    'Hanuman pauses, recognizes Ram and respectfully approaches.',
+    'Ram studies Hanuman and welcomes him.',
+    'Hanuman introduces himself while Ram listens.',
+    'Hanuman bows; Ram raises him with affection.',
+    'Ram explains that Sita must be found.',
+    'Hanuman accepts the mission with unwavering confidence.',
+    'Ram and Hanuman walk together into the forest.'
+  ]:Array.from({length:8},(_,i)=>i===0?names+' enter the scene.':i===7?names+' move into the next story beat.':names+' respond to the developing situation.');
+  const dialogues=meeting?['','आप कौन हैं, प्रभु?','तुम्हारे शब्दों में सच्चाई है।','मैं हनुमान हूँ। आपकी सेवा ही मेरा सौभाग्य होगा।','उठो हनुमान। आज से हम साथ हैं।','हमें सीता की खोज करनी है।','प्रभु, आपका कार्य ही मेरा जीवन है।','चलो, हनुमान।']:Array(8).fill('');
+  scene={...scene,scene_id:'LOCAL-'+Date.now(),scene_title:title,objective,selected_characters:[...selected],runtime_status:'GENERATED_FROM_SCENE_DESCRIPTION',frames:titles.map((t,i)=>({frame_id:'F0'+(i+1),title:t,perspective:i===0||i===7?'AUDIENCE':(meeting?(i===1||i===4||i===6?'HANUMAN_001':i===2||i===5?'RAM_001':'SHARED'):selected[i%selected.length]),purpose:'Advance the scene described by the creator.',emotion:emotions[i],action:actions[i],dialogue:dialogues[i]||null,camera:['35mm extreme wide, slow push-in','85mm close-up, gentle push-in','50mm over-shoulder','50mm two-shot, slow lateral dolly','65mm intimate medium shot','50mm over-shoulder','35mm low-angle hero push-in','35mm wide, slow pull-back'][i]}))};
+  document.getElementById('title').value=title; renderChars(); renderFrames(); renderChecks(); selectFrame(0);
+}
 function renderChars(){
   document.getElementById('chars').innerHTML=selected.map(id=>{
     const c=charById(id);
@@ -143,16 +174,18 @@ document.getElementById('pers').onchange=e=>{
   renderFrames();selectFrame(active);toast('Perspective updated locally. Generate to persist.');
 };
 document.getElementById('generate').onclick=async()=>{
+  const button=document.getElementById('generate'); button.disabled=true; button.textContent='⟳ Generating 8 Frames…';
   try{
-    const body={character_ids:selected,scene_id:scene.scene_id,scene_title:document.getElementById('title').value,objective:document.querySelector('textarea').value};
-    scene=await api('/api/cinematic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    renderFrames();renderChars();selectFrame(0);toast('CSD-002 generated from runtime contract.');
+    const body={character_ids:selected,scene_id:scene.scene_id,scene_title:document.getElementById('title').value.trim(),objective:document.querySelector('textarea').value.trim()};
+    const result=await api('/api/cinematic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    scene=result; selected=scene.selected_characters.slice(0,5);
+    renderFrames();renderChars();renderChecks();selectFrame(0);
+    toast('CSD-002 generated from your scene description.');
   }catch(e){
-    scene.selected_characters=[...selected];
-    scene.scene_title=body.scene_title;
-    scene.objective=body.objective;
-    renderChars();renderFrames();selectFrame(0);
-    toast('GitHub test mode: storyboard updated locally.');
+    buildLocalSceneFromDescription();
+    toast('CSD-002 generated locally from your scene description.');
+  }finally{
+    button.disabled=false;button.textContent='✦ Generate Storyboard';
   }
 };
 document.getElementById('identity').onclick=async()=>{
