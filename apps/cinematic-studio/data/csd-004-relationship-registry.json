@@ -1,0 +1,1043 @@
+{
+  "schema_version": "KALP-CSD-004-RELATIONSHIP-REGISTRY-1.0",
+  "engine_id": "KALP-CSD-004",
+  "engine_name": "Multi-Character Universe & Relationship Registry",
+  "universe_id": "RAMAYANA_UNIVERSE_001",
+  "status": "LOCKED",
+  "purpose": "Convert the 40-character canonical universe into a queryable relationship intelligence graph for scene retrieval and multi-character cinematic orchestration.",
+  "source_registry": "ramayana-universe-001.json",
+  "constraints": {
+    "core_characters": 40,
+    "max_active_scene_characters": 5,
+    "identity_immutable": true,
+    "relationships_are_temporal": true,
+    "variant_relationships_must_be_explicit": true
+  },
+  "relationship_types": [
+    "SPOUSE",
+    "BROTHERS",
+    "SISTERS",
+    "FATHER_SON",
+    "MOTHER_SON",
+    "FAMILY_CONFLICT",
+    "ALLY",
+    "MENTOR",
+    "GURU",
+    "DEVOTEE_LORD",
+    "ADVERSARY_EVENT",
+    "PRINCIPAL_ADVERSARIES",
+    "CAPTIVE_ABDUCTOR",
+    "PROTECTOR",
+    "COMBAT_ADVERSARIES",
+    "BROTHERS_RIVALS",
+    "BROTHERS_CONFLICT",
+    "FATHER_DAUGHTER",
+    "MOTHER_DAUGHTER",
+    "ROYAL_FAMILY",
+    "KING_TRUSTED_ATTENDANT",
+    "KING_COUNSELLOR",
+    "MISSION_ALLIES",
+    "ENGINEERING_TEAM",
+    "SYMPATHETIC_ATTENDANT",
+    "SYMPATHETIC_ALLY",
+    "TESTER_CHALLENGER",
+    "RESTORER_ENCOUNTER",
+    "EXILE_ALLY",
+    "SEARCH_INFORMATION",
+    "SAGE_COLLEAGUES",
+    "SAGE_WARRIOR_NETWORK",
+    "ROYAL_SAGE_CONTACT",
+    "MENTOR_GUIDE",
+    "DEVOTED_GENERAL",
+    "UNCLE_NEPHEW",
+    "UNCLE_NEPHEW_CONFLICT",
+    "LANKA_NETWORK",
+    "KING_SUBJECT",
+    "SAGE_COLLEAGUES",
+    "ALLY_KING",
+    "TRUSTED_ATTENDANT"
+  ],
+  "relationship_graph": {
+    "edge_count": 74,
+    "nodes": [
+      "RAM_001",
+      "SITA_001",
+      "LAKSHMAN_001",
+      "BHARAT_001",
+      "HANUMAN_001",
+      "RAVAN_001",
+      "VIBHISHAN_001",
+      "SUGRIVA_001",
+      "VALI_001",
+      "INDRAJIT_001",
+      "DASHARATH_001",
+      "KAIKEYI_001",
+      "SHATRUGHNA_001",
+      "KAUSHALYA_001",
+      "SUMITRA_001",
+      "JANAK_001",
+      "URMILA_001",
+      "MANDAVI_001",
+      "SHRUTAKIRTI_001",
+      "KUMBHAKARNA_001",
+      "SURPANAKHA_001",
+      "MARICHA_001",
+      "JATAYU_001",
+      "ANGAD_001",
+      "JAMBAVAN_001",
+      "TARA_001",
+      "NALA_001",
+      "VISHWAMITRA_001",
+      "VASHISHTHA_001",
+      "AHALYA_001",
+      "GUHA_001",
+      "SUMANTRA_001",
+      "SAMPATI_001",
+      "NILA_001",
+      "PARASHURAMA_001",
+      "TATAKA_001",
+      "AKAMPANA_001",
+      "TRIJATA_001",
+      "SARAMA_001",
+      "SUNAINA_001"
+    ],
+    "edges": [
+      {
+        "from": "RAM_001",
+        "to": "SITA_001",
+        "type": "SPOUSE",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-03",
+          "ARC-04",
+          "ARC-07",
+          "ARC-08",
+          "ARC-09",
+          "ARC-10"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "LAKSHMAN_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-03",
+          "ARC-04",
+          "ARC-05",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "BHARAT_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "SHATRUGHNA_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "DASHARATH_001",
+        "type": "FATHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "KAUSHALYA_001",
+        "type": "MOTHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "KAIKEYI_001",
+        "type": "FAMILY_CONFLICT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "SUMITRA_001",
+        "type": "FAMILY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "HANUMAN_001",
+        "type": "DEVOTEE_LORD",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-06",
+          "ARC-07",
+          "ARC-08",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "SUGRIVA_001",
+        "type": "ALLY_KING",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-06",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "RAM_001",
+        "type": "SELF",
+        "direction": "NONE",
+        "strength": "N/A",
+        "arc_ids": [],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "VALI_001",
+        "type": "ADVERSARY_EVENT",
+        "direction": "RAM_TO_VALI",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-05"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "VIBHISHAN_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-08",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "RAVAN_001",
+        "type": "PRINCIPAL_ADVERSARIES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-04",
+          "ARC-07",
+          "ARC-08",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "JATAYU_001",
+        "type": "ALLY_AND_FAMILY_FRIEND",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-04"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "JAMBAVAN_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-06",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "ANGAD_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-06",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "NALA_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "NILA_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "VISHWAMITRA_001",
+        "type": "MENTOR",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-03"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "VASHISHTHA_001",
+        "type": "GURU",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "PARASHURAMA_001",
+        "type": "TESTER_CHALLENGER",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "AHALYA_001",
+        "type": "RESTORER_ENCOUNTER",
+        "direction": "RAM_TO_AHALYA",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "GUHA_001",
+        "type": "ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-03"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAM_001",
+        "to": "SUMANTRA_001",
+        "type": "TRUSTED_ATTENDANT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "JANAK_001",
+        "type": "FATHER_DAUGHTER",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "SUNAINA_001",
+        "type": "MOTHER_DAUGHTER",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "URMILA_001",
+        "type": "SISTERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-03"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "MANDAVI_001",
+        "type": "COUSIN_SISTER_NETWORK",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "SHRUTAKIRTI_001",
+        "type": "SISTERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "RAVAN_001",
+        "type": "CAPTIVE_ABDUCTOR",
+        "direction": "RAVAN_TO_SITA",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-04",
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "JATAYU_001",
+        "type": "PROTECTOR",
+        "direction": "JATAYU_TO_SITA",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-04"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "TRIJATA_001",
+        "type": "SYMPATHETIC_ATTENDANT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SITA_001",
+        "to": "SARAMA_001",
+        "type": "SYMPATHETIC_ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "LAKSHMAN_001",
+        "to": "URMILA_001",
+        "type": "SPOUSE",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-03",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "LAKSHMAN_001",
+        "to": "INDRAJIT_001",
+        "type": "COMBAT_ADVERSARIES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "LAKSHMAN_001",
+        "to": "VISHWAMITRA_001",
+        "type": "MENTOR_ASSOCIATION",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-03"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "BHARAT_001",
+        "to": "KAIKEYI_001",
+        "type": "MOTHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "BHARAT_001",
+        "to": "SHATRUGHNA_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "BHARAT_001",
+        "to": "MANDAVI_001",
+        "type": "SPOUSE",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SHATRUGHNA_001",
+        "to": "SHRUTAKIRTI_001",
+        "type": "SPOUSE",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02",
+          "ARC-09"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "DASHARATH_001",
+        "to": "KAUSHALYA_001",
+        "type": "SPOUSES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "DASHARATH_001",
+        "to": "KAIKEYI_001",
+        "type": "SPOUSES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "DASHARATH_001",
+        "to": "SUMITRA_001",
+        "type": "SPOUSES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "DASHARATH_001",
+        "to": "SUMANTRA_001",
+        "type": "KING_TRUSTED_ATTENDANT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "KAIKEYI_001",
+        "to": "RAM_001",
+        "type": "STEPMOTHER_STEPSon",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "HANUMAN_001",
+        "to": "SUGRIVA_001",
+        "type": "DEVOTED_GENERAL",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-06",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SUGRIVA_001",
+        "to": "VALI_001",
+        "type": "BROTHERS_RIVALS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-05"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "VALI_001",
+        "to": "TARA_001",
+        "type": "SPOUSES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-05"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "VALI_001",
+        "to": "ANGAD_001",
+        "type": "FATHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-05"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SUGRIVA_001",
+        "to": "TARA_001",
+        "type": "ROYAL_FAMILY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SUGRIVA_001",
+        "to": "ANGAD_001",
+        "type": "UNCLE_NEPHEW",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-06"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "ANGAD_001",
+        "to": "TARA_001",
+        "type": "MOTHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-05",
+          "ARC-06"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "HANUMAN_001",
+        "to": "JAMBAVAN_001",
+        "type": "MENTOR_GUIDE",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-06"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "HANUMAN_001",
+        "to": "ANGAD_001",
+        "type": "MISSION_ALLIES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-06",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "JATAYU_001",
+        "to": "SAMPATI_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-04",
+          "ARC-06"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "KUMBHAKARNA_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "VIBHISHAN_001",
+        "type": "BROTHERS_CONFLICT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "INDRAJIT_001",
+        "type": "FATHER_SON",
+        "direction": "BIDIRECTIONAL",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "SURPANAKHA_001",
+        "type": "SIBLINGS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-04"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "MARICHA_001",
+        "type": "LORD_AGENT",
+        "direction": "RAVAN_TO_MARICHA",
+        "strength": "CRITICAL",
+        "arc_ids": [
+          "ARC-04"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "AKAMPANA_001",
+        "type": "KING_COUNSELLOR",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-04",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "TRIJATA_001",
+        "type": "KING_SUBJECT",
+        "direction": "RAVAN_TO_TRIJATA",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "RAVAN_001",
+        "to": "SARAMA_001",
+        "type": "KING_SUBJECT",
+        "direction": "RAVAN_TO_SARAMA",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "KUMBHAKARNA_001",
+        "to": "VIBHISHAN_001",
+        "type": "BROTHERS",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "INDRAJIT_001",
+        "to": "VIBHISHAN_001",
+        "type": "UNCLE_NEPHEW_CONFLICT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SURPANAKHA_001",
+        "to": "MARICHA_001",
+        "type": "LANKA_NETWORK",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-04"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "NALA_001",
+        "to": "NILA_001",
+        "type": "ENGINEERING_TEAM",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-08"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "JANAK_001",
+        "to": "VISHWAMITRA_001",
+        "type": "ROYAL_SAGE_CONTACT",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "VISHWAMITRA_001",
+        "to": "VASHISHTHA_001",
+        "type": "SAGE_COLLEAGUES",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "PARASHURAMA_001",
+        "to": "VISHWAMITRA_001",
+        "type": "SAGE_WARRIOR_NETWORK",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-02"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "GUHA_001",
+        "to": "RAM_001",
+        "type": "EXILE_ALLY",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-01",
+          "ARC-03"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "SAMPATI_001",
+        "to": "ANGAD_001",
+        "type": "SEARCH_INFORMATION",
+        "direction": "BIDIRECTIONAL",
+        "strength": "HIGH",
+        "arc_ids": [
+          "ARC-06"
+        ],
+        "notes": ""
+      },
+      {
+        "from": "TRIJATA_001",
+        "to": "SARAMA_001",
+        "type": "ASHOKA_GROVE_NETWORK",
+        "direction": "BIDIRECTIONAL",
+        "strength": "MEDIUM",
+        "arc_ids": [
+          "ARC-07",
+          "ARC-08"
+        ],
+        "notes": ""
+      }
+    ]
+  },
+  "retrieval_model": {
+    "required_context": [
+      "character_identity",
+      "relationship_type",
+      "relationship_strength",
+      "shared_story_arcs",
+      "current_character_state",
+      "known_information",
+      "spatial_proximity",
+      "prior_scene_memory"
+    ],
+    "rules": [
+      "Retrieve direct canonical relationships first.",
+      "Expand one relationship hop only when the scene requires context.",
+      "Prioritize relationships shared by the selected story arc.",
+      "Do not infer an unregistered relationship as canon.",
+      "Preserve directionality for asymmetric relationships.",
+      "Temporal relationship state may change while identity remains immutable.",
+      "When multiple variants exist, require explicit variant selection."
+    ]
+  },
+  "knowledge_model": {
+    "principle": "A character may only act on information available to that character at the current narrative point.",
+    "fields": [
+      "known_facts",
+      "unknown_facts",
+      "suspected_facts",
+      "misbeliefs",
+      "source_of_information",
+      "knowledge_timestamp"
+    ],
+    "examples": [
+      {
+        "character_id": "RAM_001",
+        "knowledge": "Sita has been abducted by Ravana",
+        "narrative_phase": "POST_SITA_HARANA"
+      },
+      {
+        "character_id": "SITA_001",
+        "knowledge": "Rama is searching for her",
+        "narrative_phase": "LANKA"
+      },
+      {
+        "character_id": "RAVAN_001",
+        "knowledge": "Rama is advancing toward Lanka",
+        "narrative_phase": "LANKA_WAR"
+      }
+    ]
+  },
+  "scene_resolution": {
+    "input": "1-5 character IDs + story arc + narrative intent + current scene state",
+    "output": [
+      "active_character_set",
+      "direct_relationships",
+      "relevant_indirect_relationships",
+      "knowledge_constraints",
+      "conflict_map",
+      "alliance_map",
+      "emotional_memory_candidates",
+      "continuity_constraints"
+    ],
+    "hard_rule": "Scene Director must use this registry before generating a multi-character scene."
+  },
+  "downstream": [
+    "KALP-CSD-001",
+    "KALP-CSD-002",
+    "KALP-CSD-003",
+    "KALP-CMSE-005",
+    "KALP-CMSE-006",
+    "KALP-CMSE-012",
+    "KALP-CMSE-015"
+  ]
+}
