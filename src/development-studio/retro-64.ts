@@ -252,6 +252,41 @@ export function validateRetroSceneState(
   return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
 }
 
+export interface RetroProductionJsonValidationResult { validator_version:"1.0"; status:"PASS"|"FAIL"; errors:string[]; warnings:string[]; checks:RetroSceneValidationCheck[]; }
+export function validateRetroProductionJson(episode:Record<string,any>):RetroProductionJsonValidationResult {
+  const checks:RetroSceneValidationCheck[]=[];const errors:string[]=[];const warnings:string[]=[];
+  const pass=(name:string,detail:string)=>checks.push({name,status:"PASS",detail});
+  const fail=(name:string,detail:string)=>{checks.push({name,status:"FAIL",detail});errors.push(detail);};
+  const requiredTop=["contract","episode_id","game","intent_mode","intent","progression_model","progression_source","reference_source","reference_role","duration_seconds","format","reference_elements_used","progression","locked_dna","flexible_elements","storyboard"];
+  const missingTop=requiredTop.filter(k=>episode[k]===undefined||episode[k]===null);
+  !missingTop.length?pass("required_top_level_fields","All required production contract fields are present."):fail("required_top_level_fields",`Missing top-level fields: ${missingTop.join(", ")}.`);
+  episode.contract==="KALP-RETRO-64-PRODUCTION-EPISODE-1.0"?pass("contract_version","Production contract version is correct."):fail("contract_version",`Expected production contract; received ${episode.contract||"missing"}.`);
+  typeof episode.episode_id==="string"&&episode.episode_id.trim()?pass("episode_id","Episode ID is valid."):fail("episode_id","Episode ID must be a non-empty string.");
+  typeof episode.game==="string"&&episode.game.trim()?pass("game","Game is valid."):fail("game","Game must be a non-empty string.");
+  ["REFERENCE","VARIATION","EXPANSION"].includes(episode.intent_mode)?pass("intent_mode","Intent mode is valid."):fail("intent_mode","Intent mode is invalid or missing.");
+  typeof episode.duration_seconds==="number"&&episode.duration_seconds>0?pass("duration","Duration is positive."):fail("duration","Duration must be a positive number.");
+  episode.format==="9:16"||episode.format==="16:9"?pass("format","Format is supported."):fail("format","Format must be 9:16 or 16:9.");
+  episode.progression_model==="1.1"?pass("progression_model","Progression model is 1.1."):fail("progression_model","Production JSON must use progression model 1.1.");
+  episode.reference_role==="GAME_PROGRESSION_REFERENCE"?pass("reference_role","Reference role is explicit."):fail("reference_role","Reference role must be GAME_PROGRESSION_REFERENCE.");
+  Array.isArray(episode.progression)&&episode.progression.length===8?pass("progression_contract","Progression contains exactly 8 steps."):fail("progression_contract","Progression must contain exactly 8 steps.");
+  Array.isArray(episode.locked_dna)&&episode.locked_dna.length>0?pass("locked_dna","Locked progression DNA is present."):fail("locked_dna","Locked progression DNA is missing or empty.");
+  Array.isArray(episode.flexible_elements)?pass("flexible_elements","Flexible elements array is present."):fail("flexible_elements","Flexible elements must be an array.");
+  episode.reference_elements_used&&typeof episode.reference_elements_used==="object"?pass("reference_elements","Reference elements payload is present."):fail("reference_elements","Reference elements payload is missing.");
+  const scenes=episode.storyboard;
+  Array.isArray(scenes)&&scenes.length===8?pass("storyboard_count","Production JSON contains exactly 8 scenes."):fail("storyboard_count",`Storyboard must contain exactly 8 scenes; received ${Array.isArray(scenes)?scenes.length:"non-array"}.`);
+  if(Array.isArray(scenes)&&scenes.length===8){
+    const requiredScene=["frame","stage","title","description","visual","action","characters","environment","enemy_presence","weapons","camera","vfx","sound","dialogue","continuity","progression_purpose","reference_frame","world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state"];
+    const missing=scenes.flatMap((s:any,i:number)=>requiredScene.filter(k=>s[k]===undefined||s[k]===null||s[k]==="").map(k=>`Scene ${i+1}: ${k}`));
+    !missing.length?pass("scene_required_fields","All production scenes contain required renderer-facing fields."):fail("scene_required_fields",`Missing scene fields: ${missing.join(", ")}.`);
+    const typesOk=scenes.every((s:any)=>Number.isInteger(s.frame)&&typeof s.stage==="string"&&typeof s.title==="string"&&typeof s.description==="string"&&typeof s.visual==="string"&&typeof s.action==="string"&&Array.isArray(s.characters)&&typeof s.camera==="string"&&typeof s.vfx==="string"&&typeof s.sound==="string"&&Number.isInteger(s.reference_frame));
+    typesOk?pass("scene_field_types","Renderer-facing scene fields have valid JSON types."):fail("scene_field_types","One or more scene fields have invalid JSON types.");
+    new Set(scenes.map((s:any)=>s.frame)).size===8?pass("unique_scene_frames","Scene frame IDs are unique."):fail("unique_scene_frames","Scene frame IDs must be unique.");
+    try{JSON.stringify(episode);pass("json_serializable","Production contract is JSON-serializable.");}catch{fail("json_serializable","Production contract is not JSON-serializable.");}
+  }
+  if(episode.intent_mode==="VARIATION"||episode.intent_mode==="EXPANSION") (typeof episode.intent==="string"&&episode.intent.trim())?pass("generated_intent","Generated episode retains the user intent."):fail("generated_intent","Generated episode must retain a non-empty intent.");
+  return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
+}
+
 export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
   const game=structuredClone(request.game);
   const progression=buildRetroProgressionModel(game,request.sourceArtifact);
@@ -260,7 +295,7 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
   if(!intent) throw new Error("Intent is required for VARIATION or EXPANSION mode.");
   const normalizedIntent=intent.replace(/halicopter/gi,"helicopter").replace(/persuit/gi,"pursuit");
   const storyboard=buildProductionScenes(game,normalizedIntent,request.mode,progression);
-  return {
+  const episode = {
     contract:"KALP-RETRO-64-PRODUCTION-EPISODE-1.0",
     episode_id:request.episodeId||`${game.name.toUpperCase().replace(/[^A-Z0-9]+/g,"_")}_INTENT_EP_001`,
     game:game.name,intent_mode:request.mode,intent:normalizedIntent,
@@ -273,5 +308,4 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     locked_dna:progression.lockedDna,
     flexible_elements:progression.flexibleElements,
     storyboard
-  };
-}
+  };\n  const validation=validateRetroProductionJson(episode);\n  return {...episode,validation};}
