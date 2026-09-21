@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import fs from "node:fs";
+import path from "node:path";
 import {
   buildIntentDrivenRetroEpisode,
   buildRetroProgressionModel,
@@ -117,4 +119,15 @@ test("RETRO-64 Gate v1.0: renderer receives direct scene packets without unresol
   const result = validateRetroRendererReadiness(episode);
   assert.equal(result.status, "PASS");
   assert.equal(result.errors.length, 0);
+});
+
+
+test("RETRO-64 Gate v1.1: generated episode is wired directly into the dashboard Storyboard surface", () => {
+  const dashboardPath = path.resolve(process.cwd(), "apps/cinematic-studio/index.html");
+  const html = fs.readFileSync(dashboardPath, "utf8");
+
+  assert.match(html, /id="retroStoryboard"/);
+  assert.match(html, /retroEpisode\?\.storyboard\?\.length===8/);
+  assert.match(html, /renderStoryboardView\(\);showView\("storyboard"\)/);
+  assert.match(html, /Retro 64 storyboard generated directly on the Storyboard dashboard/);
 });
