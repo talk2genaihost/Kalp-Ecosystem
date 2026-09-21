@@ -137,3 +137,32 @@ test("RETRO-64 Gate v1.1: generated episode is wired directly into the dashboard
   assert.match(html, /Renderer-facing string fields cannot be empty/);
   assert.match(html, /renderer_audio_dna/);
 });
+
+
+test("RETRO-64 semantic intent gate: underwater combat intent becomes scene content", () => {
+  const mario: RetroGameReference = {
+    ...contra,
+    id: "G002",
+    name: "Mario",
+    worksheet: "G002_Mario",
+    world: "Mushroom Kingdom with bright surface grasslands, underground passages, aquatic courses and fortified castles",
+    terrain: "Grassland, underground stone passages, water courses, elevated platforms, castle interiors and flagpole approaches",
+    enemies: "Goombas, Koopa Troopas, Buzzy Beetles, Piranha Plants, Cheep-Cheeps, Hammer Bros., Lakitu and Bowser",
+    moves: "Run, sprint, jump, stomp, swim, duck, climb vines and change direction in midair",
+    powerUps: "Mushroom, Fire Flower, Super Star and game-native power-ups",
+    frames: contra.frames
+  };
+  const episode = buildIntentDrivenRetroEpisode({
+    game: mario,
+    mode: "EXPANSION",
+    intent: "Mario goes underwater and fight with Snakes and sharks",
+    episodeId: "MARIO_UNDERWATER_INTENT_001",
+  });
+  assert.equal(episode.validation.status, "PASS");
+  assert.match(episode.storyboard[0].description, /submerged|underwater/i);
+  assert.match(episode.storyboard[1].enemy_presence, /snakes/i);
+  assert.match(episode.storyboard[1].enemy_presence, /sharks/i);
+  assert.match(episode.storyboard[2].action, /fight/i);
+  assert.match(episode.storyboard[4].description, /snakes|sharks/i);
+  assert.match(episode.storyboard[5].description, /underwater|submerged/i);
+});
