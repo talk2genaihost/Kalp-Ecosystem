@@ -5,7 +5,11 @@ on:
     branches: [main]
     paths:
       - 'apps/cinematic-studio/**'
+      - 'src/development-studio/**'
+      - 'tests/**'
       - 'data/retro-64-reference.json'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/deploy-kalp-dashboard.yml'
   workflow_dispatch:
 
@@ -19,8 +23,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Retro 64 gate tests
+        run: npm test -- --test-name-pattern="RETRO-64 Gate v1.0"
+
   build:
     runs-on: ubuntu-latest
+    needs: validate
     steps:
       - name: Checkout
         uses: actions/checkout@v4
