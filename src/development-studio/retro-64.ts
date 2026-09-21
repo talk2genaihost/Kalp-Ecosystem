@@ -1,3 +1,4 @@
+import { getRetroAudioDNA, buildRetroSceneAudio, type RetroAudioDNA, type RetroSceneAudio } from "./retro-audio";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
@@ -147,6 +148,7 @@ function intentTokens(intent:string):string[]{return intent.toLowerCase().split(
 function hasToken(tokens:string[],...words:string[]){return words.some(word=>tokens.includes(word));}
 
 function buildProductionScenes(game:RetroGameReference, intent:string, mode:RetroIntentMode, progression:RetroProgressionModel):RetroProductionScene[] {
+  const sceneAudio=buildRetroSceneAudio(game.name);
   const tokens=intentTokens(intent);
   const setting=hasToken(tokens,"night","nighttime")?"night-time":hasToken(tokens,"desert")?"desert":hasToken(tokens,"snow","snowy")?"snow-covered":hasToken(tokens,"urban","city")?"urban":"cinematic";
   const weather=hasToken(tokens,"rain","rainy","storm","stormy")?"heavy rain":hasToken(tokens,"fog","foggy")?"dense fog":hasToken(tokens,"sandstorm")?"sandstorm":"environmental pressure";
@@ -180,7 +182,7 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
       {world_state:`Fortified threshold reached: ${environment}`,threat_state:"Regrouping forces beyond the gate",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"None",capability_after:"Current capability retained",objective_state:"Cross the fortified gate",next_threat_state:"Unknown larger force beyond threshold"},
       {world_state:`New combat space revealed beyond the gate`,threat_state:"Larger enemy formation + unknown aerial threat",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"None",capability_after:"Current capability carried into next encounter",objective_state:"Enter the next battlefield",next_threat_state:"Next encounter begins",new_threat:"Unknown advanced aerial combat platform"}
     ][i];
-    return {...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame,...states};
+    return {...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame,...states,audio_dna:sceneAudio[i]};
   });
 }
 
@@ -275,7 +277,7 @@ export function validateRetroProductionJson(episode:Record<string,any>):RetroPro
   const scenes=episode.storyboard;
   Array.isArray(scenes)&&scenes.length===8?pass("storyboard_count","Production JSON contains exactly 8 scenes."):fail("storyboard_count",`Storyboard must contain exactly 8 scenes; received ${Array.isArray(scenes)?scenes.length:"non-array"}.`);
   if(Array.isArray(scenes)&&scenes.length===8){
-    const requiredScene=["frame","stage","title","description","visual","action","characters","environment","enemy_presence","weapons","camera","vfx","sound","dialogue","continuity","progression_purpose","reference_frame","world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state"];
+    const requiredScene=["frame","stage","title","description","visual","action","characters","environment","enemy_presence","weapons","camera","vfx","sound","dialogue","continuity","progression_purpose","reference_frame","world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state","audio_dna"];
     const missing=scenes.flatMap((s:any,i:number)=>requiredScene.filter(k=>s[k]===undefined||s[k]===null||s[k]==="").map(k=>`Scene ${i+1}: ${k}`));
     !missing.length?pass("scene_required_fields","All production scenes contain required renderer-facing fields."):fail("scene_required_fields",`Missing scene fields: ${missing.join(", ")}.`);
     const typesOk=scenes.every((s:any)=>Number.isInteger(s.frame)&&typeof s.stage==="string"&&typeof s.title==="string"&&typeof s.description==="string"&&typeof s.visual==="string"&&typeof s.action==="string"&&Array.isArray(s.characters)&&typeof s.camera==="string"&&typeof s.vfx==="string"&&typeof s.sound==="string"&&Number.isInteger(s.reference_frame));
@@ -284,6 +286,7 @@ export function validateRetroProductionJson(episode:Record<string,any>):RetroPro
     try{JSON.stringify(episode);pass("json_serializable","Production contract is JSON-serializable.");}catch{fail("json_serializable","Production contract is not JSON-serializable.");}
   }
   if(episode.intent_mode==="VARIATION"||episode.intent_mode==="EXPANSION") (typeof episode.intent==="string"&&episode.intent.trim())?pass("generated_intent","Generated episode retains the user intent."):fail("generated_intent","Generated episode must retain a non-empty intent.");
+  if(Array.isArray(scenes)&&scenes.length===8&&scenes.every((s:any)=>s.audio_dna&&typeof s.audio_dna.music==="string"&&typeof s.audio_dna.rhythm==="string"&&typeof s.audio_dna.ambience==="string"&&Array.isArray(s.audio_dna.sfx)&&typeof s.audio_dna.intensity==="string"&&typeof s.audio_dna.transition==="string"&&typeof s.audio_dna.mix==="string")) pass("audio_dna_contract","All 8 scenes contain embedded Audio DNA."); else fail("audio_dna_contract","All 8 scenes must contain embedded Audio DNA.");
   return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
 }
 
@@ -407,7 +410,7 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     reference_source:request.sourceArtifact||"KALP_Retro_64_Master_Reference.xlsx",
     reference_role:"GAME_PROGRESSION_REFERENCE",
     duration_seconds:game.durationSeconds??60,format:game.format??"9:16",
-    reference_elements_used:{world:game.world,terrain:game.terrain,obstacles:game.obstacles,enemies:game.enemies,moves:game.moves,weapons_ammunition:game.weapons,power_ups:game.powerUps,special_abilities:game.abilities,props:game.props,camera:game.camera,vfx:game.vfx,sound:game.sound,realistic_interpretation:game.realistic},
+    reference_elements_used:{world:game.world,terrain:game.terrain,obstacles:game.obstacles,enemies:game.enemies,moves:game.moves,weapons_ammunition:game.weapons,power_ups:game.powerUps,special_abilities:game.abilities,props:game.props,camera:game.camera,vfx:game.vfx,sound:game.sound,audio_dna:getRetroAudioDNA(game.name),realistic_interpretation:game.realistic},
     progression:progression.progression,
     locked_dna:progression.lockedDna,
     flexible_elements:progression.flexibleElements,
