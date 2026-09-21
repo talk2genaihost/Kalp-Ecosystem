@@ -558,6 +558,25 @@ function retroGenerate(){
       {world_state:"New encounter space revealed beyond the threshold",threat_state:"Larger reference enemy formation or hazard",capability_before:"Enhanced game-native capability",capability_gain:"None",capability_after:"Current capability carried forward",objective_state:"Enter the next encounter",next_threat_state:"Next encounter begins",new_threat:"A larger game-native threat"}
     ][i];return {frame:i+1,stage:RETRO_STAGES[i],title:x[0],description:x[1],visual:x[2],action:x[3],characters:[dna.character_id],character_identity:dna.identity,character_visual:dna.silhouette,character_costume:dna.costume,character_equipment:dna.equipment,character_continuity:dna.continuity_lock,environment:gameContext,enemy_presence:enemies,weapons,weapons_ammunition:weapons,camera:x[4]||cam,vfx,sound:snd,dialogue:i===7?"The next challenge begins.":"",continuity:i===0?"Establish hero, world and intent.":i===7?"Seed the next encounter.":"Continue identity, world, weather and progression from prior frame.",progression_purpose:x[5],reference_frame:i+1,audio_dna:retroSceneAudio(retroGame.name,i),...states};})};
   }
+  const retroDialogues={
+    Contra:["Move in.","Enemy contact.","Engage and advance.","Power acquired.","Heavy resistance!","Break through!","Objective ahead.","What is waiting beyond?"],
+    Mario:["Keep moving!","Watch out!","Jump and advance!","Power up!","It is getting tougher!","Break through!","The goal is ahead!","What is beyond the next world?"],
+    "Road Fighter":["Push forward.","Traffic ahead.","Find the gap.","Fuel and speed.","Traffic is closing in!","Break through!","Final stretch ahead.","What is waiting beyond?"],
+    "Kung Fu":["Stay focused.","Enemy ahead.","Engage.","New technique.","The pressure is rising!","Break through!","The next floor awaits.","Who is waiting above?"],
+    "Legend of Kage":["Move silently.","Enemies ahead.","Strike and advance.","Ability ready.","The fortress is closing in!","Break through!","The fortress lies ahead.","What waits beyond the gate?"]
+  };
+  const dialogueFallback=["Move forward.","Threat ahead.","Engage and advance.","Capability acquired.","Pressure is rising.","Break through.","Objective ahead.","A new threat awaits."];
+  const selectedDialogues=retroDialogues[retroGame.name]||dialogueFallback;
+  const flexibleElements=["Specific locations and weather","Enemy combinations","Obstacles and set pieces","Weapon or ability combinations","Exact actions and scene titles","Camera execution and cinematic treatment"];
+  retroEpisode.flexible_elements=Array.isArray(retroEpisode.flexible_elements)?retroEpisode.flexible_elements:flexibleElements;
+  retroEpisode.storyboard=(retroEpisode.storyboard||[]).map((f,i)=>({
+    ...f,
+    frame:i+1,
+    reference_frame:Number.isInteger(f.reference_frame)?f.reference_frame:i+1,
+    dialogue:typeof f.dialogue==="string"&&f.dialogue.trim()?f.dialogue:selectedDialogues[i],
+    audio_dna:f.audio_dna||retroSceneAudio(retroGame.name,i)
+  }));
+
   document.getElementById("retroFrames").innerHTML=retroEpisode.storyboard.map(f=>"<div class=\"retro-frame\"><strong>FRAME 0"+f.frame+" · "+f.stage+"</strong><h4>"+f.title+"</h4><p>"+f.description+"</p><p style=\"color:#66cce2\">VISUAL · "+f.visual+"</p><p>ACTION · "+f.action+"</p><p style=\"color:#4ed6a0\">CAMERA · "+f.camera+"</p><p style=\"color:#e9bb68\">AUDIO · "+(f.audio_dna?.music||"")+" · "+(f.audio_dna?.intensity||"")+" · "+(f.audio_dna?.transition||"")+"</p></div>").join("");
   const sceneValidation=retroValidate(retroEpisode);const contractValidation=retroValidateProductionJson(retroEpisode);const characterContinuity=retroValidateCharacterContinuity(retroEpisode);const rendererReadiness=retroValidateRendererReadiness(retroEpisode);const validation={validator_version:"1.0",status:sceneValidation.status==="PASS"&&contractValidation.status==="PASS"&&characterContinuity.status==="PASS"&&rendererReadiness.status==="PASS"?"PASS":"FAIL",errors:[...sceneValidation.errors,...contractValidation.errors,...characterContinuity.errors,...rendererReadiness.errors],warnings:[...sceneValidation.warnings,...contractValidation.warnings,...characterContinuity.warnings,...rendererReadiness.warnings],checks:[...sceneValidation.checks,...contractValidation.checks,...characterContinuity.checks,...rendererReadiness.checks]};retroEpisode.validation=validation;retroEpisode.renderer_readiness=rendererReadiness;document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);renderRetroValidationDetails(validation);
   document.getElementById("retroStatus").textContent="GENERATED · "+mode+" · "+(validation.status==="PASS"?"VALIDATED":"VALIDATION FAILED")+" · scene-state continuity v1.1 · progression DNA preserved.";
@@ -578,25 +597,26 @@ function retroValidateRendererReadiness(ep){
   ep?.contract==="KALP-RETRO-64-PRODUCTION-EPISODE-1.0"?pass("renderer_contract","Renderer receives the canonical production episode contract."):fail("renderer_contract","Renderer input is not the canonical production episode contract.");
   ep?.progression_model==="1.1"?pass("renderer_progression_model","Renderer input preserves progression model 1.1."):fail("renderer_progression_model","Renderer input must preserve progression model 1.1.");
   if(Array.isArray(s)&&s.length===8){
-    const req=["frame","stage","title","description","visual","action","characters","environment","enemy_presence","weapons","camera","vfx","sound","dialogue","continuity","progression_purpose","reference_frame","world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state","audio_dna"];
-    const missing=s.flatMap((x,i)=>req.filter(k=>k!=="characters"&&typeof x[k]!=="string").concat((Array.isArray(x.characters)&&x.characters.length)?[]:["characters"]).map(k=>"Scene "+(i+1)+": "+k));
-    missing.length?fail("renderer_required_fields","Renderer-required fields are missing or have invalid types: "+missing.join(", ")+"."):pass("renderer_required_fields","Every scene contains the complete renderer-facing field contract.");
-    const empty=s.flatMap((x,i)=>req.filter(k=>k!=="characters"&&typeof x[k]==="string"&&!x[k].trim()).map(k=>"Scene "+(i+1)+": "+k));
+    const stringFields=["stage","title","description","visual","action","environment","enemy_presence","weapons","camera","vfx","sound","dialogue","continuity","progression_purpose","world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state"];
+    const missing=s.flatMap((x,i)=>stringFields.filter(k=>typeof x[k]!=="string").map(k=>"Scene "+(i+1)+": "+k));
+    if(missing.length) fail("renderer_required_fields","Renderer-required fields are missing or have invalid types: "+missing.join(", ")+".");
+    else pass("renderer_required_fields","Every scene contains the complete renderer-facing string field contract.");
+    const empty=s.flatMap((x,i)=>stringFields.filter(k=>typeof x[k]==="string"&&!x[k].trim()).map(k=>"Scene "+(i+1)+": "+k));
     empty.length?fail("renderer_non_empty_fields","Renderer-facing string fields cannot be empty: "+empty.join(", ")+"."):pass("renderer_non_empty_fields","All renderer-facing string fields contain usable content.");
     const charsOk=s.every(x=>Array.isArray(x.characters)&&x.characters.length>0&&x.characters.every(v=>typeof v==="string"&&v.trim()));
     charsOk?pass("renderer_characters","Every scene provides a non-empty characters array."):fail("renderer_characters","Every scene must provide a non-empty characters array of strings.");
     const frameOk=s.every((x,i)=>Number.isInteger(x.frame)&&x.frame===i+1&&Number.isInteger(x.reference_frame)&&x.reference_frame===i+1);
     frameOk?pass("renderer_frame_identity","Scene frame and reference-frame identity are deterministic and aligned."):fail("renderer_frame_identity","Scene frame/reference-frame identity is not deterministic or aligned.");
-    const unresolved=s.flatMap((x,i)=>req.filter(k=>k!=="characters").some(k=>/\$\{[^}]+\}|\[TODO\]|<TODO>|undefined|null/i.test(String(x[k]??"")))?["Scene "+(i+1)+": unresolved template/token content"]:[]);
+    const audioOk=s.every(x=>x.audio_dna&&typeof x.audio_dna==="object"&&typeof x.audio_dna.music==="string"&&typeof x.audio_dna.rhythm==="string"&&typeof x.audio_dna.ambience==="string"&&Array.isArray(x.audio_dna.sfx)&&typeof x.audio_dna.intensity==="string"&&typeof x.audio_dna.transition==="string"&&typeof x.audio_dna.mix==="string");
+    audioOk?pass("renderer_audio_dna","All 8 scenes contain complete Audio DNA objects."):fail("renderer_audio_dna","Audio DNA is missing or incomplete in one or more scenes.");
+    const unresolved=s.flatMap((x,i)=>stringFields.some(k=>/\$\{[^}]+\}|\[TODO\]|<TODO>|undefined|null/i.test(String(x[k]??"")))?["Scene "+(i+1)+": unresolved template/token content"]:[]);
     unresolved.length?fail("renderer_no_unresolved_tokens","Renderer input contains unresolved template content: "+unresolved.join(", ")+"."):pass("renderer_no_unresolved_tokens","No unresolved template tokens or undefined/null placeholders are present.");
     const standalone=s.every(x=>{try{JSON.stringify(x);return true}catch{return false}});
     standalone?pass("renderer_standalone_json","Every scene can be serialized independently as a renderer packet."):fail("renderer_standalone_json","At least one scene cannot be serialized independently.");
-    const direct=s.every(x=>req.every(k=>Object.prototype.hasOwnProperty.call(x,k)));
+    const direct=s.every(x=>stringFields.every(k=>Object.prototype.hasOwnProperty.call(x,k))&&Object.prototype.hasOwnProperty.call(x,"frame")&&Object.prototype.hasOwnProperty.call(x,"reference_frame")&&Object.prototype.hasOwnProperty.call(x,"audio_dna")&&Object.prototype.hasOwnProperty.call(x,"characters"));
     direct?pass("renderer_direct_field_access","Renderer can access required fields directly without field mapping."):fail("renderer_direct_field_access","Renderer would require field mapping before consuming one or more scenes.");
     const state=s.every(x=>x.world_state&&x.threat_state&&x.capability_before&&x.capability_gain&&x.capability_after&&x.objective_state&&x.next_threat_state);
     state?pass("renderer_state_continuity","Scene-state continuity fields are directly available to the renderer."):fail("renderer_state_continuity","One or more scenes are missing direct state-continuity data.");
-    const audio=s.every(x=>x.audio_dna&&typeof x.audio_dna.music==="string"&&typeof x.audio_dna.rhythm==="string"&&typeof x.audio_dna.ambience==="string"&&Array.isArray(x.audio_dna.sfx)&&typeof x.audio_dna.intensity==="string"&&typeof x.audio_dna.transition==="string"&&typeof x.audio_dna.mix==="string");
-    audio?pass("renderer_audio_dna","All 8 scenes contain direct Audio DNA."):fail("renderer_audio_dna","Audio DNA is missing or incomplete in one or more scenes.");
   }
   return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
 }
