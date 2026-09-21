@@ -96,6 +96,14 @@ export interface RetroProductionScene {
   continuity:string;
   progression_purpose:string;
   reference_frame:number;
+  world_state?:string;
+  threat_state?:string;
+  capability_before?:string;
+  capability_gain?:string;
+  capability_after?:string;
+  objective_state?:string;
+  next_threat_state?:string;
+  new_threat?:string;
 }
 
 const STAGES:RetroProgressionStage[]=[
@@ -161,7 +169,19 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
     {frame:7,stage:"GATE_OR_OBJECTIVE",title:"The Fortified Gate",description:`The hero reaches the immediate objective threshold: the fortified compound gate.`,visual:`Massive fortified gate emerges through rain and smoke, floodlights cutting through jungle mist while enemy forces regroup beyond it.`,action:`Hero reaches the gate, disables the immediate barrier and crosses the threshold toward the ${objective}.`,characters:chars,environment,enemy_presence:"Regrouping forces beyond the gate",weapons,camera:"Wide establishing shot followed by forward push-in",vfx, sound,dialogue:"",continuity:"Gate is the consequence of the route and breakthrough, not a disconnected location.",progression_purpose:"Create a clear objective threshold before the next threat.",reference_frame:7},
     {frame:8,stage:"NEXT_THREAT",title:"Beyond the Gate",description:`The immediate objective opens into a larger combat space and reveals a new threat.`,visual:`Gate opens onto a vast fortified compound; a larger enemy formation and new aerial threat emerge beyond the rain.`,action:`Hero runs through the gate toward the next battlefield as the camera reveals the scale of the new threat, then cuts to black.`,characters:chars,environment,enemy_presence:"Larger enemy force and new aerial threat",weapons,camera:"Rear tracking shot into wide reveal and cliffhanger push-in",vfx, sound,dialogue:"Radio voice: This is only the beginning.",continuity:"End state must clearly seed the next encounter.",progression_purpose:"Close the episode on a new threat rather than resolution.",reference_frame:8}
   ];
-  return scenes.map(s=>({...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame}));
+  return scenes.map((s,i)=>{
+    const states=[
+      {world_state:`Entry environment established: ${environment}`,threat_state:"Distant surveillance and environmental pressure",capability_before:"Standard combat capability",capability_gain:"None",capability_after:"Standard combat capability",objective_state:`Advance toward ${objective}`,next_threat_state:"Patrol threat emerging"},
+      {world_state:`Same environment under escalating pursuit: ${environment}`,threat_state:"Patrol units + focused helicopter pursuit",capability_before:"Standard combat capability",capability_gain:"None",capability_after:"Standard combat capability",objective_state:"Reach the next cover position",next_threat_state:"Direct ground engagement"},
+      {world_state:`Combat zone established: ${environment}`,threat_state:"Direct ground fire with aerial exposure",capability_before:"Standard combat capability",capability_gain:"None",capability_after:"Standard combat capability",objective_state:"Survive first engagement and advance",next_threat_state:"Supply opportunity"},
+      {world_state:`Supply cache discovered inside the same combat zone`,threat_state:"Enemy fire continues while upgrade is acquired",capability_before:"Standard assault weapon",capability_gain:game.powerUps||"Weapon upgrade crate",capability_after:"Enhanced rapid-fire combat capability",objective_state:"Acquire capability before major escalation",next_threat_state:"Combined air-and-ground assault"},
+      {world_state:`Route becomes a moving battlefield: ${environment}`,threat_state:"Armored ground force + helicopter pursuit",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"Uses Scene 4 upgrade",capability_after:"Enhanced rapid-fire combat capability under pressure",objective_state:"Break the strongest immediate resistance",next_threat_state:"Obstacle breakthrough"},
+      {world_state:`Obstacle zone transformed by combat: ${environment}`,threat_state:"Concentrated resistance at the breakthrough point",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"Environmental explosive strike",capability_after:"Open route through immediate obstacle",objective_state:"Cross the cleared route",next_threat_state:"Fortified gate"},
+      {world_state:`Fortified threshold reached: ${environment}`,threat_state:"Regrouping forces beyond the gate",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"None",capability_after:"Current capability retained",objective_state:"Cross the fortified gate",next_threat_state:"Unknown larger force beyond threshold"},
+      {world_state:`New combat space revealed beyond the gate`,threat_state:"Larger enemy formation + unknown aerial threat",capability_before:"Enhanced rapid-fire combat capability",capability_gain:"None",capability_after:"Current capability carried into next encounter",objective_state:"Enter the next battlefield",next_threat_state:"Next encounter begins",new_threat:"Unknown advanced aerial combat platform"}
+    ][i];
+    return {...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame,...states};
+  });
 }
 
 export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
@@ -170,11 +190,12 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
   const intent=request.intent.trim();
   if(request.mode==="REFERENCE") return buildRetroEpisode(game,request.episodeId);
   if(!intent) throw new Error("Intent is required for VARIATION or EXPANSION mode.");
-  const storyboard=buildProductionScenes(game,intent,request.mode,progression);
+  const normalizedIntent=intent.replace(/halicopter/gi,"helicopter").replace(/persuit/gi,"pursuit");
+  const storyboard=buildProductionScenes(game,normalizedIntent,request.mode,progression);
   return {
     contract:"KALP-RETRO-64-PRODUCTION-EPISODE-1.0",
     episode_id:request.episodeId||`${game.name.toUpperCase().replace(/[^A-Z0-9]+/g,"_")}_INTENT_EP_001`,
-    game:game.name,intent_mode:request.mode,intent,
+    game:game.name,intent_mode:request.mode,intent:normalizedIntent,
     progression_model:"1.0",progression_source:game.worksheet,
     reference_source:request.sourceArtifact||"KALP_Retro_64_Master_Reference.xlsx",
     reference_role:"GAME_PROGRESSION_REFERENCE",
