@@ -13,6 +13,9 @@
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
     "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
