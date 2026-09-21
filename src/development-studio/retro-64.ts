@@ -61,7 +61,7 @@ export interface RetroProgressionStep {
 }
 
 export interface RetroProgressionModel {
-  modelVersion:"1.0";
+  modelVersion:"1.1";
   game:string;
   sourceWorksheet:string;
   sourceArtifact:string;
@@ -196,7 +196,7 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     contract:"KALP-RETRO-64-PRODUCTION-EPISODE-1.0",
     episode_id:request.episodeId||`${game.name.toUpperCase().replace(/[^A-Z0-9]+/g,"_")}_INTENT_EP_001`,
     game:game.name,intent_mode:request.mode,intent:normalizedIntent,
-    progression_model:"1.0",progression_source:game.worksheet,
+    progression_model:"1.1",progression_source:game.worksheet,
     reference_source:request.sourceArtifact||"KALP_Retro_64_Master_Reference.xlsx",
     reference_role:"GAME_PROGRESSION_REFERENCE",
     duration_seconds:game.durationSeconds??60,format:game.format??"9:16",
