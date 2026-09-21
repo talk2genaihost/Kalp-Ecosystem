@@ -47,6 +47,9 @@ jobs:
         env:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: npm run build:astro-rashi
+      - name: Run Retro 64 gate tests
+        working-directory: repo
+        run: npm test -- --test-name-pattern="RETRO-64 Gate v1.0"
       - name: Build and smoke-test AdManthan v0.8.9 publish artifact
         working-directory: repo
         run: |
@@ -62,8 +65,9 @@ jobs:
         run: |
           set -eu
           rm -rf /tmp/published-site
-          mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio /tmp/published-site/production
+          mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio/data /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
+          cp data/retro-64-reference.json /tmp/published-site/cinematic-studio/data/retro-64-reference.json
           cp -R apps/production/. /tmp/published-site/production/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
