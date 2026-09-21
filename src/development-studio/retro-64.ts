@@ -39,3 +39,157 @@ export async function parseRetro64Workbook(input: ArrayBuffer | Uint8Array): Pro
   }
   return { schemaVersion: "1.0", sourceArtifact: "KALP_Retro_64_Master_Reference.xlsx", games };
 }
+
+export type RetroIntentMode = "REFERENCE" | "VARIATION" | "EXPANSION";
+
+export type RetroProgressionStage =
+  | "ENTRY"
+  | "THREAT_INTRODUCTION"
+  | "FIRST_ENGAGEMENT"
+  | "CAPABILITY_ESCALATION"
+  | "MAJOR_ESCALATION"
+  | "BREAKTHROUGH"
+  | "GATE_OR_OBJECTIVE"
+  | "NEXT_THREAT";
+
+export interface RetroProgressionStep {
+  order:number;
+  stage:RetroProgressionStage;
+  referenceFrame:number;
+  referenceTitle:string;
+  referenceAction:string;
+}
+
+export interface RetroProgressionModel {
+  modelVersion:"1.0";
+  game:string;
+  sourceWorksheet:string;
+  sourceArtifact:string;
+  progression:RetroProgressionStep[];
+  lockedDna:string[];
+  flexibleElements:string[];
+}
+
+export interface RetroIntentEpisodeRequest {
+  game:RetroGameReference;
+  mode:RetroIntentMode;
+  intent:string;
+  episodeId?:string;
+  sourceArtifact?:string;
+}
+
+const STAGES:RetroProgressionStage[]=[
+  "ENTRY","THREAT_INTRODUCTION","FIRST_ENGAGEMENT","CAPABILITY_ESCALATION",
+  "MAJOR_ESCALATION","BREAKTHROUGH","GATE_OR_OBJECTIVE","NEXT_THREAT"
+];
+
+function stageForFrame(index:number):RetroProgressionStage {
+  return STAGES[Math.min(index,STAGES.length-1)];
+}
+
+/** Derive the game's progression grammar from the ordered reference frames. */
+export function buildRetroProgressionModel(
+  game:RetroGameReference,
+  sourceArtifact="KALP_Retro_64_Master_Reference.xlsx"
+):RetroProgressionModel {
+  if(!game.frames || game.frames.length!==8){
+    throw new Error(`Progression model requires exactly 8 reference frames: ${game.worksheet}`);
+  }
+  return {
+    modelVersion:"1.0",
+    game:game.name,
+    sourceWorksheet:game.worksheet,
+    sourceArtifact,
+    progression:game.frames.map((frame,index)=>({
+      order:index+1,
+      stage:stageForFrame(index),
+      referenceFrame:index+1,
+      referenceTitle:frame.title,
+      referenceAction:frame.action
+    })),
+    lockedDna:[
+      "Ordered escalation from entry to a new threat",
+      "Eight-step encounter rhythm",
+      "Increasing opposition and/or capability",
+      "Action-driven progression rather than static scene repetition",
+      "A gate, objective or threshold before the next threat"
+    ],
+    flexibleElements:[
+      "Specific locations and weather",
+      "Enemy combinations",
+      "Obstacles and set pieces",
+      "Weapon or ability combinations",
+      "Exact actions and scene titles",
+      "Camera execution and cinematic treatment"
+    ]
+  };
+}
+
+function intentTokens(intent:string):string[]{
+  return intent.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+/**
+ * Generate a new episode from user intent while preserving the reference game's
+ * progression grammar. This is deliberately separate from buildRetroEpisode(),
+ * which remains the exact-reference path.
+ */
+export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
+  const game=structuredClone(request.game);
+  const progression=buildRetroProgressionModel(game,request.sourceArtifact);
+  const intent=request.intent.trim();
+  if(!intent) throw new Error("Intent is required for VARIATION or EXPANSION mode.");
+  if(request.mode==="REFERENCE") return buildRetroEpisode(game,request.episodeId);
+
+  const tokens=intentTokens(intent);
+  const has=(...words:string[])=>words.some(word=>tokens.includes(word));
+  const setting=has("night","nighttime")?"night-time":has("desert")?"desert":has("snow","snowy")?"snow-covered":has("urban","city")?"urban":"cinematic";
+  const weather=has("rain","rainy","storm","stormy")?"heavy rain":has("fog","foggy")?"dense fog":has("sandstorm")?"sandstorm":"environmental pressure";
+  const pursuit=has("helicopter","chase","pursuit")?"high-speed pursuit":"advancing enemy pressure";
+  const objective=has("rescue","extract","extraction")?"rescue/extraction objective":has("destroy","destroyed","destroying")?"destruction objective":has("escape","escape")?"escape objective":"forward mission objective";
+
+  const generated=[
+    {stage:"ENTRY",title:`Approach — ${setting} ${game.name} zone`,action:`The hero enters a ${setting} combat zone under ${weather}, moving toward the ${objective}.`},
+    {stage:"THREAT_INTRODUCTION",title:"Threat Contact",action:`A first enemy unit appears and establishes the route's danger; ${pursuit} begins to close the distance.`},
+    {stage:"FIRST_ENGAGEMENT",title:"First Engagement",action:"The hero reacts with rapid movement, using cover and the environment while the first exchange escalates."},
+    {stage:"CAPABILITY_ESCALATION",title:"Capability Gain",action:`The hero acquires or activates a ${game.powerUps||"combat capability"}, changing the tactical options for the next encounter.`},
+    {stage:"MAJOR_ESCALATION",title:"Enemy Escalation",action:`A stronger opposition force combines ${game.enemies||"enemy units"} with environmental pressure and forces continuous movement.`},
+    {stage:"BREAKTHROUGH",title:"Breakthrough",action:`The hero combines ${game.moves||"movement"} with ${game.abilities||"special abilities"} to break through the escalating obstacle.`},
+    {stage:"GATE_OR_OBJECTIVE",title:"Objective Threshold",action:`A major threshold appears: ${objective}. The hero crosses the immediate gate while the environment reaches peak intensity.`},
+    {stage:"NEXT_THREAT",title:"Next Threat",action:`The route opens into a larger combat space; a new threat is revealed, creating the next ${game.name} encounter.`}
+  ];
+
+  return {
+    contract:"KALP-RETRO-64-EPISODE-1.0",
+    episode_id:request.episodeId||`${game.name.toUpperCase().replace(/[^A-Z0-9]+/g,"_")}_INTENT_EP_001`,
+    game:game.name,
+    intent_mode:request.mode,
+    intent,
+    progression_model:"1.0",
+    progression_source:game.worksheet,
+    reference_source:request.sourceArtifact||"KALP_Retro_64_Master_Reference.xlsx",
+    reference_role:"GAME_PROGRESSION_REFERENCE",
+    duration_seconds:game.durationSeconds??60,
+    format:game.format??"9:16",
+    world:game.world??"",
+    terrain:game.terrain??"",
+    obstacles:game.obstacles??"",
+    enemies:game.enemies??"",
+    moves:game.moves??"",
+    weapons_ammunition:game.weapons??"",
+    power_ups:game.powerUps??"",
+    special_abilities:game.abilities??"",
+    props:game.props??"",
+    camera:game.camera??"",
+    vfx:game.vfx??"",
+    sound:game.sound??"",
+    realistic_interpretation:game.realistic??"",
+    progression:progression.progression,
+    storyboard:generated.map((frame,index)=>({
+      frame:index+1,
+      stage:frame.stage,
+      title:frame.title,
+      action:frame.action
+    }))
+  };
+}
