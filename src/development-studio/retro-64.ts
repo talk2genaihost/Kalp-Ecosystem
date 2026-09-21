@@ -78,6 +78,26 @@ export interface RetroIntentEpisodeRequest {
   sourceArtifact?:string;
 }
 
+export interface RetroProductionScene {
+  frame:number;
+  stage:RetroProgressionStage;
+  title:string;
+  description:string;
+  visual:string;
+  action:string;
+  characters:string[];
+  environment:string;
+  enemy_presence:string;
+  weapons:string;
+  camera:string;
+  vfx:string;
+  sound:string;
+  dialogue:string;
+  continuity:string;
+  progression_purpose:string;
+  reference_frame:number;
+}
+
 const STAGES:RetroProgressionStage[]=[
   "ENTRY","THREAT_INTRODUCTION","FIRST_ENGAGEMENT","CAPABILITY_ESCALATION",
   "MAJOR_ESCALATION","BREAKTHROUGH","GATE_OR_OBJECTIVE","NEXT_THREAT"
@@ -87,7 +107,6 @@ function stageForFrame(index:number):RetroProgressionStage {
   return STAGES[Math.min(index,STAGES.length-1)];
 }
 
-/** Derive the game's progression grammar from the ordered reference frames. */
 export function buildRetroProgressionModel(
   game:RetroGameReference,
   sourceArtifact="KALP_Retro_64_Master_Reference.xlsx"
@@ -96,16 +115,10 @@ export function buildRetroProgressionModel(
     throw new Error(`Progression model requires exactly 8 reference frames: ${game.worksheet}`);
   }
   return {
-    modelVersion:"1.0",
-    game:game.name,
-    sourceWorksheet:game.worksheet,
-    sourceArtifact,
+    modelVersion:"1.0", game:game.name, sourceWorksheet:game.worksheet, sourceArtifact,
     progression:game.frames.map((frame,index)=>({
-      order:index+1,
-      stage:stageForFrame(index),
-      referenceFrame:index+1,
-      referenceTitle:frame.title,
-      referenceAction:frame.action
+      order:index+1, stage:stageForFrame(index), referenceFrame:index+1,
+      referenceTitle:frame.title, referenceAction:frame.action
     })),
     lockedDna:[
       "Ordered escalation from entry to a new threat",
@@ -115,81 +128,61 @@ export function buildRetroProgressionModel(
       "A gate, objective or threshold before the next threat"
     ],
     flexibleElements:[
-      "Specific locations and weather",
-      "Enemy combinations",
-      "Obstacles and set pieces",
-      "Weapon or ability combinations",
-      "Exact actions and scene titles",
+      "Specific locations and weather","Enemy combinations","Obstacles and set pieces",
+      "Weapon or ability combinations","Exact actions and scene titles",
       "Camera execution and cinematic treatment"
     ]
   };
 }
 
-function intentTokens(intent:string):string[]{
-  return intent.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+function intentTokens(intent:string):string[]{return intent.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);}
+function hasToken(tokens:string[],...words:string[]){return words.some(word=>tokens.includes(word));}
+
+function buildProductionScenes(game:RetroGameReference, intent:string, mode:RetroIntentMode, progression:RetroProgressionModel):RetroProductionScene[] {
+  const tokens=intentTokens(intent);
+  const setting=hasToken(tokens,"night","nighttime")?"night-time":hasToken(tokens,"desert")?"desert":hasToken(tokens,"snow","snowy")?"snow-covered":hasToken(tokens,"urban","city")?"urban":"cinematic";
+  const weather=hasToken(tokens,"rain","rainy","storm","stormy")?"heavy rain":hasToken(tokens,"fog","foggy")?"dense fog":hasToken(tokens,"sandstorm")?"sandstorm":"environmental pressure";
+  const pursuit=hasToken(tokens,"helicopter","chase","pursuit")?"helicopter pursuit":"advancing enemy pressure";
+  const objective=hasToken(tokens,"rescue","extract","extraction")?"rescue/extraction":hasToken(tokens,"destroy","destroyed","destroying")?"destruction":hasToken(tokens,"escape")?"escape":"forward mission";
+  const environment=`${setting} tropical military-industrial zone; ${weather}; ${game.terrain||""}`.trim();
+  const enemy=game.enemies||"enemy units";
+  const weapons=game.weapons||"available combat weapons";
+  const camera=game.camera||"cinematic action camera";
+  const vfx=game.vfx||"cinematic environmental effects";
+  const sound=game.sound||"cinematic action soundscape";
+  const chars=["Hero"];
+  const scenes:RetroProductionScene[]=[
+    {frame:1,stage:"ENTRY",title:`Night Jungle Approach`,description:`The hero enters the ${setting} combat zone as ${weather} reduces visibility and a distant ${pursuit} establishes the mission's pressure.`,visual:`Photorealistic ${environment}, wet reflective surfaces, dense jungle, abandoned military vehicles, distant fortified compound, lone hero advancing through rain.`,action:`Hero runs forward, scans the route and moves toward the ${objective} while distant helicopter searchlights sweep across the jungle.`,characters:chars,environment,enemy_presence:"Distant patrol units and aerial surveillance",weapons, camera:"Low tracking shot followed by wide establishing shot",vfx:`Rain spray, wet-road reflections, mist and distant searchlight beams; ${vfx}`,sound:`Heavy percussion, rainfall, distant helicopter rotor and radio chatter; ${sound}`,dialogue:"",continuity:"Establish hero, environment, weather and mission direction.",progression_purpose:"Establish entry and immediately introduce environmental pressure.",reference_frame:1},
+    {frame:2,stage:"THREAT_INTRODUCTION",title:"Helicopter Threat Contact",description:`Enemy presence becomes explicit as patrol units block the route and the helicopter begins a focused pursuit.`,visual:`Enemy patrol vehicle emerges through rain, soldiers deploy near barricades while a helicopter searchlight tracks the hero.`,action:`Hero changes direction, uses abandoned vehicles as cover and accelerates as the pursuit closes.`,characters:chars,environment,enemy_presence:`Patrol units plus helicopter support: ${enemy}`,weapons, camera:"Over-shoulder combat into handheld chase",vfx, sound,dialogue:"Radio chatter: Contact ahead.",continuity:"Threat must follow directly from Scene 1 and increase pressure.",progression_purpose:"Convert environmental danger into an identifiable enemy threat.",reference_frame:2},
+    {frame:3,stage:"FIRST_ENGAGEMENT",title:"First Engagement",description:"The hero is forced into the first direct combat exchange while the helicopter keeps the route exposed.",visual:`Hero crouches behind a concrete barrier as muzzle flashes cut through heavy rain; helicopter light sweeps the battlefield.`,action:`Hero dodges incoming fire, returns controlled bursts and moves between cover positions.`,characters:chars,environment,enemy_presence:enemy,weapons,camera:"Over-shoulder combat with rapid low-angle tracking",vfx, sound,dialogue:"",continuity:"Hero retains the same identity, equipment and weather established earlier.",progression_purpose:"Begin action escalation through direct engagement.",reference_frame:3},
+    {frame:4,stage:"CAPABILITY_ESCALATION",title:"Weapon Upgrade",description:`The hero reaches a supply cache and gains a stronger capability before the next escalation.`,visual:`Rain-soaked supply crate beside a damaged military vehicle; weapon upgrade glows subtly in the darkness.`,action:`Hero breaks from cover, reaches the crate, upgrades the weapon and immediately prepares for the next attack.`,characters:chars,environment,enemy_presence:"Enemy fire continues in the background",weapons:`${weapons}; ${game.powerUps||"weapon upgrade crate"}`,camera:"Fast tracking shot into close-up insert of the upgrade",vfx, sound,dialogue:"",continuity:"Upgrade changes capability without changing hero identity or world.",progression_purpose:"Introduce a capability gain that enables the next escalation.",reference_frame:4},
+    {frame:5,stage:"MAJOR_ESCALATION",title:"Air and Ground Assault",description:`A stronger combined force turns the route into a moving battlefield.`,visual:`Armored enemy unit advances while helicopter circles overhead, rain and smoke filling the jungle road.`,action:`Hero sprints, fires while moving and avoids overlapping ground and aerial attacks.`,characters:chars,environment,enemy_presence:`Armored sentry, patrol units and helicopter support: ${enemy}`,weapons,camera:"Wide battlefield shot into aggressive handheld chase",vfx, sound,dialogue:"",continuity:"Escalation must visibly exceed Scene 3 and use the Scene 4 capability.",progression_purpose:"Reach major opposition escalation.",reference_frame:5},
+    {frame:6,stage:"BREAKTHROUGH",title:"Breakthrough",description:`The hero turns the environment into an advantage and breaks through the strongest immediate obstacle.`,visual:`Hero uses barricades, fuel drums and damaged vehicles to create a controlled opening through the enemy line.`,action:`Hero dodges, uses the upgraded weapon and triggers an explosive strike to clear the route.`,characters:chars,environment,enemy_presence:"Concentrated enemy resistance at the obstacle",weapons,camera:"Dynamic low tracking with impact cutaways",vfx:`Controlled explosion, sparks, smoke, rain spray and debris; ${vfx}`,sound:`Impact hits, gunfire and explosion layered with rainfall; ${sound}`,dialogue:"",continuity:"Breakthrough must consume or transform the major obstacle introduced in Scene 5.",progression_purpose:"Convert escalation into forward progress.",reference_frame:6},
+    {frame:7,stage:"GATE_OR_OBJECTIVE",title:"The Fortified Gate",description:`The hero reaches the immediate objective threshold: the fortified compound gate.`,visual:`Massive fortified gate emerges through rain and smoke, floodlights cutting through jungle mist while enemy forces regroup beyond it.`,action:`Hero reaches the gate, disables the immediate barrier and crosses the threshold toward the ${objective}.`,characters:chars,environment,enemy_presence:"Regrouping forces beyond the gate",weapons,camera:"Wide establishing shot followed by forward push-in",vfx, sound,dialogue:"",continuity:"Gate is the consequence of the route and breakthrough, not a disconnected location.",progression_purpose:"Create a clear objective threshold before the next threat.",reference_frame:7},
+    {frame:8,stage:"NEXT_THREAT",title:"Beyond the Gate",description:`The immediate objective opens into a larger combat space and reveals a new threat.`,visual:`Gate opens onto a vast fortified compound; a larger enemy formation and new aerial threat emerge beyond the rain.`,action:`Hero runs through the gate toward the next battlefield as the camera reveals the scale of the new threat, then cuts to black.`,characters:chars,environment,enemy_presence:"Larger enemy force and new aerial threat",weapons,camera:"Rear tracking shot into wide reveal and cliffhanger push-in",vfx, sound,dialogue:"Radio voice: This is only the beginning.",continuity:"End state must clearly seed the next encounter.",progression_purpose:"Close the episode on a new threat rather than resolution.",reference_frame:8}
+  ];
+  return scenes.map(s=>({...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame}));
 }
 
-/**
- * Generate a new episode from user intent while preserving the reference game's
- * progression grammar. This is deliberately separate from buildRetroEpisode(),
- * which remains the exact-reference path.
- */
 export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
   const game=structuredClone(request.game);
   const progression=buildRetroProgressionModel(game,request.sourceArtifact);
   const intent=request.intent.trim();
-  if(!intent) throw new Error("Intent is required for VARIATION or EXPANSION mode.");
   if(request.mode==="REFERENCE") return buildRetroEpisode(game,request.episodeId);
-
-  const tokens=intentTokens(intent);
-  const has=(...words:string[])=>words.some(word=>tokens.includes(word));
-  const setting=has("night","nighttime")?"night-time":has("desert")?"desert":has("snow","snowy")?"snow-covered":has("urban","city")?"urban":"cinematic";
-  const weather=has("rain","rainy","storm","stormy")?"heavy rain":has("fog","foggy")?"dense fog":has("sandstorm")?"sandstorm":"environmental pressure";
-  const pursuit=has("helicopter","chase","pursuit")?"high-speed pursuit":"advancing enemy pressure";
-  const objective=has("rescue","extract","extraction")?"rescue/extraction objective":has("destroy","destroyed","destroying")?"destruction objective":has("escape","escape")?"escape objective":"forward mission objective";
-
-  const generated=[
-    {stage:"ENTRY",title:`Approach — ${setting} ${game.name} zone`,action:`The hero enters a ${setting} combat zone under ${weather}, moving toward the ${objective}.`},
-    {stage:"THREAT_INTRODUCTION",title:"Threat Contact",action:`A first enemy unit appears and establishes the route's danger; ${pursuit} begins to close the distance.`},
-    {stage:"FIRST_ENGAGEMENT",title:"First Engagement",action:"The hero reacts with rapid movement, using cover and the environment while the first exchange escalates."},
-    {stage:"CAPABILITY_ESCALATION",title:"Capability Gain",action:`The hero acquires or activates a ${game.powerUps||"combat capability"}, changing the tactical options for the next encounter.`},
-    {stage:"MAJOR_ESCALATION",title:"Enemy Escalation",action:`A stronger opposition force combines ${game.enemies||"enemy units"} with environmental pressure and forces continuous movement.`},
-    {stage:"BREAKTHROUGH",title:"Breakthrough",action:`The hero combines ${game.moves||"movement"} with ${game.abilities||"special abilities"} to break through the escalating obstacle.`},
-    {stage:"GATE_OR_OBJECTIVE",title:"Objective Threshold",action:`A major threshold appears: ${objective}. The hero crosses the immediate gate while the environment reaches peak intensity.`},
-    {stage:"NEXT_THREAT",title:"Next Threat",action:`The route opens into a larger combat space; a new threat is revealed, creating the next ${game.name} encounter.`}
-  ];
-
+  if(!intent) throw new Error("Intent is required for VARIATION or EXPANSION mode.");
+  const storyboard=buildProductionScenes(game,intent,request.mode,progression);
   return {
-    contract:"KALP-RETRO-64-EPISODE-1.0",
+    contract:"KALP-RETRO-64-PRODUCTION-EPISODE-1.0",
     episode_id:request.episodeId||`${game.name.toUpperCase().replace(/[^A-Z0-9]+/g,"_")}_INTENT_EP_001`,
-    game:game.name,
-    intent_mode:request.mode,
-    intent,
-    progression_model:"1.0",
-    progression_source:game.worksheet,
+    game:game.name,intent_mode:request.mode,intent,
+    progression_model:"1.0",progression_source:game.worksheet,
     reference_source:request.sourceArtifact||"KALP_Retro_64_Master_Reference.xlsx",
     reference_role:"GAME_PROGRESSION_REFERENCE",
-    duration_seconds:game.durationSeconds??60,
-    format:game.format??"9:16",
-    world:game.world??"",
-    terrain:game.terrain??"",
-    obstacles:game.obstacles??"",
-    enemies:game.enemies??"",
-    moves:game.moves??"",
-    weapons_ammunition:game.weapons??"",
-    power_ups:game.powerUps??"",
-    special_abilities:game.abilities??"",
-    props:game.props??"",
-    camera:game.camera??"",
-    vfx:game.vfx??"",
-    sound:game.sound??"",
-    realistic_interpretation:game.realistic??"",
+    duration_seconds:game.durationSeconds??60,format:game.format??"9:16",
+    reference_elements_used:{world:game.world,terrain:game.terrain,obstacles:game.obstacles,enemies:game.enemies,moves:game.moves,weapons_ammunition:game.weapons,power_ups:game.powerUps,special_abilities:game.abilities,props:game.props,camera:game.camera,vfx:game.vfx,sound:game.sound,realistic_interpretation:game.realistic},
     progression:progression.progression,
-    storyboard:generated.map((frame,index)=>({
-      frame:index+1,
-      stage:frame.stage,
-      title:frame.title,
-      action:frame.action
-    }))
+    locked_dna:progression.lockedDna,
+    flexible_elements:progression.flexibleElements,
+    storyboard
   };
 }
