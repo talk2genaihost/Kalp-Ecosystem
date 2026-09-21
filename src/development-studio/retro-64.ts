@@ -412,4 +412,13 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     locked_dna:progression.lockedDna,
     flexible_elements:progression.flexibleElements,
     storyboard
-  };\n  const validation=validateRetroProductionJson(episode);\n  return {...episode,validation};}
+  };\n  const contractValidation=validateRetroProductionJson(episode);
+  const rendererReadiness=validateRetroRendererReadiness(episode);
+  const validation={
+    validator_version:"1.0",
+    status:contractValidation.status==="PASS"&&rendererReadiness.status==="PASS"?"PASS":"FAIL",
+    errors:[...contractValidation.errors,...rendererReadiness.errors],
+    warnings:[...contractValidation.warnings,...rendererReadiness.warnings],
+    checks:[...contractValidation.checks,...rendererReadiness.checks]
+  };
+  return {...episode,validation,renderer_readiness:rendererReadiness};}
