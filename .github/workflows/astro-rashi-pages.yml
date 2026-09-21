@@ -67,7 +67,7 @@ jobs:
           rm -rf /tmp/published-site
           mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio/data /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
-          cp data/retro-64-reference.json /tmp/published-site/cinematic-studio/data/retro-64-reference.json
+          cp apps/cinematic-studio/data/retro-64-reference.json /tmp/published-site/cinematic-studio/data/retro-64-reference.json
           cp -R apps/production/. /tmp/published-site/production/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
