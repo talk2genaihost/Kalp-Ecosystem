@@ -105,6 +105,7 @@ export interface RetroProductionScene {
   objective_state?:string;
   next_threat_state?:string;
   new_threat?:string;
+  audio_dna:RetroSceneAudio;
 }
 
 const STAGES:RetroProgressionStage[]=[
@@ -169,6 +170,7 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const chars=[cd?.character_id||`${game.name.toUpperCase()}_PROTAGONIST_001`];
   const environment=`${setting} ${world}; ${weather}; terrain: ${terrain}`.trim();
   const common={character_identity:cd?.identity||"Game protagonist",character_visual:cd?.silhouette||"",character_costume:cd?.costume||"",character_equipment:cd?.equipment||"",character_continuity:cd?.continuity_lock||"Maintain protagonist identity consistently across all scenes."};
+  const dialogue=["Move forward.","Enemy contact.","Engage and advance.","Capability acquired.","Major threat ahead.","Break through!","Objective threshold reached.","A new threat awaits."];
   const scenes:RetroProductionScene[]=[
     {frame:1,stage:"ENTRY",title:`${setting} approach`,description:`The hero enters ${world} under ${weather}, following the established game route toward the ${objective}.`,visual:`Cinematic ${environment}. Preserve the ${game.name} visual identity, ${props}, readable traversal space and the protagonist silhouette.`,action:`Hero advances using ${moves} while ${pursuit} introduces environmental pressure.`,characters:chars,...common,environment,enemy_presence:"Environmental pressure and distant reference threats",weapons,camera,vfx,sound,dialogue:"",continuity:"Establish hero, world, weather and mission direction.",progression_purpose:"Establish the game world and entry pressure.",reference_frame:1},
     {frame:2,stage:"THREAT_INTRODUCTION",title:"Threat Contact",description:"Reference enemies appear and the route becomes more demanding without changing the game's core identity.",visual:`Cinematic encounter using ${enemies}, ${obstacles} and ${terrain}; ${weather} changes visibility but does not replace the reference world.`,action:`Hero uses ${moves} to evade the first threat and continue forward.`,characters:chars,...common,environment,enemy_presence:enemies,weapons,camera,vfx,sound,dialogue:"",continuity:"Threat follows directly from Scene 1 and increases pressure.",progression_purpose:"Convert environmental pressure into an identifiable game-native threat.",reference_frame:2},
@@ -190,7 +192,7 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
       {world_state:`Objective threshold reached inside ${world}`,threat_state:"Forces/hazards regroup beyond the threshold",capability_before:"Enhanced game-native capability",capability_gain:"None",capability_after:"Current capability retained",objective_state:"Cross the threshold",next_threat_state:"Unknown larger reference challenge"},
       {world_state:"New encounter space revealed beyond the threshold",threat_state:"Larger reference enemy formation or hazard",capability_before:"Enhanced game-native capability",capability_gain:"None",capability_after:"Current capability carried forward",objective_state:"Enter the next encounter",next_threat_state:"Next encounter begins",new_threat:"A larger game-native threat"}
     ][i];
-    return {...s,...states,audio_dna:sceneAudio[i],reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame};
+    return {...s,...states,dialogue:s.dialogue||dialogue[i],audio_dna:sceneAudio[i],reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame};
   });
 }
 
