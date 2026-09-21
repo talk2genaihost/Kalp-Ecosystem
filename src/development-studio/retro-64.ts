@@ -287,6 +287,110 @@ export function validateRetroProductionJson(episode:Record<string,any>):RetroPro
   return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
 }
 
+
+export interface RetroRendererReadinessResult {
+  validator_version:"1.0";
+  status:"PASS"|"FAIL";
+  errors:string[];
+  warnings:string[];
+  checks:RetroSceneValidationCheck[];
+}
+
+/**
+ * Renderer Readiness Gate v1.0.
+ * Validates that the production contract can be consumed scene-by-scene
+ * by a renderer using the declared scene contract, with no mapping,
+ * cleanup, or inferred fields required.
+ */
+export function validateRetroRendererReadiness(
+  episode:Record<string,any>
+):RetroRendererReadinessResult {
+  const checks:RetroSceneValidationCheck[]=[];
+  const errors:string[]=[];
+  const warnings:string[]=[];
+  const pass=(name:string,detail:string)=>checks.push({name,status:"PASS",detail});
+  const fail=(name:string,detail:string)=>{checks.push({name,status:"FAIL",detail});errors.push(detail);};
+
+  const scenes=episode?.storyboard;
+  Array.isArray(scenes)&&scenes.length===8
+    ? pass("renderer_scene_count","Exactly 8 scene packets are available to the renderer.")
+    : fail("renderer_scene_count","Renderer requires exactly 8 scene packets.");
+
+  episode?.contract==="KALP-RETRO-64-PRODUCTION-EPISODE-1.0"
+    ? pass("renderer_contract","Renderer receives the canonical production episode contract.")
+    : fail("renderer_contract","Renderer input is not the canonical production episode contract.");
+
+  episode?.progression_model==="1.1"
+    ? pass("renderer_progression_model","Renderer input preserves progression model 1.1.")
+    : fail("renderer_progression_model","Renderer input must preserve progression model 1.1.");
+
+  if(Array.isArray(scenes)&&scenes.length===8){
+    const required=[
+      "frame","stage","title","description","visual","action","characters",
+      "environment","enemy_presence","weapons","camera","vfx","sound",
+      "dialogue","continuity","progression_purpose","reference_frame",
+      "world_state","threat_state","capability_before","capability_gain",
+      "capability_after","objective_state","next_threat_state"
+    ];
+    const missing=scenes.flatMap((s:any,i:number)=>
+      required.filter(k=>typeof s[k]!=="string" && !Array.isArray(s[k]))
+        .map(k=>`Scene ${i+1}: ${k}`)
+    );
+    missing.length
+      ? fail("renderer_required_fields",`Renderer-required fields are missing or have invalid container types: ${missing.join(", ")}.`)
+      : pass("renderer_required_fields","Every scene contains the complete renderer-facing field contract.");
+
+    const empty=scenes.flatMap((s:any,i:number)=>
+      required.filter(k=>k!=="characters" && typeof s[k]==="string" && !s[k].trim())
+        .map(k=>`Scene ${i+1}: ${k}`)
+    );
+    empty.length
+      ? fail("renderer_non_empty_fields",`Renderer-facing string fields cannot be empty: ${empty.join(", ")}.`)
+      : pass("renderer_non_empty_fields","All renderer-facing string fields contain usable content.");
+
+    const charactersOk=scenes.every((s:any)=>Array.isArray(s.characters)&&s.characters.length>0&&s.characters.every((x:any)=>typeof x==="string"&&x.trim()));
+    charactersOk
+      ? pass("renderer_characters","Every scene provides at least one renderer character identifier.")
+      : fail("renderer_characters","Every scene must provide a non-empty characters array of strings.");
+
+    const frameOk=scenes.every((s:any,i:number)=>Number.isInteger(s.frame)&&s.frame===i+1&&Number.isInteger(s.reference_frame)&&s.reference_frame===i+1);
+    frameOk
+      ? pass("renderer_frame_identity","Scene frame and reference-frame identity are deterministic and aligned.")
+      : fail("renderer_frame_identity","Scene frame/reference-frame identity is not deterministic or aligned.");
+
+    const stageOk=scenes.every((s:any)=>typeof s.stage==="string");
+    stageOk
+      ? pass("renderer_stage_identity","Every scene has an explicit progression stage.")
+      : fail("renderer_stage_identity","Every renderer scene requires an explicit progression stage.");
+
+    const unresolved=scenes.flatMap((s:any,i:number)=>{
+      const values=required.filter(k=>k!=="characters").map(k=>String(s[k]??""));
+      return values.some(v=>/\$\{[^}]+\}|\[TODO\]|<TODO>|undefined|null/i.test(v))
+        ? [`Scene ${i+1}: unresolved template/token content`] : [];
+    });
+    unresolved.length
+      ? fail("renderer_no_unresolved_tokens",`Renderer input contains unresolved template content: ${unresolved.join(", ")}.`)
+      : pass("renderer_no_unresolved_tokens","No unresolved template tokens or undefined/null placeholders are present.");
+
+    const standaloneOk=scenes.every((s:any)=>{try{JSON.stringify(s);return true;}catch{return false;}});
+    standaloneOk
+      ? pass("renderer_standalone_json","Every scene can be serialized independently as a renderer packet.")
+      : fail("renderer_standalone_json","At least one scene cannot be serialized independently.");
+
+    const directFieldsOk=scenes.every((s:any)=>required.every(k=>Object.prototype.hasOwnProperty.call(s,k)));
+    directFieldsOk
+      ? pass("renderer_direct_field_access","Renderer can access required fields directly without field mapping.")
+      : fail("renderer_direct_field_access","Renderer would require field mapping before consuming one or more scenes.");
+
+    const stateContinuityOk=scenes.every((s:any)=>s.world_state&&s.threat_state&&s.capability_before&&s.capability_gain&&s.capability_after&&s.objective_state&&s.next_threat_state);
+    stateContinuityOk
+      ? pass("renderer_state_continuity","Scene-state continuity fields are directly available to the renderer.")
+      : fail("renderer_state_continuity","One or more scenes are missing direct state-continuity data.");
+  }
+
+  return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
+}
+
 export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
   const game=structuredClone(request.game);
   const progression=buildRetroProgressionModel(game,request.sourceArtifact);
