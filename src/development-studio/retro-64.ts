@@ -123,7 +123,7 @@ export function buildRetroProgressionModel(
     throw new Error(`Progression model requires exactly 8 reference frames: ${game.worksheet}`);
   }
   return {
-    modelVersion:"1.0", game:game.name, sourceWorksheet:game.worksheet, sourceArtifact,
+    modelVersion:"1.1", game:game.name, sourceWorksheet:game.worksheet, sourceArtifact,
     progression:game.frames.map((frame,index)=>({
       order:index+1, stage:stageForFrame(index), referenceFrame:index+1,
       referenceTitle:frame.title, referenceAction:frame.action
@@ -182,6 +182,74 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
     ][i];
     return {...s,reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame,...states};
   });
+}
+
+export interface RetroSceneValidationCheck {
+  name:string;
+  status:"PASS"|"FAIL";
+  detail:string;
+}
+export interface RetroSceneValidationResult {
+  validator_version:"1.0";
+  status:"PASS"|"FAIL";
+  errors:string[];
+  warnings:string[];
+  checks:RetroSceneValidationCheck[];
+}
+
+export function validateRetroSceneState(
+  episode:{contract?:string;intent_mode?:RetroIntentMode;intent?:string;progression_model?:string;progression?:RetroProgressionStep[];storyboard?:RetroProductionScene[]}
+):RetroSceneValidationResult {
+  const checks:RetroSceneValidationCheck[]=[];
+  const errors:string[]=[];
+  const warnings:string[]=[];
+  const pass=(name:string,detail:string)=>checks.push({name,status:"PASS",detail});
+  const fail=(name:string,detail:string)=>{checks.push({name,status:"FAIL",detail});errors.push(detail);};
+  const scenes=episode.storyboard||[];
+  if(scenes.length===8) pass("exactly_8_scenes","Storyboard contains exactly 8 scenes.");
+  else fail("exactly_8_scenes",`Expected exactly 8 scenes; received ${scenes.length}.`);
+  if(episode.progression_model==="1.1") pass("progression_model","Progression model is v1.1.");
+  else fail("progression_model",`Expected progression_model 1.1; received ${episode.progression_model||"missing"}.`);
+  if(episode.intent_mode==="REFERENCE" || episode.intent_mode==="VARIATION" || episode.intent_mode==="EXPANSION") pass("intent_mode","Intent mode is valid.");
+  else fail("intent_mode","Intent mode is missing or invalid.");
+  if(episode.intent_mode==="VARIATION" || episode.intent_mode==="EXPANSION"){
+    if((episode.intent||"").trim()) pass("intent_required","Variation/expansion has non-empty intent.");
+    else fail("intent_required","Variation/expansion requires non-empty intent.");
+    if(/halicopter|persuit/i.test(episode.intent||"")) fail("intent_normalization","Intent contains known spelling variants; normalization was not applied.");
+    else pass("intent_normalization","Intent spelling normalization check passed.");
+    if(episode.contract==="KALP-RETRO-64-PRODUCTION-EPISODE-1.0") pass("production_contract","Variation/expansion uses the production episode contract.");
+    else fail("production_contract","Variation/expansion must use KALP-RETRO-64-PRODUCTION-EPISODE-1.0.");
+  }
+  const stages=STAGES;
+  if(scenes.length===8){
+    const stageOk=scenes.every((s,i)=>s.frame===i+1 && s.stage===stages[i]);
+    if(stageOk) pass("stage_order","Eight scenes follow the canonical progression stage order.");
+    else fail("stage_order","Scene frame/stage order does not match the canonical 8-stage progression.");
+    const refs=scenes.every((s,i)=>s.reference_frame===i+1);
+    if(refs) pass("reference_frame_alignment","Each production scene maps to the corresponding reference frame.");
+    else fail("reference_frame_alignment","Reference-frame mapping is misaligned.");
+    const required=["world_state","threat_state","capability_before","capability_gain","capability_after","objective_state","next_threat_state"];
+    const missing=scenes.flatMap((s,i)=>required.filter(k=>!(s as any)[k]).map(k=>`Scene ${i+1}: ${k}`));
+    if(!missing.length) pass("required_state_fields","All 8 scenes contain required state-continuity fields.");
+    else fail("required_state_fields",`Missing state fields: ${missing.join(", ")}.`);
+    const s4=scenes[3],s5=scenes[4],s6=scenes[5],s7=scenes[6],s8=scenes[7];
+    if(s4.capability_gain && s4.capability_after && s4.capability_before!==s4.capability_after) pass("scene4_capability_gain","Scene 4 introduces a capability change.");
+    else fail("scene4_capability_gain","Scene 4 does not explicitly introduce a capability change.");
+    if(s5.capability_before===s4.capability_after) pass("scene5_uses_scene4_capability","Scene 5 starts with Scene 4's resulting capability.");
+    else fail("scene5_uses_scene4_capability",`Scene 5 capability_before does not equal Scene 4 capability_after.`);
+    if(/armored|major|combined|helicopter/i.test(s5.threat_state||"")) pass("scene5_major_escalation","Scene 5 explicitly represents major escalation.");
+    else fail("scene5_major_escalation","Scene 5 threat state does not explicitly show major escalation.");
+    if(s6.capability_gain && /open route|breakthrough|cleared/i.test(s6.capability_after||"")) pass("scene6_resolves_obstacle","Scene 6 records a capability/action that resolves the immediate obstacle.");
+    else fail("scene6_resolves_obstacle","Scene 6 does not clearly resolve the Scene 5 obstacle.");
+    if(/gate/i.test(s6.next_threat_state||"") && /gate/i.test(s7.objective_state||"")) pass("scene6_to_scene7_continuity","Scene 6 points to the fortified gate objective in Scene 7.");
+    else fail("scene6_to_scene7_continuity","Scene 6 next threat and Scene 7 objective are not explicitly linked.");
+    if(/gate|objective|threshold/i.test(s7.objective_state||"")) pass("scene7_objective","Scene 7 explicitly defines a gate/objective threshold.");
+    else fail("scene7_objective","Scene 7 lacks an explicit gate/objective threshold.");
+    if(s8.new_threat && /new|larger|unknown|aerial/i.test(s8.threat_state||"")) pass("scene8_new_threat","Scene 8 explicitly introduces a new threat.");
+    else fail("scene8_new_threat","Scene 8 must explicitly define a new threat and reflect it in threat_state.");
+  }
+  if(episode.intent_mode==="REFERENCE") warnings.push("REFERENCE mode is validated as a reference reconstruction; production-state checks apply only to generated variation/expansion episodes.");
+  return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};
 }
 
 export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest) {
