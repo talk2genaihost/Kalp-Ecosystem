@@ -55,7 +55,20 @@
           "Cliffhanger",
           "Hero runs toward the gate as the screen cuts to black on a new threat."
         ]
-      ]
+      ],
+      "character_dna": {
+        "character_id": "CONTRA_PROTAGONIST_001",
+        "identity": "Military commando protagonist in the Contra action tradition",
+        "protagonist_name": "Bill Rizer / Lance Bean archetype",
+        "silhouette": "Athletic military commando silhouette with combat-ready posture",
+        "head": "Short military-style hair or combat-ready head presentation",
+        "costume": "Field combat fatigues with tactical gear and rugged boots",
+        "palette": "Military greens, browns and neutral combat tones",
+        "equipment": "Assault rifle and mission equipment; upgrades persist through continuity",
+        "movement": "Fast sprinting, jumping, crouching, directional dodging and aggressive forward combat",
+        "performance": "Focused, alert, physically explosive, mission-driven",
+        "continuity_lock": "Face, body proportions, costume silhouette, primary palette and baseline equipment remain consistent across all scenes"
+      }
     },
     {
       "id": "G002",
@@ -110,7 +123,20 @@
           "New Kingdom Threat",
           "The objective is achieved, but the wider kingdom and next world are revealed as the next adventure begins."
         ]
-      ]
+      ],
+      "character_dna": {
+        "character_id": "MARIO_PROTAGONIST_001",
+        "identity": "Mario platform-hero protagonist",
+        "protagonist_name": "Mario",
+        "silhouette": "Compact recognizable platform-hero silhouette with rounded proportions",
+        "head": "Distinctive cap and mustached face",
+        "costume": "Cap, shirt, overalls and sturdy shoes",
+        "palette": "Bright primary-color costume palette",
+        "equipment": "No persistent weapon; power-up states can alter abilities while identity remains locked",
+        "movement": "Run, jump, stomp, swim, duck and midair direction change",
+        "performance": "Energetic, expressive, determined and playful",
+        "continuity_lock": "Face, cap, costume silhouette, proportions and core identity remain consistent; power-up state may change capability"
+      }
     },
     {
       "id": "G003",
@@ -165,7 +191,20 @@
           "Final Sprint",
           "The driver maintains speed through the final traffic sequence and reaches the finish before fuel or time is exhausted."
         ]
-      ]
+      ],
+      "character_dna": {
+        "character_id": "ROAD_FIGHTER_PROTAGONIST_001",
+        "identity": "High-speed arcade racing driver",
+        "protagonist_name": "Driver of the signature red racing car",
+        "silhouette": "Driver presented primarily through vehicle cockpit/chase-camera identity",
+        "head": "Helmeted or race-ready driver presentation when visible",
+        "costume": "Professional racing suit and gloves",
+        "palette": "Racing-suit neutrals with the signature red car as the dominant identity cue",
+        "equipment": "Signature red racing car; fuel state and vehicle damage persist as continuity variables",
+        "movement": "Acceleration, braking, steering, lane changes, overtaking and skid recovery",
+        "performance": "Focused, precise and speed-driven",
+        "continuity_lock": "Driver presentation and signature red racing car remain consistent across every scene"
+      }
     },
     {
       "id": "G004",
@@ -220,7 +259,20 @@
           "Rescue and Next Cycle",
           "Mr. X is defeated, Sylvia is reached, and the combat loop establishes the next harder cycle."
         ]
-      ]
+      ],
+      "character_dna": {
+        "character_id": "KUNG_FU_PROTAGONIST_001",
+        "identity": "Martial-arts hero protagonist",
+        "protagonist_name": "Thomas",
+        "silhouette": "Lean athletic martial-arts fighter silhouette optimized for side-on combat",
+        "head": "Short dark hair and focused martial-arts facial presentation",
+        "costume": "Traditional martial-arts training attire with simple combat footwear",
+        "palette": "Muted martial-arts tones with clear silhouette separation",
+        "equipment": "Unarmed combat; no persistent weapon inventory",
+        "movement": "Walk, crouch, jump, punch, kick and rapid directional changes",
+        "performance": "Disciplined, concentrated, reactive and combat-focused",
+        "continuity_lock": "Face, body proportions, martial-arts attire and combat style remain consistent through all temple floors"
+      }
     },
     {
       "id": "G005",
@@ -275,7 +327,20 @@
           "Rescue and New Season",
           "The princess is rescued, the season changes and the next cycle of the mission begins."
         ]
-      ]
+      ],
+      "character_dna": {
+        "character_id": "LEGEND_OF_KAGE_PROTAGONIST_001",
+        "identity": "Fast vertical ninja protagonist",
+        "protagonist_name": "Kage",
+        "silhouette": "Lean agile ninja silhouette built for vertical movement and aerial attacks",
+        "head": "Ninja head presentation with tied-back hair or traditional head covering",
+        "costume": "Traditional dark ninja attire with lightweight combat gear",
+        "palette": "Dark red/black ninja tones with clear weapon contrast",
+        "equipment": "Kodachi sword and star knives/shuriken",
+        "movement": "Run, jump, climb trees and poles, crouch, sword strike, shuriken throw and aerial movement",
+        "performance": "Silent, agile, precise and highly mobile",
+        "continuity_lock": "Face/head presentation, costume silhouette, weapons and movement language remain consistent across forest and fortress scenes"
+      }
     }
   ]
 }
