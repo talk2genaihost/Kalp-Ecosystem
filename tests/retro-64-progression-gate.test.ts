@@ -87,6 +87,10 @@ test("RETRO-64 Gate v1.0: generates and validates the requested night-rain-helic
   assert.equal(validateRetroProductionJson(episode).status, "PASS");
   assert.equal(validateRetroCharacterContinuity(episode).status, "PASS");
   assert.equal(validateRetroRendererReadiness(episode).status, "PASS");
+  assert.ok(Array.isArray(episode.flexible_elements));
+  assert.ok(episode.storyboard.every((s) => typeof s.dialogue === "string" && s.dialogue.trim()));
+  assert.ok(episode.storyboard.every((s) => Number.isInteger(s.frame) && Number.isInteger(s.reference_frame)));
+  assert.ok(episode.storyboard.every((s) => s.audio_dna && typeof s.audio_dna.music === "string" && Array.isArray(s.audio_dna.sfx)));
 
   const stages = episode.storyboard.map((s) => s.stage);
   assert.deepEqual(stages, [
@@ -130,4 +134,6 @@ test("RETRO-64 Gate v1.1: generated episode is wired directly into the dashboard
   assert.match(html, /retroEpisode\?\.storyboard\?\.length===8/);
   assert.match(html, /renderStoryboardView\(\);showView\("storyboard"\)/);
   assert.match(html, /Retro 64 storyboard generated directly on the Storyboard dashboard/);
+  assert.match(html, /Renderer-facing string fields cannot be empty/);
+  assert.match(html, /renderer_audio_dna/);
 });
