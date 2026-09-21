@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0",
+  "sourceArtifact": "KALP_Retro_64_Master_Reference.xlsx",
+  "games": [
+    {
+      "id": "G001",
+      "name": "Contra",
+      "worksheet": "Contra",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "9:16",
+      "world": "Dense tropical military-industrial jungle bordering a fortified compound",
+      "terrain": "Broken asphalt service road, muddy shoulders, bridges and concrete barriers",
+      "obstacles": "Roadblocks, abandoned vehicles, sandbags, trenches, collapsed structures",
+      "enemies": "Armed soldiers, patrol units, armored sentry, helicopter support",
+      "moves": "Run, sprint, jump, slide, crouch, dodge, climb, rapid direction change",
+      "weapons": "Assault rifle, heavy machine gun, explosive launcher",
+      "powerUps": "Weapon upgrade crate, ammunition cache, temporary armor",
+      "abilities": "Rapid fire, tactical dodge, precision burst, explosive strike",
+      "props": "Military jeep, cargo truck, barricades, radio tower, fuel drums",
+      "camera": "Low tracking shot, over-shoulder combat, wide establishing shot, handheld chase",
+      "vfx": "Muzzle flashes, shell casings, sparks, smoke, rain spray, controlled explosions",
+      "sound": "Heavy percussion, engine rumble, gunfire, rain, radio chatter, impact hits",
+      "realistic": "Photorealistic cinematic military action while preserving fast arcade rhythm",
+      "frames": [
+        [
+          "The Road",
+          "Hero enters the deserted road as distant alarms activate."
+        ],
+        [
+          "The Blockade",
+          "A patrol vehicle blocks the route and enemies emerge."
+        ],
+        [
+          "Incoming Fire",
+          "Hero takes cover as fire crosses the road."
+        ],
+        [
+          "Weapon Upgrade",
+          "Hero reaches a supply crate and upgrades the weapon."
+        ],
+        [
+          "Escalation",
+          "An armored enemy arrives; the road becomes a moving battlefield."
+        ],
+        [
+          "Breakthrough",
+          "Hero uses the environment and explosives to break through."
+        ],
+        [
+          "The Gate",
+          "A massive gate opens, revealing a larger enemy force."
+        ],
+        [
+          "Cliffhanger",
+          "Hero runs toward the gate as the screen cuts to black on a new threat."
+        ]
+      ]
+    },
+    {
+      "id": "G002",
+      "name": "Mario",
+      "worksheet": "Mario",
+      "status": "PLANNED"
+    },
+    {
+      "id": "G003",
+      "name": "Road Fighter",
+      "worksheet": "Road_Fighter",
+      "status": "PLANNED"
+    },
+    {
+      "id": "G004",
+      "name": "Kung Fu",
+      "worksheet": "Kung_Fu",
+      "status": "PLANNED"
+    },
+    {
+      "id": "G005",
+      "name": "Legend of Kage",
+      "worksheet": "Legend_of_Kage",
+      "status": "PLANNED"
+    }
+  ]
+}
