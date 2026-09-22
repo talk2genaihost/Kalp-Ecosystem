@@ -262,3 +262,21 @@ test("dashboard gate: exposes 12-shot Reel generation and Resume controls",()=>{
   assert.match(html,/ending_state/);
   assert.match(html,/is_resolution_shot/);
 });
+
+test("RETRO-64 semantic world gate: desert intent overrides jungle reference world and props",()=>{
+  const episode = buildIntentDrivenRetroEpisode({
+    game: contra,
+    mode: "EXPANSION",
+    intent: "Contra mission in desert to rescue the president",
+    episodeId: "CONTRA_DESERT_RESCUE_001"
+  });
+  assert.equal(episode.validation.status, "PASS");
+  assert.equal(episode.semantic_resolution.world_id, "DESERT");
+  assert.equal(episode.semantic_resolution.world_label, "Desert");
+  const text = episode.storyboard.map((s:any)=>[s.description,s.visual,s.environment,s.enemy_presence,s.action].join(" ")).join("\n");
+  assert.match(text,/desert/i);
+  assert.match(text,/dunes|dry rocks|dust|tents/i);
+  assert.doesNotMatch(text,/dense tropical jungle|rainforest|muddy shoulders/i);
+  assert.doesNotMatch(text,/helicopter rotor|heavy rain|jungle/i);
+  assert.ok(episode.storyboard.every((s:any)=>s.semantic_world_id==="DESERT"));
+});
