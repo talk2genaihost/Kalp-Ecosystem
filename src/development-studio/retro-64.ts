@@ -209,6 +209,13 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const tokens=intentTokens(intent);
   const semantic=resolveRetroSemanticWorld(intent);
   const worldProfile=resolveRetroWorldPropProfile(intent);
+  if(worldProfile.id==="DESERT"){
+    sceneAudio.forEach(x=>{x.ambience="Dry wind, sand movement, distant engines and radio";x.sfx=["Gunfire","Explosions","Shell casings","Dust impacts","Radio chatter"];});
+  }else if(worldProfile.id==="SNOW"){
+    sceneAudio.forEach(x=>{x.ambience="Cold wind, ice movement, distant engines and radio";x.sfx=["Gunfire","Explosions","Shell casings","Ice impacts","Radio chatter"];});
+  }else if(worldProfile.id==="UNDERWATER"){
+    sceneAudio.forEach(x=>{x.ambience="Muffled underwater pressure, bubbles and aquatic movement";x.sfx=["Muffled impacts","Bubbles","Underwater propulsion","Aquatic threat movement"];});
+  }
   const setting=hasToken(tokens,"night","nighttime")?"night-time":hasToken(tokens,"desert")?"desert":hasToken(tokens,"snow","snowy")?"snow-covered":hasToken(tokens,"urban","city")?"urban":"daytime";
   const weather=hasToken(tokens,"rain","rainy","storm","stormy")?"heavy rain":hasToken(tokens,"fog","foggy")?"dense fog":hasToken(tokens,"sandstorm")?"sandstorm":"environmental pressure";
   const pursuit=hasToken(tokens,"helicopter","chase","pursuit")
