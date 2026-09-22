@@ -84,6 +84,7 @@ export interface RetroIntentEpisodeRequest {
 }
 
 export { buildRetroMissionProduction, validateRetroMissionReels } from "./retro-mission-production";
+export { buildRetroInitialMissionState, buildRetroReelProduction } from "./retro-mission-arc";
 
 export interface RetroProductionScene {
   frame:number;
