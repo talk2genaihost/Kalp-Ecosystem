@@ -542,9 +542,22 @@ function retroGenerate(){
     const weather=/(rain|rainy|storm|stormy)/.test(words)?"heavy rain":/(fog|foggy)/.test(words)?"dense fog":/(sandstorm)/.test(words)?"sandstorm":"environmental pressure";
     const objective=/(rescue|extract|extraction)/.test(words)?"rescue/extraction":/(destroy|destroyed|destroying)/.test(words)?"destruction":/(escape)/.test(words)?"escape":"forward mission";
     const underwater=/(underwater|submerged|aquatic|ocean|sea|undersea|dive|diving)/.test(words);
-    const pursuit=/(helicopter|chase|pursuit)/.test(words)?(underwater?"underwater pursuit pressure":"aerial pursuit"):"advancing enemy pressure";
-    const worldProfile=underwater?{id:"UNDERWATER",allowedProps:["coral","submerged rocks","underwater barriers","current channels","sun rays through water","bubbles","aquatic plants","underwater ruins","sea floor"],suppressedProps:["sky","clouds","horizon sky","helicopter","aircraft","airplane","military jeep","cargo truck","radio tower","fuel drums","dry road","dry asphalt"]}:{id:"SURFACE",allowedProps:[],suppressedProps:[]};
-    const semanticRules=underwater?["UNDERWATER world selected.","Surface-only sky/aircraft/land props are suppressed.","Underwater prop vocabulary is enforced."]:[];
+    const desert=/(desert|sandstorm|dune|sand)/.test(words);
+    const snow=/(snow|snowy|ice|frozen|arctic)/.test(words);
+    const urban=/(urban|city|street|building|metro)/.test(words);
+    const space=/(space|orbit|zero[- ]?g|zero gravity|spaceship)/.test(words);
+    const worldId=underwater?"UNDERWATER":space?"SPACE":desert?"DESERT":snow?"SNOW":urban?"URBAN":"SURFACE";
+    const worldProfiles={
+      SURFACE:{label:"Surface / Land",allowedProps:["military jeep","cargo truck","barricade","radio tower","fuel drums","roadblocks","bridges","vehicles","buildings","trees"],suppressedProps:[]},
+      UNDERWATER:{label:"Underwater / Aquatic",allowedProps:["coral","submerged rocks","underwater barriers","current channels","sun rays through water","bubbles","aquatic plants","underwater ruins","sea floor"],suppressedProps:["sky","clouds","horizon sky","helicopter","aircraft","airplane","military jeep","cargo truck","radio tower","fuel drums","dry road","dry asphalt"]},
+      DESERT:{label:"Desert",allowedProps:["dunes","sandbags","desert vehicles","ruins","dry rocks","dust","tents"],suppressedProps:["snow banks","coral","submerged rocks","underwater currents","dense tropical jungle","jungle","rainforest","muddy shoulders","bridges"]},
+      SNOW:{label:"Snow / Frozen",allowedProps:["snow banks","ice","frozen structures","snow vehicles","ice barriers","frost"],suppressedProps:["coral","sand dunes","dry tropical mud","underwater currents","dense tropical jungle","jungle","rainforest"]},
+      URBAN:{label:"Urban / City",allowedProps:["buildings","streets","vehicles","signage","streetlights","barriers","rooftops"],suppressedProps:["coral","deep jungle props","desert dunes","snow banks"]},
+      SPACE:{label:"Space / Zero-G",allowedProps:["spacecraft","airlock","debris","stars","planets","station modules"],suppressedProps:["sky","clouds","road","trees","dry land","underwater currents","dense tropical jungle"]}
+    };
+    const worldProfile=worldProfiles[worldId];
+    const pursuit=/(helicopter|chase|pursuit)/.test(words)?(underwater?"underwater pursuit pressure":(worldId==="DESERT"||worldId==="SNOW"||worldId==="URBAN"||worldId==="SPACE"?"ground/mission pursuit":"aerial pursuit")):"advancing enemy pressure";
+    const semanticRules=worldId!=="SURFACE"?[worldProfile.label+" world selected.","Reference environment is overridden by the semantic world.","Only world-compatible props are permitted."]:[];
     const fight=/(fight|fighting|battle|combat|attack|attacks)/.test(words);
     const snake=/(snake|snakes|serpent|serpents)/.test(words);
     const shark=/(shark|sharks)/.test(words);
@@ -562,12 +575,12 @@ function retroGenerate(){
     const aquaticThreat=underwater?"Aquatic threats: "+([snake?"snakes/serpents":"",shark?"sharks":""].filter(Boolean).join(" and ")||"aquatic enemies")+".":"";
     const weapons=retroGame.weapons||"available game attacks";
     const powerUps=retroGame.powerUps||"available power-up";
-    const props=underwater?worldProfile.allowedProps.join(", "):(retroGame.props||"reference props");
+    const props=worldId!=="SURFACE"?worldProfile.allowedProps.join(", "):(retroGame.props||"reference props");
     const cam=retroGame.camera||"cinematic game camera";
     const vfx=retroGame.vfx||"cinematic effects";
     const snd=retroGame.sound||"game soundscape";
     const dna=retroCharacterDNA(retroGame.name);
-    const visualWeather=underwater?"underwater particulate, caustic light and bubbles":weather;
+    const visualWeather=underwater?"underwater particulate, caustic light and bubbles":worldId==="DESERT"?"dry heat, blowing dust and desert haze":worldId==="SNOW"?"cold air, frost and snow particulate":worldId==="SPACE"?"zero-g particulate and stellar light":weather;
     const gameContext=(underwater?"underwater ":"")+world+"; "+visualWeather+"; terrain: "+terrain+"; props: "+props;
     const p=[
       [underwater?"Underwater approach":`${setting} approach`,underwater?`The hero enters ${world} under ${weather}, following the established game route toward the ${objective} in a submerged mission.`:`The hero enters ${world} under ${weather}, following the established game route toward the ${objective}.`,`Cinematic ${gameContext}. Preserve the ${retroGame.name} visual identity, ${props}, readable traversal space and the protagonist silhouette.`,`Hero advances using ${moves} while ${pursuit} introduces environmental pressure${aquaticThreat?" "+aquaticThreat:""}.`,cam,"Establish the game world and entry pressure."],
