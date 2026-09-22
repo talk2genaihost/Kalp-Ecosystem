@@ -577,8 +577,8 @@ function retroGenerate(){
     const powerUps=retroGame.powerUps||"available power-up";
     const props=worldId!=="SURFACE"?worldProfile.allowedProps.join(", "):(retroGame.props||"reference props");
     const cam=retroGame.camera||"cinematic game camera";
-    const vfx=retroGame.vfx||"cinematic effects";
-    const snd=retroGame.sound||"game soundscape";
+    const vfx=worldId==="DESERT"?"dust plumes, heat shimmer, sand impacts and controlled explosions":worldId==="SNOW"?"snow spray, ice fragments, frost and controlled explosions":underwater?"bubbles, caustic light, particulate matter and controlled underwater impacts":retroGame.vfx||"cinematic effects";
+    const snd=worldId==="DESERT"?"dry wind, sand movement, distant engines, gunfire and impact hits":worldId==="SNOW"?"cold wind, ice movement, engines, gunfire and impact hits":underwater?"muffled impacts, bubbles, underwater propulsion and pressure ambience":retroGame.sound||"game soundscape";
     const dna=retroCharacterDNA(retroGame.name);
     const visualWeather=underwater?"underwater particulate, caustic light and bubbles":worldId==="DESERT"?"dry heat, blowing dust and desert haze":worldId==="SNOW"?"cold air, frost and snow particulate":worldId==="SPACE"?"zero-g particulate and stellar light":weather;
     const gameContext=(underwater?"underwater ":"")+world+"; "+visualWeather+"; terrain: "+terrain+"; props: "+props;
