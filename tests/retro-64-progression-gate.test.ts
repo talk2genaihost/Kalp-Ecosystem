@@ -222,6 +222,31 @@ test("mission arc planner rejects fewer than two reels",()=>{
   expect(()=>buildRetroMissionArcPlan("Contra should rescue the U.S. President.",0)).toThrow();
 });
 
+test("mission episode gate: generated production JSON contains actual 12-shot reels with Resume continuity",()=>{
+  const episode=buildIntentDrivenRetroEpisode({
+    game:contra,
+    mode:"EXPANSION",
+    intent:"Contra mission in desert to rescue the president",
+    episodeId:"CONTRA_DESERT_RESCUE_REELS_001",
+    missionReelCount:3
+  });
+  assert.equal(episode.validation.status,"PASS");
+  assert.equal(episode.mission_arc_plan.reel_count,3);
+  assert.equal(episode.reels.length,3);
+  assert.equal(episode.production_shot_count,36);
+  assert.ok(episode.reels.every((reel:any)=>reel.shots.length===12));
+  assert.equal(episode.reels[0].ending_state.status,"IN_PROGRESS");
+  assert.equal(episode.reels[1].starting_state.continuity_anchor,episode.reels[0].ending_state.continuity_anchor);
+  assert.equal(episode.reels[1].starting_state.world_state,episode.reels[0].ending_state.world_state);
+  assert.equal(episode.reels[1].starting_state.character_state,episode.reels[0].ending_state.character_state);
+  assert.equal(episode.reels[1].starting_state.objective,episode.reels[0].ending_state.objective);
+  assert.equal(episode.reels[1].shots[0].continuity_from,episode.reels[0].ending_state.continuity_anchor);
+  assert.equal(episode.reels[2].shots[11].is_resolution_shot,true);
+  assert.equal(episode.reels[2].ending_state.status,"COMPLETE");
+  assert.match(episode.reels[2].ending_state.objective_state,/COMPLETE/i);
+  assert.ok(episode.reels.every((reel:any)=>reel.starting_state.world_state==="Desert environment"));
+});
+
 test("mission reel production gate: every reel generates 12 shots and Resume carries mission state",()=>{
   const plan=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",3);
   const initial=buildRetroInitialMissionState(plan,"Jungle fortress","CONTRA_001","Baseline capability","Enemy perimeter active");
