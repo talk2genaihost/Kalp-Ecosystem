@@ -1,4 +1,5 @@
 import { getRetroAudioDNA, buildRetroSceneAudio, type RetroAudioDNA, type RetroSceneAudio } from "./retro-audio";
+import { resolveRetroWorldPropProfile, type RetroWorldPropProfile } from "./retro-world-prop-library";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroCharacterDNA { character_id:string; identity:string; protagonist_name:string; silhouette:string; head:string; costume:string; palette:string; equipment:string; movement:string; performance:string; continuity_lock:string; }\nexport interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; character_dna?:RetroCharacterDNA; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
@@ -148,12 +149,66 @@ export function buildRetroProgressionModel(
 function intentTokens(intent:string):string[]{return intent.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);}
 function hasToken(tokens:string[],...words:string[]){return words.some(word=>tokens.includes(word));}
 
+export interface RetroSemanticResolution {
+  world_id:string;
+  world_label:string;
+  normalized_intent:string;
+  normalized_actions:string[];
+  suppressed_reference_elements:string[];
+  applied_rules:string[];
+  status:"PASS"|"CONFLICT_REQUIRES_RESOLUTION";
+}
+
+function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution {
+  const profile:RetroWorldPropProfile=resolveRetroWorldPropProfile(intent);
+  const tokens=intentTokens(intent);
+  const normalizedActions:string[]=[];
+  const suppressed:string[]=[];
+  const rules=[...profile.visualRules];
+  let normalizedIntent=intent;
+
+  if(profile.id==="UNDERWATER"){
+    if(hasToken(tokens,"run","running","sprint","sprinting","walk","walking","jump","jumping")){
+      normalizedActions.push("Surface locomotion normalized to underwater propulsion/swimming.");
+      normalizedIntent=normalizedIntent
+        .replace(/\\brun(?:ning)?\\b/gi,"swim")
+        .replace(/\\bsprint(?:ing)?\\b/gi,"underwater sprint")
+        .replace(/\\bwalk(?:ing)?\\b/gi,"underwater propulsion")
+        .replace(/\\bjump(?:ing)?\\b/gi,"vertical underwater kick");
+      rules.push("Underwater movement uses aquatic locomotion; surface locomotion words are normalized, not rendered literally.");
+    }
+    if(hasToken(tokens,"helicopter","helicopters","aircraft","airplane","plane")){
+      suppressed.push("helicopter/aircraft");
+      normalizedIntent=normalizedIntent.replace(/\\bhelicopters?\\b/gi,"").replace(/\\baircraft\\b/gi,"").replace(/\\bairplanes?\\b/gi,"");
+      rules.push("Helicopter/aircraft suppressed inside submerged camera volume; it is not a valid underwater prop.");
+    }
+    if(hasToken(tokens,"sky","cloud","clouds")){
+      suppressed.push("sky/clouds");
+      rules.push("Sky props suppressed inside submerged camera volume.");
+    }
+  }
+
+  return {
+    world_id:profile.id,
+    world_label:profile.label,
+    normalized_intent:normalizedIntent.replace(/\\s{2,}/g," ").trim(),
+    normalized_actions:normalizedActions,
+    suppressed_reference_elements:suppressed,
+    applied_rules:rules,
+    status:"PASS"
+  };
+}
+
 function buildProductionScenes(game:RetroGameReference, intent:string, mode:RetroIntentMode, progression:RetroProgressionModel):RetroProductionScene[] {
   const sceneAudio=buildRetroSceneAudio(game.name);
   const tokens=intentTokens(intent);
+  const semantic=resolveRetroSemanticWorld(intent);
+  const worldProfile=resolveRetroWorldPropProfile(intent);
   const setting=hasToken(tokens,"night","nighttime")?"night-time":hasToken(tokens,"desert")?"desert":hasToken(tokens,"snow","snowy")?"snow-covered":hasToken(tokens,"urban","city")?"urban":"daytime";
   const weather=hasToken(tokens,"rain","rainy","storm","stormy")?"heavy rain":hasToken(tokens,"fog","foggy")?"dense fog":hasToken(tokens,"sandstorm")?"sandstorm":"environmental pressure";
-  const pursuit=hasToken(tokens,"helicopter","chase","pursuit")?"aerial pursuit":"advancing enemy pressure";
+  const pursuit=hasToken(tokens,"helicopter","chase","pursuit")
+    ? (worldProfile.id==="UNDERWATER" ? "underwater pursuit pressure" : "aerial pursuit")
+    : "advancing enemy pressure";
   const objective=hasToken(tokens,"rescue","extract","extraction")?"rescue/extraction":hasToken(tokens,"destroy","destroyed","destroying")?"destruction":hasToken(tokens,"escape")?"escape":"forward mission";
   const world=game.world||"the game world";
   const terrain=game.terrain||"the reference terrain";
@@ -172,18 +227,19 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const semanticWorld=underwater?`${worldBase}; submerged aquatic zone`:worldBase;
   const semanticTerrain=underwater?`${terrainBase}; submerged passages, aquatic currents and underwater traversal`:terrainBase;
   const semanticObstacles=underwater?`${obstaclesBase}; submerged rocks, coral passages, underwater barriers and current channels`:obstaclesBase;
-  const semanticEnemies=underwater?`${enemiesBase}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:enemiesBase;
+  const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.replace(new RegExp(`\\\\b${term.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\  const semanticEnemies=underwater?`${enemiesBase}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:enemiesBase;")}\\\\b`,"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
+  const semanticEnemies=underwater?`${filteredEnemies}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:filteredEnemies;
   const semanticMoves=underwater?`${movesBase}; swim, dive, underwater dodge and three-dimensional aquatic movement`:movesBase;
   const aquaticThreat=underwater?`Aquatic threats: ${[snake?"snakes/serpents":"",shark?"sharks":""].filter(Boolean).join(" and ")||"aquatic enemies"}.`:"";
   const weapons=game.weapons||"available game attacks";
   const powerUps=game.powerUps||"available power-up";
-  const props=game.props||"reference props";
+  const props=worldProfile.allowedProps.join(", ")||game.props||"reference props";
   const camera=game.camera||"cinematic game camera";
   const vfx=game.vfx||"cinematic effects";
   const sound=game.sound||"game soundscape";
   const cd=game.character_dna;
   const chars=[cd?.character_id||`${game.name.toUpperCase()}_PROTAGONIST_001`];
-  const environment=`${underwater?"underwater":setting} ${semanticWorld}; ${weather}; terrain: ${semanticTerrain}`.trim();
+  const environment=`${underwater?"underwater":setting} ${semanticWorld}; ${underwater?"submerged visual volume":weather}; terrain: ${semanticTerrain}; props: ${props}`.trim();
   const common={character_identity:cd?.identity||"Game protagonist",character_visual:cd?.silhouette||"",character_costume:cd?.costume||"",character_equipment:cd?.equipment||"",character_continuity:cd?.continuity_lock||"Maintain protagonist identity consistently across all scenes."};
   const dialogue=["Move forward.","Enemy contact.","Engage and advance.","Capability acquired.","Major threat ahead.","Break through!","Objective threshold reached.","A new threat awaits."];
   const scenes:RetroProductionScene[]=[
@@ -207,7 +263,7 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
       {world_state:`Objective threshold reached inside ${world}`,threat_state:"Forces/hazards regroup beyond the threshold",capability_before:"Enhanced game-native capability",capability_gain:"None",capability_after:"Current capability retained",objective_state:"Cross the threshold",next_threat_state:"Unknown larger reference challenge"},
       {world_state:"New encounter space revealed beyond the threshold",threat_state:"Larger reference enemy formation or hazard",capability_before:"Enhanced game-native capability",capability_gain:"None",capability_after:"Current capability carried forward",objective_state:"Enter the next encounter",next_threat_state:"Next encounter begins",new_threat:"A larger game-native threat"}
     ][i];
-    return {...s,...states,dialogue:s.dialogue||dialogue[i],audio_dna:sceneAudio[i],reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame};
+    return {...s,...states,dialogue:s.dialogue||dialogue[i],audio_dna:sceneAudio[i],reference_frame:progression.progression.find(p=>p.stage===s.stage)?.referenceFrame||s.frame,semantic_world_id:semantic.world_id,semantic_world_label:semantic.world_label,suppressed_reference_elements:semantic.suppressed_reference_elements};
   });
 }
 
@@ -439,7 +495,8 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     progression:progression.progression,
     locked_dna:progression.lockedDna,
     flexible_elements:progression.flexibleElements,
-    storyboard
+    storyboard,
+    semantic_resolution:{...resolveRetroSemanticWorld(normalizedIntent),original_intent:intent}
   };\n  const contractValidation=validateRetroProductionJson(episode);
   const characterContinuity=validateRetroCharacterContinuity(episode);\n  const rendererReadiness=validateRetroRendererReadiness(episode);
   const validation={
