@@ -227,8 +227,8 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const semanticWorld=underwater?`${worldBase}; submerged aquatic zone`:worldBase;
   const semanticTerrain=underwater?`${terrainBase}; submerged passages, aquatic currents and underwater traversal`:terrainBase;
   const semanticObstacles=underwater?`${obstaclesBase}; submerged rocks, coral passages, underwater barriers and current channels`:obstaclesBase;
-  const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.replace(new RegExp(`\\\\b${term.replace(/[.*+?^${}()|[\\]\\\\]/g,"\\\\  const semanticEnemies=underwater?`${enemiesBase}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:enemiesBase;")}\\\\b`,"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
-  const semanticEnemies=underwater?`${filteredEnemies}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:filteredEnemies;
+  const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.replace(new RegExp(term.replace(/[.*+?^$()|[\\]\\\\]/g,"\\\\$&"),"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
+  const semanticEnemies=underwater?\`${filteredEnemies}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}\`:filteredEnemies;
   const semanticMoves=underwater?`${movesBase}; swim, dive, underwater dodge and three-dimensional aquatic movement`:movesBase;
   const aquaticThreat=underwater?`Aquatic threats: ${[snake?"snakes/serpents":"",shark?"sharks":""].filter(Boolean).join(" and ")||"aquatic enemies"}.`:"";
   const weapons=game.weapons||"available game attacks";
