@@ -440,6 +440,11 @@ let retroRegistry=null,retroGame=null,retroEpisode=null;
 const RETRO_STAGES=["ENTRY","THREAT_INTRODUCTION","FIRST_ENGAGEMENT","CAPABILITY_ESCALATION","MAJOR_ESCALATION","BREAKTHROUGH","GATE_OR_OBJECTIVE","NEXT_THREAT"];
 
 async function retroFetchReference(){
+  const inline=document.getElementById("kalp-retro-reference-inline");
+  if(inline?.textContent?.trim()){
+    const data=JSON.parse(inline.textContent);
+    if(Array.isArray(data.games)&&data.games.length)return data;
+  }
   const candidates=[
     new URL(`./data/retro-64-reference.json?v=${RETRO64_CACHE_VERSION}`,document.baseURI).href,
     new URL(`../data/retro-64-reference.json?v=${RETRO64_CACHE_VERSION}`,document.baseURI).href,
@@ -738,4 +743,349 @@ function wireRetroReelControls(){
 function retroExport(){if(!retroEpisode){retroGenerate();if(!retroEpisode)return}const b=new Blob([JSON.stringify(retroEpisode,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=retroEpisode.episode_id+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);}
 document.addEventListener("DOMContentLoaded",()=>{document.getElementById("retroLoad").onclick=retroLoadReference;document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;renderStoryboardView();showView("storyboard");toast("Retro 64 storyboard review opened.");};
 document.getElementById("retroVisualStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);renderStoryboardView();showView("storyboard");toast("Retro 64 visual storyboard generated and production JSON refreshed.");};document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroExport").onclick=retroExport;document.getElementById("retroGame").onchange=retroLoadReference;wireRetroReelControls();document.getElementById("retroIntent").oninput=updateRetroMissionPlanUI;document.getElementById("retroReelCount").onchange=updateRetroMissionPlanUI;updateRetroMissionPlanUI();window.__retroReady=retroBoot();});
-</script></body></html>
+</script><script id="kalp-retro-reference-inline" type="application/json">{
+  "schemaVersion": "1.0",
+  "sourceArtifact": "KALP_Retro_64_Master_Reference.xlsx",
+  "games": [
+    {
+      "id": "G001",
+      "name": "Contra",
+      "worksheet": "Contra",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "9:16",
+      "world": "Dense tropical military-industrial jungle bordering a fortified compound",
+      "terrain": "Broken asphalt service road, muddy shoulders, bridges and concrete barriers",
+      "obstacles": "Roadblocks, abandoned vehicles, sandbags, trenches, collapsed structures",
+      "enemies": "Armed soldiers, patrol units, armored sentry, helicopter support",
+      "moves": "Run, sprint, jump, slide, crouch, dodge, climb, rapid direction change",
+      "weapons": "Assault rifle, heavy machine gun, explosive launcher",
+      "powerUps": "Weapon upgrade crate, ammunition cache, temporary armor",
+      "abilities": "Rapid fire, tactical dodge, precision burst, explosive strike",
+      "props": "Military jeep, cargo truck, barricades, radio tower, fuel drums",
+      "camera": "Low tracking shot, over-shoulder combat, wide establishing shot, handheld chase",
+      "vfx": "Muzzle flashes, shell casings, sparks, smoke, rain spray, controlled explosions",
+      "sound": "Heavy percussion, engine rumble, gunfire, rain, radio chatter, impact hits",
+      "realistic": "Photorealistic cinematic military action while preserving fast arcade rhythm",
+      "frames": [
+        [
+          "The Road",
+          "Hero enters the deserted road as distant alarms activate."
+        ],
+        [
+          "The Blockade",
+          "A patrol vehicle blocks the route and enemies emerge."
+        ],
+        [
+          "Incoming Fire",
+          "Hero takes cover as fire crosses the road."
+        ],
+        [
+          "Weapon Upgrade",
+          "Hero reaches a supply crate and upgrades the weapon."
+        ],
+        [
+          "Escalation",
+          "An armored enemy arrives; the road becomes a moving battlefield."
+        ],
+        [
+          "Breakthrough",
+          "Hero uses the environment and explosives to break through."
+        ],
+        [
+          "The Gate",
+          "A massive gate opens, revealing a larger enemy force."
+        ],
+        [
+          "Cliffhanger",
+          "Hero runs toward the gate as the screen cuts to black on a new threat."
+        ]
+      ],
+      "character_dna": {
+        "character_id": "CONTRA_PROTAGONIST_001",
+        "identity": "Military commando protagonist in the Contra action tradition",
+        "protagonist_name": "Bill Rizer / Lance Bean archetype",
+        "silhouette": "Athletic military commando silhouette with combat-ready posture",
+        "head": "Short military-style hair or combat-ready head presentation",
+        "costume": "Field combat fatigues with tactical gear and rugged boots",
+        "palette": "Military greens, browns and neutral combat tones",
+        "equipment": "Assault rifle and mission equipment; upgrades persist through continuity",
+        "movement": "Fast sprinting, jumping, crouching, directional dodging and aggressive forward combat",
+        "performance": "Focused, alert, physically explosive, mission-driven",
+        "continuity_lock": "Face, body proportions, costume silhouette, primary palette and baseline equipment remain consistent across all scenes"
+      }
+    },
+    {
+      "id": "G002",
+      "name": "Mario",
+      "worksheet": "Mario",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "16:9",
+      "world": "Mushroom Kingdom with bright surface grasslands, underground passages, aquatic courses and fortified castles",
+      "terrain": "Grassland, underground stone passages, water courses, elevated platforms, castle interiors and flagpole approaches",
+      "obstacles": "Pits, pipes, blocks, moving platforms, water hazards, fire bars, Podoboos and castle traps",
+      "enemies": "Goombas, Koopa Troopas, Buzzy Beetles, Piranha Plants, Cheep-Cheeps, Hammer Bros., Lakitu and Bowser",
+      "moves": "Run, sprint, jump, stomp, swim, duck, climb vines and change direction in midair",
+      "weapons": "Fireballs when Fire Mario is active; direct stomp attacks",
+      "powerUps": "Super Mushroom, Fire Flower, Starman, 1-Up Mushroom",
+      "abilities": "Size growth, fireball attack, temporary invincibility, underwater swimming and power-up transformation",
+      "props": "Question blocks, brick blocks, coins, pipes, platforms, flagpole, castle bridge and axe",
+      "camera": "Side-scrolling tracking, wide level establishing shots, low jump-following shots and close-up obstacle reveals",
+      "vfx": "Coin bursts, fireballs, block impacts, water spray, star glow, enemy defeat effects and castle fire hazards",
+      "sound": "Driving platform-game rhythm, jump accents, coin chimes, power-up cues, enemy impacts and castle tension",
+      "realistic": "Cinematic fantasy adventure interpretation while preserving readable platforming rhythm and escalating level hazards",
+      "frames": [
+        [
+          "The Kingdom Road",
+          "Hero enters the Mushroom Kingdom grassland and begins the forward run toward the distant castle."
+        ],
+        [
+          "First Obstacles",
+          "Enemy patrols and environmental gaps force the hero to jump, stomp and use blocks to advance."
+        ],
+        [
+          "Underground Route",
+          "The path drops into an underground passage where pipes, blocks and tighter hazards change the rhythm."
+        ],
+        [
+          "Power-Up",
+          "Hero discovers a power-up and gains a stronger capability before the next escalation."
+        ],
+        [
+          "Water and Air Assault",
+          "The route shifts through water or elevated terrain as aquatic and airborne enemies increase pressure."
+        ],
+        [
+          "Castle Approach",
+          "The hero reaches a fortified castle section filled with fire hazards and precision timing challenges."
+        ],
+        [
+          "Final Threshold",
+          "The hero crosses the castle bridge, defeats the final guardian and reaches the rescue objective."
+        ],
+        [
+          "New Kingdom Threat",
+          "The objective is achieved, but the wider kingdom and next world are revealed as the next adventure begins."
+        ]
+      ],
+      "character_dna": {
+        "character_id": "MARIO_PROTAGONIST_001",
+        "identity": "Mario platform-hero protagonist",
+        "protagonist_name": "Mario",
+        "silhouette": "Compact recognizable platform-hero silhouette with rounded proportions",
+        "head": "Distinctive cap and mustached face",
+        "costume": "Cap, shirt, overalls and sturdy shoes",
+        "palette": "Bright primary-color costume palette",
+        "equipment": "No persistent weapon; power-up states can alter abilities while identity remains locked",
+        "movement": "Run, jump, stomp, swim, duck and midair direction change",
+        "performance": "Energetic, expressive, determined and playful",
+        "continuity_lock": "Face, cap, costume silhouette, proportions and core identity remain consistent; power-up state may change capability"
+      }
+    },
+    {
+      "id": "G003",
+      "name": "Road Fighter",
+      "worksheet": "Road_Fighter",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "16:9",
+      "world": "High-speed intercity highway network progressing through open countryside, bridges, coastline, mountains and forest",
+      "terrain": "Multi-lane asphalt highway, bridge sections, coastal road, mountain road and forest road",
+      "obstacles": "Dense traffic, lane-changing cars, oil patches, barriers, roadside edges and fuel pressure",
+      "enemies": "Yellow traffic cars, red and cyan lane-changing cars, blue rival cars and heavy trucks",
+      "moves": "Accelerate, brake, steer, lane change, overtake, recover from skid and maintain racing line",
+      "weapons": "None; speed, positioning and collision avoidance are the core tools",
+      "powerUps": "Fuel-refill vehicles and route-based fuel opportunities",
+      "abilities": "High-speed acceleration, precision lane control, slip recovery and traffic threading",
+      "props": "Race car, traffic cars, trucks, roadside barriers, fuel vehicles, bridge structures and finish marker",
+      "camera": "Low rear chase camera, hood-level speed shots, wide traffic reveals and aggressive lateral tracking",
+      "vfx": "Road spray, tire smoke, speed streaks, reflections, collision sparks and environmental motion blur",
+      "sound": "High-rev engine, tire squeal, wind rush, traffic impacts, acceleration cues and finish-line intensity",
+      "realistic": "Photorealistic high-speed road-action interpretation while preserving arcade racing rhythm and fuel management",
+      "frames": [
+        [
+          "The Highway Start",
+          "The red racing car launches onto the highway with limited fuel and immediate traffic pressure."
+        ],
+        [
+          "Traffic Weave",
+          "Straight-line traffic and lane-changing cars force rapid steering and overtaking decisions."
+        ],
+        [
+          "Rival Pressure",
+          "Aggressive rival cars begin changing lanes into the racing line, increasing collision risk."
+        ],
+        [
+          "Fuel Opportunity",
+          "Fuel pressure becomes critical and the driver targets a special fuel-refill vehicle without losing speed."
+        ],
+        [
+          "Oil and Skid",
+          "An oil patch destabilizes the car, forcing a controlled recovery before the next road section."
+        ],
+        [
+          "Bridge and Coast",
+          "The route opens into a bridge and coastal stretch where speed and lane discipline become the dominant challenge."
+        ],
+        [
+          "Mountain to Forest Run",
+          "The course transitions through mountain terrain toward the forest, with traffic and fuel pressure still active."
+        ],
+        [
+          "Final Sprint",
+          "The driver maintains speed through the final traffic sequence and reaches the finish before fuel or time is exhausted."
+        ]
+      ],
+      "character_dna": {
+        "character_id": "ROAD_FIGHTER_PROTAGONIST_001",
+        "identity": "High-speed arcade racing driver",
+        "protagonist_name": "Driver of the signature red racing car",
+        "silhouette": "Driver presented primarily through vehicle cockpit/chase-camera identity",
+        "head": "Helmeted or race-ready driver presentation when visible",
+        "costume": "Professional racing suit and gloves",
+        "palette": "Racing-suit neutrals with the signature red car as the dominant identity cue",
+        "equipment": "Signature red racing car; fuel state and vehicle damage persist as continuity variables",
+        "movement": "Acceleration, braking, steering, lane changes, overtaking and skid recovery",
+        "performance": "Focused, precise and speed-driven",
+        "continuity_lock": "Driver presentation and signature red racing car remain consistent across every scene"
+      }
+    },
+    {
+      "id": "G004",
+      "name": "Kung Fu",
+      "worksheet": "Kung_Fu",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "16:9",
+      "world": "Five-floor Devil's Temple pagoda where Thomas fights upward toward Sylvia and Mr. X",
+      "terrain": "Temple floors, narrow combat corridors, stairways, open floor sections and boss arenas",
+      "obstacles": "Enemy formations, thrown weapons, snakes, fireballs, time pressure and floor transitions",
+      "enemies": "Grabbers, knife throwers, stick fighters, Tom Tom Brothers, Giants, snakes, fire-breathing dragon and floor bosses",
+      "moves": "Walk, crouch, jump, punch, kick, jump punch, jump kick and rapid directional changes",
+      "weapons": "Punches, kicks and jumping attacks; no persistent weapon inventory",
+      "powerUps": "No core persistent power-up system; progression comes from combat skill and survival",
+      "abilities": "Low punch, high punch, low kick, high kick, jump attack, crouch evasion and enemy-pattern recognition",
+      "props": "Temple floors, staircases, doors, combat spaces and boss arenas",
+      "camera": "Side-on tracking, low combat angle, tight impact close-ups and vertical stair-transition shots",
+      "vfx": "Impact flashes, dust, weapon trails, fireballs, sparks, debris and dramatic boss effects",
+      "sound": "Martial-arts impacts, footwork, enemy cries, weapon throws, fire effects, timer tension and boss cues",
+      "realistic": "Grounded cinematic martial-arts action while preserving the game's compact side-scrolling combat rhythm",
+      "frames": [
+        [
+          "Temple Entrance",
+          "Thomas enters the Devil's Temple and begins the climb toward Sylvia."
+        ],
+        [
+          "First Floor Assault",
+          "Grabbers and knife throwers force Thomas to establish the punch, kick and jump-combat rhythm."
+        ],
+        [
+          "First Boss",
+          "A stronger floor guardian blocks the staircase and must be defeated before the ascent continues."
+        ],
+        [
+          "Second and Third Floors",
+          "Enemy patterns diversify and the vertical climb becomes more demanding under time pressure."
+        ],
+        [
+          "Heavy Threats",
+          "Stronger attackers, Giants, snakes and projectile hazards force tighter defensive timing."
+        ],
+        [
+          "Upper Floor Boss",
+          "A major guardian controls the route upward and introduces a stronger combat escalation."
+        ],
+        [
+          "Mr. X Threshold",
+          "Thomas reaches the top section and confronts the final obstacle before Sylvia's rescue."
+        ],
+        [
+          "Rescue and Next Cycle",
+          "Mr. X is defeated, Sylvia is reached, and the combat loop establishes the next harder cycle."
+        ]
+      ],
+      "character_dna": {
+        "character_id": "KUNG_FU_PROTAGONIST_001",
+        "identity": "Martial-arts hero protagonist",
+        "protagonist_name": "Thomas",
+        "silhouette": "Lean athletic martial-arts fighter silhouette optimized for side-on combat",
+        "head": "Short dark hair and focused martial-arts facial presentation",
+        "costume": "Traditional martial-arts training attire with simple combat footwear",
+        "palette": "Muted martial-arts tones with clear silhouette separation",
+        "equipment": "Unarmed combat; no persistent weapon inventory",
+        "movement": "Walk, crouch, jump, punch, kick and rapid directional changes",
+        "performance": "Disciplined, concentrated, reactive and combat-focused",
+        "continuity_lock": "Face, body proportions, martial-arts attire and combat style remain consistent through all temple floors"
+      }
+    },
+    {
+      "id": "G005",
+      "name": "Legend of Kage",
+      "worksheet": "Legend_of_Kage",
+      "status": "ACTIVE",
+      "durationSeconds": 60,
+      "format": "16:9",
+      "world": "Feudal Japan surrounding a forest, secret passage, fortress wall and castle controlled by Yoshi's forces",
+      "terrain": "Dense forest, climbable trees, underground moat passage, fortress platforms and castle grounds",
+      "obstacles": "Enemy swarms, vertical platform gaps, moat passage, castle walls and projectile attacks",
+      "enemies": "Red and blue Shinobi, Yohbohs, Genbohs, evil Samurai Yuki and Yoshi's forces",
+      "moves": "Run, jump, climb trees and poles, crouch, sword strike, throw shuriken and rapid aerial movement",
+      "weapons": "Kodachi sword and unlimited star knives/shuriken",
+      "powerUps": "Crystal-ball transformations that can increase speed or shuriken capability in home versions",
+      "abilities": "Tree climbing, pole climbing, aerial attacks, directional shuriken throws and enhanced movement states",
+      "props": "Trees, poles, moat, fortress walls, castle platforms, crystal balls and princess rescue points",
+      "camera": "Wide forest establishing shot, vertical tracking, side-on combat, aerial chase and fortress reveal",
+      "vfx": "Shuriken trails, sword sparks, fire attacks, smoke, leaves, magical effects and seasonal atmosphere",
+      "sound": "Taiko-inspired action rhythm, sword impacts, shuriken throws, enemy calls, wind and forest ambience",
+      "realistic": "Cinematic feudal-Japan ninja action while preserving fast vertical platforming and repeated rescue progression",
+      "frames": [
+        [
+          "Forest Entry",
+          "Kage enters the forest and begins the rescue mission through dense terrain and enemy patrols."
+        ],
+        [
+          "Forest Guardian",
+          "Yohboh and Shinobi resistance increases as Kage uses trees, jumps and shuriken to advance."
+        ],
+        [
+          "Secret Passage",
+          "Kage reaches the underground passage leading toward the moat and the castle approach."
+        ],
+        [
+          "Shinobi Ambush",
+          "Blue Shinobi swarm the passage, turning the route into a concentrated combat challenge."
+        ],
+        [
+          "Fortress Wall",
+          "Kage emerges at the fortress and begins a vertical climb across walls and platforms."
+        ],
+        [
+          "Castle Assault",
+          "Red Shinobi and stronger enemies pressure Kage as he approaches the castle interior."
+        ],
+        [
+          "Princess Threshold",
+          "Kage reaches the castle objective and confronts the forces protecting Princess Kiri."
+        ],
+        [
+          "Rescue and New Season",
+          "The princess is rescued, the season changes and the next cycle of the mission begins."
+        ]
+      ],
+      "character_dna": {
+        "character_id": "LEGEND_OF_KAGE_PROTAGONIST_001",
+        "identity": "Fast vertical ninja protagonist",
+        "protagonist_name": "Kage",
+        "silhouette": "Lean agile ninja silhouette built for vertical movement and aerial attacks",
+        "head": "Ninja head presentation with tied-back hair or traditional head covering",
+        "costume": "Traditional dark ninja attire with lightweight combat gear",
+        "palette": "Dark red/black ninja tones with clear weapon contrast",
+        "equipment": "Kodachi sword and star knives/shuriken",
+        "movement": "Run, jump, climb trees and poles, crouch, sword strike, shuriken throw and aerial movement",
+        "performance": "Silent, agile, precise and highly mobile",
+        "continuity_lock": "Face/head presentation, costume silhouette, weapons and movement language remain consistent across forest and fortress scenes"
+      }
+    }
+  ]
+}</script></body></html>
