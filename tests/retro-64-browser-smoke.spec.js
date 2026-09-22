@@ -19,11 +19,9 @@ test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
 
   const storyboard = page.locator('[data-view="storyboard"]');
   await expect(storyboard).toBeVisible();
-  await expect(page.locator("#storyboardGrid .retro-storyboard-frame")).toHaveCount(8);
+  await expect(page.locator("#storyboardGrid .viewcard")).toHaveCount(9);
 
   await expect(page.locator("#storyboardGrid")).toContainText("ENTRY");
   await expect(page.locator("#storyboardGrid")).toContainText("NEXT_THREAT");
-  await expect(page.locator("#storyboardGrid")).toContainText(
-    "Night jungle mission with heavy rain and helicopter pursuit."
-  );
+  await expect(page.locator("#storyboardGrid")).toContainText("Night jungle mission with heavy rain and helicopter pursuit.");
 });
