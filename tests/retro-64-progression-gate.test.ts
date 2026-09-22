@@ -250,3 +250,15 @@ test("Resume Reel is blocked when the previous reel state is missing",()=>{
   const initial=buildRetroInitialMissionState(plan,"Jungle fortress","CONTRA_001","Baseline capability","Enemy perimeter active");
   assert.throws(()=>buildRetroReelProduction(plan,2,initial,["CONTRA_001"],"Jungle fortress","Baseline capability",contra.frames));
 });
+
+test("dashboard gate: exposes 12-shot Reel generation and Resume controls",()=>{
+  const dashboardPath = path.resolve(process.cwd(), "apps/cinematic-studio/index.html");
+  const html = fs.readFileSync(dashboardPath, "utf8");
+  assert.match(html,/id="retroGenerateReel"/);
+  assert.match(html,/id="retroResumeReel"/);
+  assert.match(html,/12 Shots/);
+  assert.match(html,/Resume blocked: generate the previous reel first/);
+  assert.match(html,/mission_state/);
+  assert.match(html,/ending_state/);
+  assert.match(html,/is_resolution_shot/);
+});
