@@ -229,16 +229,27 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const obstaclesBase=obstacles;
   const enemiesBase=enemies;
   const movesBase=moves;
-  const semanticWorld=underwater?`${worldBase}; submerged aquatic zone`:worldBase;
-  const semanticTerrain=underwater?`${terrainBase}; submerged passages, aquatic currents and underwater traversal`:terrainBase;
-  const semanticObstacles=underwater?`${obstaclesBase}; submerged rocks, coral passages, underwater barriers and current channels`:obstaclesBase;
+  const profileLockedWorld=worldProfile.id!=="SURFACE";
+  const semanticWorld=profileLockedWorld
+    ? worldProfile.label+" environment"
+    : worldBase;
+  const semanticTerrain=worldProfile.id==="UNDERWATER"
+    ? "submerged passages, aquatic currents and underwater traversal"
+    : profileLockedWorld
+      ? worldProfile.allowedProps.join(", ")
+      : terrainBase;
+  const semanticObstacles=worldProfile.id==="UNDERWATER"
+    ? "submerged rocks, coral passages, underwater barriers and current channels"
+    : profileLockedWorld
+      ? worldProfile.allowedProps.join(", ")
+      : obstaclesBase;
   const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.replace(new RegExp(term.replace(/[.*+?^$()|[\\]\\\\]/g,"\\\\$&"),"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
   const semanticEnemies=underwater?`${filteredEnemies}${snake?", aquatic snakes/serpents":""}${shark?", sharks":""}`:filteredEnemies;
   const semanticMoves=underwater?`${movesBase}; swim, dive, underwater dodge and three-dimensional aquatic movement`:movesBase;
   const aquaticThreat=underwater?`Aquatic threats: ${[snake?"snakes/serpents":"",shark?"sharks":""].filter(Boolean).join(" and ")||"aquatic enemies"}.`:"";
   const weapons=game.weapons||"available game attacks";
   const powerUps=game.powerUps||"available power-up";
-  const props=worldProfile.allowedProps.join(", ")||game.props||"reference props";
+  const props=worldProfile.id!=="SURFACE" ? worldProfile.allowedProps.join(", ") : (game.props||"reference props");
   const camera=game.camera||"cinematic game camera";
   const vfx=game.vfx||"cinematic effects";
   const sound=game.sound||"game soundscape";
