@@ -90,3 +90,21 @@ test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", as
   expect(episode.reels[2].ending_state.status).toBe("COMPLETE");
   await expect(page.locator("#retroResumeReel")).toBeDisabled();
 });
+
+
+test("Retro 64 browser smoke: desert intent overrides reference jungle props", async ({ page }) => {
+  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.locator('[data-nav="retro"]').click();
+  await page.locator("#retroGame").selectOption("G001");
+  await page.locator("#retroMode").selectOption("EXPANSION");
+  await page.locator("#retroIntent").fill("Contra mission in desert to rescue the president");
+  await page.locator("#retroGenerate").click();
+  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
+  const cards = page.locator("#storyboardGrid .viewcard");
+  await expect(cards).toHaveCount(9);
+  const sceneText = await cards.evaluateAll(nodes => nodes.slice(1).map(n => n.textContent || "").join("\n"));
+  expect(sceneText).toMatch(/desert/i);
+  expect(sceneText).toMatch(/dunes|dry rocks|dust|tents/i);
+  expect(sceneText).not.toMatch(/dense tropical jungle|rainforest|muddy shoulders|jungle/i);
+  expect(sceneText).not.toMatch(/heavy rain|helicopter rotor/i);
+});
