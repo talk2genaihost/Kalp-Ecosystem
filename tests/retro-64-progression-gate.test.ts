@@ -196,3 +196,28 @@ test("RETRO-64 semantic world gate: generated underwater episode uses underwater
     [s.action, s.environment, s.world_state].join(" ")
   )));
 });
+
+test("mission arc planner supports user-selected reel counts and final conclusion",()=>{
+  const plan2=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",2);
+  expect(plan2.reel_count).toBe(2);
+  expect(plan2.total_shots).toBe(24);
+  expect(plan2.reels).toHaveLength(2);
+  expect(plan2.reels.every(r=>r.shots===12)).toBe(true);
+  expect(plan2.reels[1].role).toBe("MISSION_RESOLUTION");
+  expect(plan2.reels[1].concludes_mission).toBe(true);
+  expect(plan2.reels[0].concludes_mission).toBe(false);
+
+  const plan5=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",5);
+  expect(plan5.total_shots).toBe(60);
+  expect(plan5.final_reel).toBe(5);
+  expect(plan5.reels).toHaveLength(5);
+  expect(plan5.reels[0].role).toBe("MISSION_SETUP");
+  expect(plan5.reels[3].role).toBe("MISSION_CRISIS");
+  expect(plan5.reels[4].role).toBe("MISSION_RESOLUTION");
+  expect(plan5.completion_rule).toMatch(/final reel/i);
+});
+
+test("mission arc planner rejects fewer than two reels",()=>{
+  expect(()=>buildRetroMissionArcPlan("Contra should rescue the U.S. President.",1)).toThrow();
+  expect(()=>buildRetroMissionArcPlan("Contra should rescue the U.S. President.",0)).toThrow();
+});
