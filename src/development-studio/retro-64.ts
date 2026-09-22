@@ -251,8 +251,20 @@ function buildProductionScenes(game:RetroGameReference, intent:string, mode:Retr
   const powerUps=game.powerUps||"available power-up";
   const props=worldProfile.id!=="SURFACE" ? worldProfile.allowedProps.join(", ") : (game.props||"reference props");
   const camera=game.camera||"cinematic game camera";
-  const vfx=game.vfx||"cinematic effects";
-  const sound=game.sound||"game soundscape";
+  const vfx=worldProfile.id==="DESERT"
+    ? "dust plumes, heat shimmer, sand impacts and controlled explosions"
+    : worldProfile.id==="SNOW"
+      ? "snow spray, ice fragments, frost and controlled explosions"
+      : worldProfile.id==="UNDERWATER"
+        ? "bubbles, caustic light, particulate matter and controlled underwater impacts"
+        : game.vfx||"cinematic effects";
+  const sound=worldProfile.id==="DESERT"
+    ? "dry wind, sand movement, distant engines, gunfire and impact hits"
+    : worldProfile.id==="SNOW"
+      ? "cold wind, ice movement, engines, gunfire and impact hits"
+      : worldProfile.id==="UNDERWATER"
+        ? "muffled impacts, bubbles, underwater propulsion and pressure ambience"
+        : game.sound||"game soundscape";
   const cd=game.character_dna;
   const chars=[cd?.character_id||`${game.name.toUpperCase()}_PROTAGONIST_001`];
   const environment=`${underwater?"underwater":setting} ${semanticWorld}; ${underwater?"submerged visual volume":weather}; terrain: ${semanticTerrain}; props: ${props}`.trim();
