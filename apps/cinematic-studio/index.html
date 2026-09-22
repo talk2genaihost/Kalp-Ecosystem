@@ -616,6 +616,8 @@ function retroGenerate(){
   document.getElementById("retroStatus").textContent="GENERATED · "+mode+" · "+(validation.status==="PASS"?"VALIDATED":"VALIDATION FAILED")+" · scene-state continuity v1.1 · progression DNA preserved.";
   document.getElementById("retroStoryboard").disabled=validation.status!=="PASS";
   document.getElementById("retroVisualStoryboard").disabled=validation.status!=="PASS";
+  document.getElementById("retroGenerateReel").disabled=validation.status!=="PASS";
+  document.getElementById("retroResumeReel").disabled=true;
   renderStoryboardView();
   if(validation.status==="PASS"){showView("storyboard");toast("Retro 64 storyboard generated directly on the Storyboard dashboard.");}
 }
