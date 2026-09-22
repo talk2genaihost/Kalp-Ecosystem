@@ -32,7 +32,7 @@ test("Retro 64 browser smoke: underwater intent uses underwater props and suppre
   await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.evaluate(() => window.__retroReady);
-  await expect(page.locator("#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
+  await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
   await page.locator("#retroIntent").fill(
