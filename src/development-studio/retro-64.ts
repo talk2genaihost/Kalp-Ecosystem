@@ -171,15 +171,15 @@ function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution {
     if(hasToken(tokens,"run","running","sprint","sprinting","walk","walking","jump","jumping")){
       normalizedActions.push("Surface locomotion normalized to underwater propulsion/swimming.");
       normalizedIntent=normalizedIntent
-        .replace(/\\brun(?:ning)?\\b/gi,"swim")
-        .replace(/\\bsprint(?:ing)?\\b/gi,"underwater sprint")
-        .replace(/\\bwalk(?:ing)?\\b/gi,"underwater propulsion")
-        .replace(/\\bjump(?:ing)?\\b/gi,"vertical underwater kick");
+        .replace(/\brun(?:ning)?\b/gi,"swim")
+        .replace(/\bsprint(?:ing)?\b/gi,"underwater sprint")
+        .replace(/\bwalk(?:ing)?\b/gi,"underwater propulsion")
+        .replace(/\bjump(?:ing)?\b/gi,"vertical underwater kick");
       rules.push("Underwater movement uses aquatic locomotion; surface locomotion words are normalized, not rendered literally.");
     }
     if(hasToken(tokens,"helicopter","helicopters","aircraft","airplane","plane")){
       suppressed.push("helicopter/aircraft");
-      normalizedIntent=normalizedIntent.replace(/\\bhelicopters?\\b/gi,"").replace(/\\baircraft\\b/gi,"").replace(/\\bairplanes?\\b/gi,"");
+      normalizedIntent=normalizedIntent.replace(/\bhelicopters?\b/gi,"").replace(/\baircraft\b/gi,"").replace(/\bairplanes?\b/gi,"");
       rules.push("Helicopter/aircraft suppressed inside submerged camera volume; it is not a valid underwater prop.");
     }
     if(hasToken(tokens,"sky","cloud","clouds")){
