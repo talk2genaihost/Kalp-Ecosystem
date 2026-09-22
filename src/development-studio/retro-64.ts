@@ -107,6 +107,9 @@ export interface RetroProductionScene {
   next_threat_state?:string;
   new_threat?:string;
   audio_dna:RetroSceneAudio;
+  semantic_world_id?:string;
+  semantic_world_label?:string;
+  suppressed_reference_elements?:string[];
 }
 
 const STAGES:RetroProgressionStage[]=[
@@ -159,7 +162,7 @@ export interface RetroSemanticResolution {
   status:"PASS"|"CONFLICT_REQUIRES_RESOLUTION";
 }
 
-function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution {
+export function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution {
   const profile:RetroWorldPropProfile=resolveRetroWorldPropProfile(intent);
   const tokens=intentTokens(intent);
   const normalizedActions:string[]=[];
