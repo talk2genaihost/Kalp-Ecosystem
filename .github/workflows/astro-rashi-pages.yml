@@ -98,9 +98,13 @@ jobs:
       - name: Install Chromium for browser smoke test
         run: npx --yes playwright@1.55.0 install --with-deps chromium
 
+      - name: Install Playwright test runner
+        working-directory: repo
+        run: npm install --no-audit --no-fund --save-dev @playwright/test@1.55.0
+
       - name: Run Retro 64 browser smoke gate
         working-directory: repo
-        run: npx --yes @playwright/test@1.55.0 test tests/retro-64-browser-smoke.spec.js --workers=1
+        run: npx playwright test tests/retro-64-browser-smoke.spec.js --workers=1
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
