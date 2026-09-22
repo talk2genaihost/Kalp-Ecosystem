@@ -49,7 +49,7 @@ jobs:
         run: npm run build:astro-rashi
       - name: Run Retro 64 gate tests
         working-directory: repo
-        run: npm test -- --test-name-pattern="RETRO-64 Gate v1.0"
+        run: npm test -- --test-name-pattern="RETRO-64|mission arc|dashboard gate"
       - name: Build and smoke-test AdManthan v0.8.9 publish artifact
         working-directory: repo
         run: |
