@@ -1,5 +1,6 @@
 import { getRetroAudioDNA, buildRetroSceneAudio, type RetroAudioDNA, type RetroSceneAudio } from "./retro-audio";
 import { resolveRetroWorldPropProfile, type RetroWorldPropProfile } from "./retro-world-prop-library";
+import { buildRetroMissionArcPlan, type RetroMissionArcPlan } from "./retro-mission-arc";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroCharacterDNA { character_id:string; identity:string; protagonist_name:string; silhouette:string; head:string; costume:string; palette:string; equipment:string; movement:string; performance:string; continuity_lock:string; }\nexport interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; character_dna?:RetroCharacterDNA; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
@@ -78,6 +79,7 @@ export interface RetroIntentEpisodeRequest {
   intent:string;
   episodeId?:string;
   sourceArtifact?:string;
+  missionReelCount?:number;
 }
 
 export interface RetroProductionScene {
@@ -499,7 +501,8 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     locked_dna:progression.lockedDna,
     flexible_elements:progression.flexibleElements,
     storyboard,
-    semantic_resolution:{...resolveRetroSemanticWorld(normalizedIntent),original_intent:intent}
+    semantic_resolution:{...resolveRetroSemanticWorld(normalizedIntent),original_intent:intent},
+    mission_arc_plan:buildRetroMissionArcPlan(normalizedIntent,request.missionReelCount??3)
   };\n  const contractValidation=validateRetroProductionJson(episode);
   const characterContinuity=validateRetroCharacterContinuity(episode);\n  const rendererReadiness=validateRetroRendererReadiness(episode);
   const validation={
