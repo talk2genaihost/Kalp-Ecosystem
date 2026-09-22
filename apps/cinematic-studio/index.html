@@ -566,9 +566,9 @@ function retroGenerate(){
     const obstaclesBase=retroGame.obstacles||"reference obstacles";
     const enemiesBase=retroGame.enemies||"reference enemies";
     const movesBase=retroGame.moves||"reference movement";
-    const world=underwater?worldBase+"; submerged aquatic zone":worldBase;
-    const terrain=underwater?terrainBase+"; submerged passages, aquatic currents and underwater traversal":terrainBase;
-    const obstacles=underwater?obstaclesBase+"; submerged rocks, coral passages, underwater barriers and current channels":obstaclesBase;
+    const world=worldId==="SURFACE"?worldBase:worldProfile.label+" environment";
+    const terrain=worldId==="UNDERWATER"?"submerged passages, aquatic currents and underwater traversal":worldId==="SURFACE"?terrainBase:worldProfile.allowedProps.join(", ");
+    const obstacles=worldId==="UNDERWATER"?"submerged rocks, coral passages, underwater barriers and current channels":worldId==="SURFACE"?obstaclesBase:worldProfile.allowedProps.join(", ");
     const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.split(term).join(""),enemiesBase).replace(/\s{2,}/g," ").trim();
     const enemies=underwater?filteredEnemies+(snake?", aquatic snakes/serpents":"")+(shark?", sharks":""):filteredEnemies;
     const moves=underwater?movesBase+"; swim, dive, underwater dodge and three-dimensional aquatic movement":movesBase;
