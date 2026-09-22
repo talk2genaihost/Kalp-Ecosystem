@@ -1,6 +1,7 @@
 import { getRetroAudioDNA, buildRetroSceneAudio, type RetroAudioDNA, type RetroSceneAudio } from "./retro-audio";
 import { resolveRetroWorldPropProfile, type RetroWorldPropProfile } from "./retro-world-prop-library";
 import { buildRetroMissionArcPlan, type RetroMissionArcPlan } from "./retro-mission-arc";
+import { buildRetroMissionProduction, validateRetroMissionReels } from "./retro-mission-production";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroCharacterDNA { character_id:string; identity:string; protagonist_name:string; silhouette:string; head:string; costume:string; palette:string; equipment:string; movement:string; performance:string; continuity_lock:string; }\nexport interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; character_dna?:RetroCharacterDNA; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
@@ -81,6 +82,8 @@ export interface RetroIntentEpisodeRequest {
   sourceArtifact?:string;
   missionReelCount?:number;
 }
+
+export { buildRetroMissionProduction, validateRetroMissionReels } from "./retro-mission-production";
 
 export interface RetroProductionScene {
   frame:number;
@@ -533,14 +536,22 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     storyboard,
     semantic_resolution:{...resolveRetroSemanticWorld(normalizedIntent),original_intent:intent},
     mission_arc_plan:buildRetroMissionArcPlan(normalizedIntent,request.missionReelCount??3)
-  };\n  const contractValidation=validateRetroProductionJson(episode);
+  };
+  const missionProduction=buildRetroMissionProduction(
+    episode.mission_arc_plan,
+    episode.episode_id,
+    episode.semantic_resolution.world_label+" environment",
+    [game.character_dna?.character_id||game.name.toUpperCase()+"_PROTAGONIST_001"],
+    storyboard.map(scene=>({title:scene.title,description:scene.description,action:scene.action}))
+  );
+  Object.assign(episode,missionProduction);\n  const contractValidation=validateRetroProductionJson(episode);
   const characterContinuity=validateRetroCharacterContinuity(episode);\n  const rendererReadiness=validateRetroRendererReadiness(episode);
   const validation={
     validator_version:"1.0",
-    status:contractValidation.status==="PASS"&&characterContinuity.status==="PASS"&&rendererReadiness.status==="PASS"?"PASS":"FAIL",
-    errors:[...contractValidation.errors,...characterContinuity.errors,...rendererReadiness.errors],
-    warnings:[...contractValidation.warnings,...characterContinuity.warnings,...rendererReadiness.warnings],
-    checks:[...contractValidation.checks,...characterContinuity.checks,...rendererReadiness.checks]
+    status:contractValidation.status==="PASS"&&characterContinuity.status==="PASS"&&rendererReadiness.status==="PASS"&&missionReelsValidation.status==="PASS"?"PASS":"FAIL",
+    errors:[...contractValidation.errors,...characterContinuity.errors,...rendererReadiness.errors,...missionReelsValidation.errors],
+    warnings:[...contractValidation.warnings,...characterContinuity.warnings,...rendererReadiness.warnings,...missionReelsValidation.warnings],
+    checks:[...contractValidation.checks,...characterContinuity.checks,...rendererReadiness.checks,...missionReelsValidation.checks]
   };
   return {...episode,validation,renderer_readiness:rendererReadiness};}
 \nexport interface RetroCharacterContinuityResult { validator_version:"1.0"; status:"PASS"|"FAIL"; errors:string[]; warnings:string[]; checks:RetroSceneValidationCheck[]; }\nexport function validateRetroCharacterContinuity(episode:Record<string,any>):RetroCharacterContinuityResult {\n const checks:RetroSceneValidationCheck[]=[],errors:string[]=[],warnings:string[]=[]; const pass=(name:string,detail:string)=>checks.push({name,status:"PASS",detail}); const fail=(name:string,detail:string)=>{checks.push({name,status:"FAIL",detail});errors.push(detail)};\n const dna=episode?.reference_elements_used?.character_dna; const s=episode?.storyboard;\n dna&&typeof dna.character_id==="string"&&dna.identity&&dna.costume&&dna.equipment&&dna.continuity_lock?pass("character_dna_present","Canonical protagonist Character DNA is present."):fail("character_dna_present","Canonical protagonist Character DNA is missing or incomplete.");\n Array.isArray(s)&&s.length===8?pass("character_scene_count","All 8 scenes are available for character continuity validation."):fail("character_scene_count","Character continuity requires exactly 8 scenes.");\n if(Array.isArray(s)&&s.length===8){ const fields=["character_identity","character_visual","character_costume","character_equipment","character_continuity"]; const missing=s.flatMap((x,i)=>fields.filter(k=>typeof x[k]!=="string"||!x[k].trim()).map(k=>"Scene "+(i+1)+": "+k)); missing.length?fail("character_scene_fields","Character continuity fields missing: "+missing.join(", ")):pass("character_scene_fields","All scenes contain direct character identity, visual, costume, equipment and continuity fields."); const ids=s.every(x=>Array.isArray(x.characters)&&x.characters.length===1&&x.characters[0]===dna?.character_id); ids?pass("character_identity_lock","All scenes use the same canonical protagonist character ID."):fail("character_identity_lock","Protagonist character ID changes between scenes."); const costumes=s.every(x=>x.character_costume===s[0].character_costume); costumes?pass("costume_continuity","Protagonist costume remains continuous across all scenes."):fail("costume_continuity","Protagonist costume continuity is broken."); const visuals=s.every(x=>x.character_visual===s[0].character_visual); visuals?pass("visual_continuity","Protagonist visual silhouette remains continuous across all scenes."):fail("visual_continuity","Protagonist visual continuity is broken."); const equipment=s.every(x=>x.character_equipment===s[0].character_equipment)||s.slice(0,3).every(x=>x.character_equipment===s[0].character_equipment); equipment?pass("equipment_continuity","Baseline protagonist equipment remains continuous; progression upgrades may be represented separately."):warnings.push("Equipment continuity should be checked against explicit capability upgrades."); }\n return {validator_version:"1.0",status:errors.length?"FAIL":"PASS",errors,warnings,checks};\n}\n
