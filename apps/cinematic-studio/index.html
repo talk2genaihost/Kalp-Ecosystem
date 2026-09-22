@@ -465,8 +465,8 @@ async function retroBoot(){
     retroRegistry=await retroFetchReference();
     if(!retroRegistry.games.length) throw new Error("Retro reference contains no games");
     const s=document.getElementById("retroGame");
-    s.innerHTML=retroRegistry.games.map(g=>`<option value="${g.name}">${g.name}${g.status==="PLANNED"?" · planned":""}</option>`).join("");
-    s.value=retroRegistry.games.some(g=>g.name==="Contra")?"Contra":(retroRegistry.games[0]?.name||"");
+    s.innerHTML=retroRegistry.games.map(g=>`<option value="${g.id}">${g.name}${g.status==="PLANNED"?" · planned":""}</option>`).join("");
+    s.value=retroRegistry.games.some(g=>g.id==="G001")?"G001":(retroRegistry.games[0]?.id||"");
     retroLoadReference();
   }catch(error){
     retroRegistry=null;retroGame=null;
@@ -485,7 +485,8 @@ function retroLoadReference(){
     document.getElementById("retroStatus").textContent="REFERENCE LOAD FAILED · Reference registry is unavailable.";
     return;
   }
-  retroGame=retroRegistry.games.find(g=>g.name===document.getElementById("retroGame").value);
+  const selectedId=document.getElementById("retroGame").value;
+  retroGame=retroRegistry.games.find(g=>g.id===selectedId)||retroRegistry.games.find(g=>g.name===selectedId);
   if(!retroGame)return;
   const dna=retroGame.character_dna||{};
   document.getElementById("retroMeta").textContent=
