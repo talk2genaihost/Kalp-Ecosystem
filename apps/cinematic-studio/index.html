@@ -538,7 +538,8 @@ function retroGenerate(){
     const world=underwater?worldBase+"; submerged aquatic zone":worldBase;
     const terrain=underwater?terrainBase+"; submerged passages, aquatic currents and underwater traversal":terrainBase;
     const obstacles=underwater?obstaclesBase+"; submerged rocks, coral passages, underwater barriers and current channels":obstaclesBase;
-    const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.replace(new RegExp(term.replace(/[.*+?^$()|[\\]\\\\]/g,"\\\\    const enemies=underwater?enemiesBase+(snake?", aquatic snakes/serpents":"")+(shark?", sharks":""):enemiesBase;"),"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
+    const filteredEnemies=worldProfile.suppressedProps.reduce((value,term)=>value.split(term).join(""),enemiesBase).replace(/\s{2,}/g," ").trim();
+    const enemies=underwater?enemiesBase+(snake?", aquatic snakes/serpents":"")+(shark?", sharks":""):enemiesBase;"),"gi"),""),enemiesBase).replace(/\\s{2,}/g," ").trim();
     const enemies=underwater?filteredEnemies+(snake?", aquatic snakes/serpents":"")+(shark?", sharks":""):filteredEnemies;
     const moves=underwater?movesBase+"; swim, dive, underwater dodge and three-dimensional aquatic movement":movesBase;
     const aquaticThreat=underwater?"Aquatic threats: "+([snake?"snakes/serpents":"",shark?"sharks":""].filter(Boolean).join(" and ")||"aquatic enemies")+".":"";
