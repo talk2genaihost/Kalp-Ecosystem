@@ -142,3 +142,134 @@ export function buildRetroNextReelPlan(plan:RetroMissionArcPlan,currentReel:numb
   }
   return currentReel===plan.reel_count ? null : plan.reels[currentReel];
 }
+
+
+export interface RetroMissionState {
+  mission_id:string;
+  reel:number;
+  status:"IN_PROGRESS"|"COMPLETE";
+  objective:string;
+  world_state:string;
+  character_state:string;
+  capability_state:string;
+  threat_state:string;
+  objective_state:string;
+  continuity_anchor:string;
+}
+
+export interface RetroMissionShot {
+  shot:number;
+  reel:number;
+  stage:RetroMissionReelRole;
+  title:string;
+  description:string;
+  action:string;
+  characters:string[];
+  world_state:string;
+  character_state:string;
+  capability_state:string;
+  threat_state:string;
+  objective_state:string;
+  continuity_from:string;
+  continuity_to:string;
+  is_resolution_shot:boolean;
+}
+
+export interface RetroGeneratedReel {
+  reel:number;
+  shots:RetroMissionShot[];
+  starting_state:RetroMissionState;
+  ending_state:RetroMissionState;
+  continuation_token:string;
+}
+
+const SHOT_BEATS = [
+  "Establish current state",
+  "Advance toward objective",
+  "Introduce opposition",
+  "First engagement",
+  "Movement challenge",
+  "Capability pressure",
+  "Escalate opposition",
+  "Use environment",
+  "Major obstacle",
+  "Breakthrough",
+  "Objective threshold",
+  "Transition to next state"
+];
+
+export function buildRetroInitialMissionState(plan:RetroMissionArcPlan,worldState:string,characterState:string,capabilityState:string,threatState:string):RetroMissionState {
+  return {
+    mission_id:"RETRO-MISSION-"+Date.now(),
+    reel:0,
+    status:"IN_PROGRESS",
+    objective:plan.reels[0].objective,
+    world_state:worldState,
+    character_state:characterState,
+    capability_state:capabilityState,
+    threat_state:threatState,
+    objective_state:"Mission accepted; objective not yet complete.",
+    continuity_anchor:"Mission initialized from approved intent and progression plan."
+  };
+}
+
+export function buildRetroReelProduction(
+  plan:RetroMissionArcPlan,
+  reel:number,
+  previousState:RetroMissionState,
+  characterIds:string[],
+  worldState:string,
+  capabilityState:string,
+  progressionFrames:Array<{title:string,description:string,action:string}>
+):RetroGeneratedReel {
+  const reelPlan=plan.reels.find(x=>x.reel===reel);
+  if(!reelPlan) throw new Error("Requested reel is outside the mission plan.");
+  if(reel>1 && previousState.reel!==reel-1) throw new Error("Resume Reel requires the previous reel state.");
+  if(reel===1 && previousState.reel!==0) throw new Error("Reel 1 requires an initial mission state.");
+  const objective=reelPlan.objective;
+  const source=progressionFrames.length?progressionFrames:plan.reels.map(x=>({title:x.title,description:x.progression_focus,action:x.progression_focus}));
+  const shots:Array<RetroMissionShot>=[];
+  let state=previousState;
+  for(let index=0;index<RETRO_SHOTS_PER_REEL;index++){
+    const shot=index+1;
+    const sourceFrame=source[index%source.length];
+    const resolution=reelPlan.concludes_mission && shot===RETRO_SHOTS_PER_REEL;
+    const nextObjective=resolution?"Objective completed; mission marked COMPLETE.":shot===11?"Objective threshold reached; prepare for the next state.":state.objective_state;
+    const nextThreat=resolution?"Threat neutralized or escaped; mission closes.":reelPlan.role==="MISSION_SETUP"&&shot<4?"Initial opposition is forming.":"Escalating opposition carried forward.";
+    const description=resolution
+      ? "Final confrontation resolves the mission objective and establishes a clear cinematic ending."
+      : `${sourceFrame.description} Continue from the previous shot without resetting character, world or objective state. Beat: ${SHOT_BEATS[index]}.`;
+    const nextState:RetroMissionState={
+      ...state,
+      reel,
+      status:resolution?"COMPLETE":"IN_PROGRESS",
+      world_state:worldState,
+      character_state:characterIds.join(", "),
+      capability_state:capabilityState,
+      threat_state:nextThreat,
+      objective_state:nextObjective,
+      continuity_anchor:`Reel ${reel} Shot ${shot} is the continuity anchor for the next shot.`
+    };
+    shots.push({
+      shot,reel,stage:reelPlan.role,title:resolution?"Mission Complete":`${sourceFrame.title} — Shot ${shot}`,
+      description,action:resolution?"Complete the objective, secure the outcome, and close the mission.":sourceFrame.action,
+      characters:characterIds,
+      world_state:worldState,
+      character_state:characterIds.join(", "),
+      capability_state:capabilityState,
+      threat_state:nextThreat,
+      objective_state:nextObjective,
+      continuity_from:state.continuity_anchor,
+      continuity_to:nextState.continuity_anchor,
+      is_resolution_shot:resolution
+    });
+    state=nextState;
+  }
+  return {
+    reel,
+    shots,
+    starting_state:previousState,
+    ending_state:state,
+    continuation_token:`RETRO-MISSION|${plan.mission_intent}|${reel}|${state.status}|${state.objective_state}`
+  };
+}
