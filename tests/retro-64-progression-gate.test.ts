@@ -8,6 +8,7 @@ import {
   validateRetroProductionJson,
   validateRetroRendererReadiness,
   validateRetroCharacterContinuity,
+  resolveRetroSemanticWorld,
   type RetroGameReference,
 } from "../src/development-studio/retro-64.ts";
 
@@ -165,4 +166,33 @@ test("RETRO-64 semantic intent gate: underwater combat intent becomes scene cont
   assert.match(episode.storyboard[2].action, /fight/i);
   assert.match(episode.storyboard[4].description, /snakes|sharks/i);
   assert.match(episode.storyboard[5].description, /underwater|submerged/i);
+});
+
+
+test("RETRO-64 semantic world gate: underwater intent suppresses surface-only props and normalizes movement", () => {
+  const resolution = resolveRetroSemanticWorld("Contra should run and fight underwater with a helicopter nearby.");
+  assert.equal(resolution.world_id, "UNDERWATER");
+  assert.match(resolution.normalized_intent, /swim/i);
+  assert.ok(!/helicopter/i.test(resolution.normalized_intent));
+  assert.ok(resolution.suppressed_reference_elements.some(x => /helicopter/i.test(x)));
+  assert.ok(resolution.applied_rules.some(x => /sky|submerged|helicopter/i.test(x)));
+});
+
+test("RETRO-64 semantic world gate: generated underwater episode uses underwater prop vocabulary", () => {
+  const episode = buildIntentDrivenRetroEpisode({
+    game: contra,
+    mode: "EXPANSION",
+    intent: "Contra should run and fight underwater with a helicopter pursuit.",
+    episodeId: "CONTRA_UNDERWATER_WORLD_PROP_001",
+  });
+  assert.equal(episode.validation.status, "PASS");
+  assert.equal(episode.semantic_resolution.world_id, "UNDERWATER");
+  assert.ok(episode.semantic_resolution.suppressed_reference_elements.some((x:string) => /helicopter/i.test(x)));
+  assert.ok(episode.storyboard.every((s:any) => s.semantic_world_id === "UNDERWATER"));
+  assert.ok(episode.storyboard.every((s:any) => !/helicopter|sky|clouds|radio tower|cargo truck|military jeep/i.test(
+    [s.visual, s.environment, s.enemy_presence, s.action].join(" ")
+  )));
+  assert.ok(episode.storyboard.every((s:any) => /swim|underwater propulsion|dive|aquatic/i.test(
+    [s.action, s.environment, s.world_state].join(" ")
+  )));
 });
