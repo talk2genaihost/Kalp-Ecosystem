@@ -29,7 +29,7 @@
 <button data-nav="scenes">Scenes</button>
 <button data-nav="storyboard">Storyboard</button>
 <button data-nav="production">Production</button>
-<button data-nav="library">Library</button><button data-nav="retro">Retro 64</button>
+<button data-nav="library">Library</button><button data-nav="retro" aria-label="Open Retro 64 Mission Production Studio" title="Open Retro 64 Mission Production Studio">Retro 64</button>
 </nav><div class="quote">Ancient Wisdom. Infinite Possibilities.</div></header>
 <main class="view layout active" data-view="create">
 <aside class="panel left"><div class="ey">CSD-002</div><div class="title">Scene Director</div><div class="muted">20–30+ character registry. Select up to five for a scene.</div>
@@ -56,7 +56,7 @@
 <section class="view" data-view="library"><div class="appview">
 <div class="viewhead"><div class="ey">ASSET LIBRARY</div><div class="title">Cinematic Assets & Jobs</div><div class="muted">Canonical scene assets, visual jobs and production references.</div></div>
 <div class="viewgrid" id="libraryGrid"></div></div></section><section class="view" data-view="retro"><div class="retro-shell">
-<div class="viewhead"><div class="ey">KALP RETRO 64 · MISSION PRODUCTION STUDIO</div><div class="title">Retro 64 Mission Production Engine v2.0</div><div class="muted">Game progression DNA → intent → mission arc → 12-shot reels → Resume continuity → mission completion. The 8-stage Excel reference is source DNA, not the final reel.</div></div>
+<div class="viewhead"><div class="ey">RETRO 64 · DEDICATED WORKFLOW</div><div class="title">Retro 64 Mission Production Studio <span style="font:10px system-ui;color:#66cce2;vertical-align:middle">● ACTIVE WORKFLOW</span></div><div class="muted">Game progression DNA → intent → mission arc → 12-shot reels → Resume continuity → mission completion. The 8-stage Excel reference is source DNA, not the final reel.</div></div>
 <div class="retro-grid"><aside class="retro-panel"><div class="field"><label>GAME REFERENCE</label><select class="retro-select" id="retroGame"></select></div><div class="field"><label>INTENT MODE</label><select class="retro-select" id="retroMode"><option value="REFERENCE">REFERENCE · Exact reference episode</option><option value="VARIATION" selected>VARIATION · Same game progression, new episode</option><option value="EXPANSION">EXPANSION · Intent-driven new episode</option></select></div><div class="field"><label>USER INTENT</label><textarea id="retroIntent" placeholder="Example: Contra should rescue the U.S. President."></textarea></div><div class="field"><label>MISSION LENGTH</label><select class="retro-select" id="retroReelCount"><option value="2">2 REELS · 24 SHOTS</option><option value="3" selected>3 REELS · 36 SHOTS</option><option value="4">4 REELS · 48 SHOTS</option><option value="5">5 REELS · 60 SHOTS</option><option value="6">6 REELS · 72 SHOTS</option></select></div><div id="retroMissionPlan" class="muted" style="margin-top:8px"></div><button class="primary" id="retroGenerate">Generate Progression Episode</button><button class="primary" id="retroGenerateReel" disabled>▶ Generate Reel 1 · 12 Shots</button><button class="secondary" id="retroResumeReel" disabled>↻ Resume Next Reel · 12 Shots</button><button class="primary" id="retroVisualStoryboard" disabled>▣ Generate Visual Storyboard</button><button class="primary" id="retroSendProduction" disabled>⇢ Approve & Send to Production</button><button class="secondary" id="retroStoryboard" disabled>▣ Open Storyboard Review</button><button class="secondary" id="retroLoad">Load Reference</button><button class="secondary" id="retroExport">Export Production JSON</button><div id="retroStatus" class="muted" style="margin-top:10px">Ready.</div><div id="retroValidationDetails" class="retro-validation" style="display:none"></div></aside>
 <section class="retro-panel"><div class="ey">PROGRESSION DNA</div><div id="retroMeta" class="muted">Select a game.</div><div id="retroProgression" class="retro-frames" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">MISSION PRODUCTION · LIVE STATE</div><div id="retroMissionProduction" class="retro-mission-production"><div class="muted">Generate a mission to initialize the production state.</div></div><div class="ey" style="margin-top:14px">REFERENCE DNA · SOURCE</div><div id="retroCards" class="retro-cards" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">8-STAGE PROGRESSION SOURCE MAP</div><div class="muted" style="margin:5px 0 8px">These 8 frames define progression rhythm. They are not the generated 12-shot reel output.</div><div id="retroFrames" class="retro-frames"></div><div class="ey" style="margin-top:14px">PRODUCTION JSON</div><pre id="retroJson" class="retro-json">Generate an episode to create the production contract.</pre></section></div></div></section><div class="toast" id="toast"></div>
 <script>
@@ -391,7 +391,16 @@ function showView(view){
   if(view==='storyboard') renderStoryboardView();
   if(view==='production') renderProductionView();
   if(view==='library') renderLibraryView();
+  if(view==='retro'){
+    document.querySelector('[data-nav="retro"]')?.scrollIntoView({block:'nearest',inline:'center'});
+    updateRetroMissionPlanUI?.();
+    if(window.__retroReady?.then) window.__retroReady.then(()=>updateRetroMissionPlanUI?.());
+  }
   window.scrollTo({top:0,behavior:'smooth'});
+}
+function openRetro64(){
+  showView('retro');
+  document.getElementById('retroStatus')?.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 document.addEventListener('click',e=>{
   const nav=e.target.closest('[data-nav]');
