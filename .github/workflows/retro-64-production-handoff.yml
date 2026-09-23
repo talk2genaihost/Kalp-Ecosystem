@@ -2,12 +2,16 @@ name: RETRO-64 Production Handoff Gate
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy KALP Applications to GitHub Pages"]
+    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   retro-64-handoff:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') }}
     name: RETRO-64 → Published Cinematic Studio
     runs-on: ubuntu-latest
 
