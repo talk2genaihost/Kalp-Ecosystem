@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "3.0",
+  "canonicalWorkbook": "KALP_Master_Reference_UNIFIED_v3.xlsx",
+  "sha256": "ead23df252fa8a0f1183a03cb8cbda16c4c28065554e401a2568308c1d5eae9b",
+  "authority": {
+    "world": "WORLD_REGISTRY + WORLD_PHYSICS + WORLD_PROPS + MOVEMENT_DYNAMICS + VFX_AUDIO + CONFLICT_RULES",
+    "progression": "PROGRESSION_DNA + MISSION_ARCHETYPES + EPISODE_RULES",
+    "effects": "01_Camera_Movement through 12_Sound_Music_VO_SFX",
+    "visualStyles": "Style Entry Registry + Classification Summary"
+  },
+  "runtime": "src/development-studio/unified-knowledge-loader.ts",
+  "fallback": "data/retro-world-progression-kb.json"
+}
