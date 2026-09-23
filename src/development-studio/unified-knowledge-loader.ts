@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import XLSX from "xlsx";
 import type { RetroKnowledgeBase, RetroKnowledgeWorld } from "./retro-knowledge-base";
 
-export const UNIFIED_MASTER_WORKBOOK = "KALP_Retro_64_Master_Reference_CANONICAL_v3.xlsx";
+export const UNIFIED_MASTER_WORKBOOK = "KALP_Master_Reference_UNIFIED_v3.xlsx";
 type Row = Record<string, unknown>;
 
 function rows(workbook: XLSX.WorkBook, sheet: string): Row[] {
@@ -56,7 +56,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
   const physicsRows = rows(workbook, "WORLD_PHYSICS");
   const propsRows = rows(workbook, "WORLD_PROPS");
   const movementRows = rows(workbook, "MOVEMENT_DYNAMICS");
-  const vfxAudioRows = rows(workbook, "VFX_AUDIO").length ? rows(workbook, "VFX_AUDIO") : rows(workbook, "WORLD_VFX");
+  const vfxAudioRows = rows(workbook, "VFX_AUDIO");\n  const vfxRows = rows(workbook, "WORLD_VFX");\n  const audioRows = rows(workbook, "WORLD_AUDIO");
   const conflictRows = rows(workbook, "CONFLICT_RULES").length ? rows(workbook, "CONFLICT_RULES") : rows(workbook, "WORLD_CONFLICT_MATRIX");
   const progressionRows = rows(workbook, "PROGRESSION_DNA");
   const missionRows = rows(workbook, "MISSION_ARCHETYPES");
@@ -66,7 +66,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
     const id = String(r.world_id).toUpperCase() as RetroKnowledgeWorld["id"];
     const physics = physicsRows
       .filter(x => String(x.world_id).toUpperCase() === id)
-      .map(x => String(x.physics_rule));
+      .map(x => String(x.physics_rule ?? x.rule ?? ""))\n      .filter(Boolean);
 
     const props = propsRows.find(x => String(x.world_id).toUpperCase() === id);
     const movement: Record<string, string> = {};
@@ -75,7 +75,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
       movement[String(x.input_movement).toLowerCase()] = String(x.normalized_movement);
     }
 
-    const va = vfxAudioRows.find(x => String(x.world_id).toUpperCase() === id);
+    const va = vfxAudioRows.find(x => String(x.world_id).toUpperCase() === id);\n    const vfx = va ? list(va.vfx) : vfxRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.vfx ?? x.effect ?? x.value));\n    const audio = va ? list(va.audio) : audioRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.audio ?? x.sound ?? x.value));
 
     return {
       id,
@@ -97,7 +97,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
 
   const progressionStages = progressionRows
     .sort((a, b) => Number(a.stage_order) - Number(b.stage_order))
-    .map(r => String(r.stage_id));
+    .map(r => String(r.stage_id ?? r.stage ?? ""))\n    .filter(Boolean);
 
   const missionArchetypes: Record<string, string> = {};
   for (const r of missionRows) {
