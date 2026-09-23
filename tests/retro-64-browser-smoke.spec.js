@@ -111,3 +111,31 @@ test("Retro 64 browser smoke: desert intent overrides reference jungle props", a
   expect(sceneText).not.toMatch(/dense tropical jungle|rainforest|muddy shoulders|jungle/i);
   expect(sceneText).not.toMatch(/heavy rain|helicopter rotor/i);
 });
+
+
+test("Retro 64 → Production Control Tower end-to-end handoff", async ({ page }) => {
+  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.locator('[data-nav="retro"]').click();
+  await page.locator("#retroGame").selectOption("G001");
+  await page.locator("#retroMode").selectOption("EXPANSION");
+  await page.locator("#retroReelCount").selectOption("3");
+  await page.locator("#retroIntent").fill("Night jungle mission with heavy rain and helicopter pursuit.");
+  await page.locator("#retroGenerate").click();
+  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
+
+  await page.locator("#retroGenerateReel").click();
+  await page.locator("#retroResumeReel").click();
+  await page.locator("#retroResumeReel").click();
+  await expect(page.locator("#retroStatus")).toContainText("REEL 3 GENERATED · 12 SHOTS · MISSION COMPLETE");
+  await expect(page.locator("#retroSendProduction")).toBeEnabled();
+
+  await page.locator("#retroSendProduction").click();
+  await page.waitForURL("**/production/");
+
+  await expect(page.locator("#ready")).toContainText("APPROVED");
+  await expect(page.locator("#render")).toBeEnabled();
+  await expect(page.locator("#frameCount")).toContainText("36");
+  await expect(page.locator("#storyMeta")).toContainText("Night jungle mission");
+  const packageType = await page.evaluate(() => JSON.parse(localStorage.getItem("KALP_PRODUCTION_PACKAGE") || "{}").production_type);
+  expect(packageType).toBe("RETRO64_MISSION");
+});
