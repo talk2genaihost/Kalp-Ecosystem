@@ -1,0 +1,58 @@
+name: RETRO-64 Production Handoff Gate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retro-64-handoff:
+    name: RETRO-64 → Production Control Tower
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout KALP-Ecosystem
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Astro Rashi package
+        run: npm run build:astro-rashi
+
+      - name: Assemble published site
+        run: npm run assemble:pages
+
+      - name: Start local KALP server
+        run: |
+          python3 -m http.server 4173 --directory dist &
+          echo $! > /tmp/kalp-server.pid
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/cinematic-studio/ >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Install Playwright Chromium
+        run: npx --yes playwright@1.55.0 install --with-deps chromium
+
+      - name: Run RETRO-64 browser handoff gate
+        run: npx playwright test tests/retro-64-browser-smoke.spec.js --workers=1
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: retro-64-production-handoff-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
