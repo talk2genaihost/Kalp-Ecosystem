@@ -68,21 +68,32 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
   for (const r of missionRows) missionArchetypes[String(r.archetype).toLowerCase()] = String(r.progression_focus);
   const episodeValue = (rule: string, fallback: string) =>
     String(episodeRows.find(r => String(r.rule_id) === rule)?.rule ?? fallback);
+  const episodeNumber = (rule: string, fallback: number): number => {
+    const value = episodeValue(rule, "");
+    const match = value.match(/\\b(\\d+)\\b/);
+    return match ? Number(match[1]) : fallback;
+  };
+  const episodeBoolean = (rule: string, fallback: boolean): boolean => {
+    const value = episodeValue(rule, "").toLowerCase();
+    if (/\\b(true|yes|locked)\\b/.test(value)) return true;
+    if (/\\b(false|no)\\b/.test(value)) return false;
+    return fallback;
+  };
 
   const retro: RetroKnowledgeBase = {
     schemaVersion: "3.0",
     sourceArtifact: UNIFIED_MASTER_WORKBOOK,
     worlds, conflictRules, progressionStages, missionArchetypes,
     productionRules: {
-      minimumReels: Number(episodeValue("EP-005","2")),
-      shotsPerReel: Number(episodeValue("EP-006","12")),
-      finalReelConcludesMission: episodeValue("EP-007","true").toLowerCase() === "true",
-      resumeFromPreviousReel: episodeValue("EP-008","true").toLowerCase() === "true"
+      minimumReels: episodeNumber("EP-005", 2),
+      shotsPerReel: episodeNumber("EP-006", 12),
+      finalReelConcludesMission: episodeBoolean("EP-007", true),
+      resumeFromPreviousReel: episodeBoolean("EP-008", true)
     }
   };
 
   const effects: UnifiedEffectsRegistry = { domains: {} };
-  for (const sheet of workbook.SheetNames.filter(s => /^\\d{2}_/.test(s))) effects.domains[sheet] = rows(workbook, sheet);
+  for (const sheet of workbook.SheetNames.filter(s => /^\d{2}_/.test(s))) effects.domains[sheet] = rows(workbook, sheet);
 
   return {
     workbookPath: filePath,
