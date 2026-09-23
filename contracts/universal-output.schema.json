@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"KALP Universal Output",
+  "type":"object",
+  "required":["output_id","source_studio","output_type","status","created_at"],
+  "properties":{
+    "output_id":{"type":"string"},
+    "source_studio":{"type":"string","enum":["CINEMATIC_STUDIO","GAME_STUDIO","PERSONA_PODCAST"]},
+    "output_type":{"type":"string"},
+    "status":{"type":"string","enum":["DRAFT","GENERATED","APPROVED","READY","FAILED"]},
+    "created_at":{"type":"string"},
+    "title":{"type":"string"},
+    "persona":{"type":"object"},
+    "production":{"type":"object"},
+    "assets":{"type":"object"}
+  },
+  "additionalProperties":true
+}
