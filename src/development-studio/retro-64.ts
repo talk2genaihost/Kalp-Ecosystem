@@ -2,6 +2,7 @@ import { getRetroAudioDNA, buildRetroSceneAudio, type RetroAudioDNA, type RetroS
 import { resolveRetroWorldPropProfile, type RetroWorldPropProfile } from "./retro-world-prop-library";
 import { buildRetroMissionArcPlan, type RetroMissionArcPlan } from "./retro-mission-arc";
 import { buildRetroMissionProduction, validateRetroMissionReels } from "./retro-mission-production";
+import { resolveRetroKnowledge } from "./retro-knowledge-engine-v2";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroCharacterDNA { character_id:string; identity:string; protagonist_name:string; silhouette:string; head:string; costume:string; palette:string; equipment:string; movement:string; performance:string; continuity_lock:string; }\nexport interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; character_dna?:RetroCharacterDNA; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
@@ -165,11 +166,15 @@ export interface RetroSemanticResolution {
   normalized_actions:string[];
   suppressed_reference_elements:string[];
   applied_rules:string[];
+  knowledge_source?:string;
+  physics_rules?:string[];
+  allowed_props?:string[];
   status:"PASS"|"CONFLICT_REQUIRES_RESOLUTION";
 }
 
 export function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution {
   const profile:RetroWorldPropProfile=resolveRetroWorldPropProfile(intent);
+  const knowledge=resolveRetroKnowledge(intent);
   const tokens=intentTokens(intent);
   const normalizedActions:string[]=[];
   const suppressed:string[]=[];
@@ -203,8 +208,11 @@ export function resolveRetroSemanticWorld(intent:string):RetroSemanticResolution
     normalized_intent:normalizedIntent.replace(/\\s{2,}/g," ").trim(),
     normalized_actions:normalizedActions,
     suppressed_reference_elements:suppressed,
-    applied_rules:rules,
-    status:"PASS"
+    applied_rules:[...rules,...knowledge.world.appliedRules],
+    knowledge_source:knowledge.sourceArtifact,
+    physics_rules:knowledge.world.physics,
+    allowed_props:knowledge.world.allowedProps,
+    status:knowledge.world.conflicts.length ? "CONFLICT_REQUIRES_RESOLUTION" : "PASS"
   };
 }
 
@@ -536,6 +544,7 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
     flexible_elements:progression.flexibleElements,
     storyboard,
     semantic_resolution:{...resolveRetroSemanticWorld(normalizedIntent),original_intent:intent},
+    knowledge_resolution:resolveRetroKnowledge(normalizedIntent),
     mission_arc_plan:buildRetroMissionArcPlan(normalizedIntent,request.missionReelCount??3)
   };
   const missionProduction=buildRetroMissionProduction(
@@ -547,6 +556,7 @@ export function buildIntentDrivenRetroEpisode(request:RetroIntentEpisodeRequest)
   );
   Object.assign(episode,missionProduction);\n  const contractValidation=validateRetroProductionJson(episode);
   const characterContinuity=validateRetroCharacterContinuity(episode);\n  const rendererReadiness=validateRetroRendererReadiness(episode);
+  const missionReelsValidation=validateRetroMissionReels(episode);
   const validation={
     validator_version:"1.0",
     status:contractValidation.status==="PASS"&&characterContinuity.status==="PASS"&&rendererReadiness.status==="PASS"&&missionReelsValidation.status==="PASS"?"PASS":"FAIL",
