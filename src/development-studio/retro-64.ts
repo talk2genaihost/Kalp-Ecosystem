@@ -3,10 +3,11 @@ import { resolveRetroWorldPropProfile, type RetroWorldPropProfile } from "./retr
 import { buildRetroMissionArcPlan, type RetroMissionArcPlan } from "./retro-mission-arc";
 import { buildRetroMissionProduction, validateRetroMissionReels } from "./retro-mission-production";
 import { resolveRetroKnowledge } from "./retro-knowledge-engine-v2";
+import { setRetroKnowledgeBase, getRetroKnowledgeBase, type RetroKnowledgeBase } from "./retro-knowledge-base";
 export type RetroGameId = "G001"|"G002"|"G003"|"G004"|"G005";
 export interface RetroFrame { title:string; action:string }
 export interface RetroCharacterDNA { character_id:string; identity:string; protagonist_name:string; silhouette:string; head:string; costume:string; palette:string; equipment:string; movement:string; performance:string; continuity_lock:string; }\nexport interface RetroGameReference { id:RetroGameId; name:string; worksheet:string; status:"ACTIVE"|"PLANNED"; character_dna?:RetroCharacterDNA; durationSeconds?:number; format?:"9:16"|"16:9"; world?:string; terrain?:string; obstacles?:string; enemies?:string; moves?:string; weapons?:string; powerUps?:string; abilities?:string; props?:string; camera?:string; vfx?:string; sound?:string; realistic?:string; frames?:RetroFrame[] }
-export interface RetroReferenceRegistry { schemaVersion:string; sourceArtifact:string; games:RetroGameReference[] }
+export interface RetroReferenceRegistry { schemaVersion:string; sourceArtifact:string; games:RetroGameReference[]; knowledgeBase?:RetroKnowledgeBase }
 export function resolveRetroGame(registry:RetroReferenceRegistry, gameName:string):RetroGameReference {
   const game=registry.games.find(g=>g.name.toLowerCase()===gameName.trim().toLowerCase());
   if(!game) throw new Error(`Retro game not registered: ${gameName}`);
@@ -17,32 +18,115 @@ export function buildRetroEpisode(game:RetroGameReference, episodeId=`${game.nam
   return {contract:"KALP-RETRO-64-EPISODE-1.0",episode_id:episodeId,game:game.name,reference_worksheet:game.worksheet,duration_seconds:game.durationSeconds??60,format:game.format??"9:16",world:game.world??"",terrain:game.terrain??"",obstacles:game.obstacles??"",enemies:game.enemies??"",moves:game.moves??"",weapons_ammunition:game.weapons??"",power_ups:game.powerUps??"",special_abilities:game.abilities??"",props:game.props??"",camera:game.camera??"",vfx:game.vfx??"",sound:game.sound??"",realistic_interpretation:game.realistic??"",storyboard:game.frames.map((f,i)=>({frame:i+1,title:f.title,action:f.action}))};
 }
 
-/** Parse a Retro 64 XLSX workbook into the canonical registry shape. */
+/** Parse the Retro 64 workbook. v2 knowledge sheets are authoritative when present. */
 export async function parseRetro64Workbook(input: ArrayBuffer | Uint8Array): Promise<RetroReferenceRegistry> {
   const XLSX = await import("xlsx");
   const workbook = XLSX.read(input, { type: "array" });
+  const table = (name:string): any[][] => {
+    const sheet = workbook.Sheets[name];
+    return sheet ? XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "" }) : [];
+  };
+  const asObjects = (rows:any[][]): Record<string,string>[] => {
+    if (!rows.length) return [];
+    const headers = rows[0].map((x:any)=>String(x ?? "").trim());
+    return rows.slice(1).filter(row=>row.some((x:any)=>String(x ?? "").trim())).map(row =>
+      Object.fromEntries(headers.map((h:string,i:number)=>[h,String(row?.[i] ?? "").trim()]))
+    );
+  };
+  const split = (value:string): string[] => value ? value.split(/\\s*\\|\\s*/).map(x=>x.trim()).filter(Boolean) : [];
+  const gameRows = asObjects(table("GAME_REGISTRY"));
+  const dnaRows = asObjects(table("GAME_DNA"));
+  const frameRows = asObjects(table("REFERENCE_FRAMES"));
   const games: RetroGameReference[] = [];
-  for (const worksheet of workbook.SheetNames) {
-    const sheet = workbook.Sheets[worksheet];
-    const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "" });
-    if (!rows.length) continue;
-    const meta: Record<string,string> = {};
-    const frames: RetroFrame[] = [];
-    for (const row of rows) {
-      const key = String(row?.[0] ?? "").trim();
-      const value = String(row?.[1] ?? "").trim();
-      if (/^frame$/i.test(key) && String(row?.[1] ?? "").trim()) {
-        frames.push({ title: String(row?.[2] ?? ("Frame " + (frames.length + 1))).trim(), action: String(row?.[3] ?? "").trim() });
-      } else if (key) {
-        const canonical = key.replace(/[\\s_-]+/g, "");
-        meta[canonical] = value;
-      }
+
+  if (gameRows.length) {
+    for (const row of gameRows) {
+      const id = String(row.id || "").toUpperCase() as RetroGameId;
+      const dna = dnaRows.find(x=>x.game_id===id);
+      const frames = frameRows.filter(x=>x.game_id===id).sort((a,b)=>Number(a.frame)-Number(b.frame)).map(x=>({title:x.title,action:x.action}));
+      games.push({
+        id,
+        name:row.name,
+        worksheet:row.worksheet || row.name,
+        status:row.status==="PLANNED"?"PLANNED":"ACTIVE",
+        durationSeconds:Number(row.durationSeconds || 60),
+        format:row.format==="16:9"?"16:9":"9:16",
+        world:row.world, terrain:row.terrain, obstacles:row.obstacles, enemies:row.enemies,
+        moves:row.moves, weapons:row.weapons, powerUps:row.powerUps, abilities:row.abilities,
+        props:row.props, camera:row.camera, vfx:row.vfx, sound:row.sound, realistic:row.realistic,
+        frames,
+        character_dna:dna?.character_id ? {
+          character_id:dna.character_id, identity:dna.identity, protagonist_name:dna.protagonist_name,
+          silhouette:dna.silhouette, head:dna.head, costume:dna.costume, palette:dna.palette,
+          equipment:dna.equipment, movement:dna.movement, performance:dna.performance,
+          continuity_lock:dna.continuity_lock
+        } : undefined
+      });
     }
-    const gameName = meta.name || worksheet.replace(/^G\\d+[_-]?/i, "").trim() || worksheet;
-    const id = (worksheet.match(/^G\\d+/i)?.[0].toUpperCase() || ("G" + String(games.length + 1).padStart(3, "0"))) as RetroGameId;
-    games.push({ id, name: gameName, worksheet, status: "ACTIVE", durationSeconds: Number(meta.durationSeconds || 60), format: meta.format === "16:9" ? "16:9" : "9:16", world: meta.world, terrain: meta.terrain, obstacles: meta.obstacles, enemies: meta.enemies, moves: meta.moves, weapons: meta.weapons, powerUps: meta.powerUps, abilities: meta.abilities, props: meta.props, camera: meta.camera, vfx: meta.vfx, sound: meta.sound, realistic: meta.realistic, frames });
+  } else {
+    for (const worksheet of workbook.SheetNames) {
+      if (/^(GAME_|WORLD_|MOVEMENT_|ENCOUNTER_|OBSTACLE_|POWERUP_|PROGRESSION_|MISSION_|ESCALATION_|CAMERA_|EPISODE_|KB_)/i.test(worksheet)) continue;
+      const rows = table(worksheet);
+      if (!rows.length) continue;
+      const meta:Record<string,string>={}; const frames:RetroFrame[]=[];
+      for (const row of rows) {
+        const key=String(row?.[0] ?? "").trim(), value=String(row?.[1] ?? "").trim();
+        if (/^frame$/i.test(key) && value) frames.push({title:String(row?.[2] ?? ("Frame "+(frames.length+1))).trim(),action:String(row?.[3] ?? "").trim()});
+        else if (key) meta[key.replace(/[\\s_-]+/g,"")]=value;
+      }
+      const gameName=meta.name || worksheet; const id=(worksheet.match(/^G\\d+/i)?.[0].toUpperCase() || ("G"+String(games.length+1).padStart(3,"0"))) as RetroGameId;
+      games.push({id,name:gameName,worksheet,status:"ACTIVE",durationSeconds:Number(meta.durationSeconds||60),format:meta.format==="16:9"?"16:9":"9:16",world:meta.world,terrain:meta.terrain,obstacles:meta.obstacles,enemies:meta.enemies,moves:meta.moves,weapons:meta.weapons,powerUps:meta.powerUps,abilities:meta.abilities,props:meta.props,camera:meta.camera,vfx:meta.vfx,sound:meta.sound,realistic:meta.realistic,frames});
+    }
   }
-  return { schemaVersion: "1.0", sourceArtifact: "KALP_Retro_64_Master_Reference.xlsx", games };
+
+  const worldRows=asObjects(table("WORLD_REGISTRY"));
+  if (worldRows.length) {
+    const physicsRows=asObjects(table("WORLD_PHYSICS"));
+    const propRows=asObjects(table("WORLD_PROPS"));
+    const moveRows=asObjects(table("MOVEMENT_DYNAMICS"));
+    const vfxRows=asObjects(table("WORLD_VFX"));
+    const audioRows=asObjects(table("WORLD_AUDIO"));
+    const conflictRows=asObjects(table("WORLD_CONFLICT_MATRIX"));
+    const progressionRows=asObjects(table("PROGRESSION_DNA"));
+    const missionRows=asObjects(table("MISSION_ARCHETYPES"));
+    const episodeRows=asObjects(table("EPISODE_RULES"));
+    const worlds=worldRows.map(row=>{
+      const id=String(row.world_id).toUpperCase() as RetroKnowledgeBase["worlds"][number]["id"];
+      const movement:Record<string,string>={};
+      for(const x of moveRows.filter(x=>x.world_id===id)) movement[x.input||""]=x.normalized||"";
+      return {
+        id,label:row.label,allowedProps:propRows.filter(x=>x.world_id===id&&x.status==="ALLOWED").map(x=>x.prop),
+        suppressedProps:propRows.filter(x=>x.world_id===id&&x.status!=="ALLOWED").map(x=>x.prop),
+        movement,
+        physics:physicsRows.filter(x=>x.world_id===id).map(x=>x.rule),
+        vfx:vfxRows.filter(x=>x.world_id===id).map(x=>x.vfx),
+        audio:audioRows.filter(x=>x.world_id===id).map(x=>x.audio)
+      };
+    });
+    const conflictRules=conflictRows.map(x=>[x.world_id,x.element,x.action] as [string,string,string]);
+    const progressionStages=progressionRows.sort((a,b)=>Number(a.order)-Number(b.order)).map(x=>x.stage).filter(Boolean);
+    const missionArchetypes=Object.fromEntries(missionRows.map(x=>[x.archetype,x.progression]));
+    const value=(key:string, fallback:string)=>episodeRows.find(x=>x.rule_id===key)?.value ?? fallback;
+    const knowledgeBase:RetroKnowledgeBase={
+      schemaVersion:value("KB_SCHEMA_VERSION","2.0"),
+      sourceArtifact:value("SOURCE_ARTIFACT","KALP_Retro_64_Master_Reference.xlsx"),
+      worlds,conflictRules,progressionStages,missionArchetypes,
+      productionRules:{
+        minimumReels:Number(value("MINIMUM_REELS","2")),
+        shotsPerReel:Number(value("SHOTS_PER_REEL","12")),
+        finalReelConcludesMission:value("FINAL_REEL_CONCLUDES_MISSION","true")==="true",
+        resumeFromPreviousReel:value("RESUME_FROM_PREVIOUS_REEL","true")==="true"
+      }
+    };
+    setRetroKnowledgeBase(knowledgeBase);
+  }
+
+  return {
+    schemaVersion:worldRows.length ? "2.0" : "1.0",
+    sourceArtifact:"KALP_Retro_64_Master_Reference.xlsx",
+    games,
+    knowledgeBase:worldRows.length ? getRetroKnowledgeBase() : undefined
+  } as RetroReferenceRegistry;
 }
 
 export type RetroIntentMode = "REFERENCE" | "VARIATION" | "EXPANSION";
