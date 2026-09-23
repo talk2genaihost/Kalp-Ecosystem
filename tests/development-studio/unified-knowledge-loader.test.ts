@@ -72,3 +72,29 @@ test("canonical unified workbook loads as the runtime authority", () => {
   assert.equal(loaded.visualStyles.entries.length, 54);
   assert.equal(loaded.visualStyles.entries[12]["Style Name"], "Mythic Cinematic Realism");
 });
+
+
+test("shared cinematic resolver resolves world, physics, progression, effects, style and conflicts", async () => {
+  const { resolveCinematicScene } = await import("../../src/development-studio/cinematic-knowledge-resolver");
+  const resolved = resolveCinematicScene({
+    intent: "An underwater rescue mission with a diver approaching a submerged ruin under pressure",
+    mission: "RESCUE", movement: "run",
+    elements: ["coral", "submerged rocks", "helicopter", "sea floor"],
+    visualStyle: "Mythic Cinematic Realism"
+  });
+  assert.equal(resolved.source, "KALP_Master_Reference_UNIFIED_v3.xlsx");
+  assert.equal(resolved.world.id, "UNDERWATER");
+  assert.equal(resolved.movement, "swim");
+  assert.ok(resolved.physics.some(x => x.toLowerCase().includes("buoyancy")));
+  assert.equal(resolved.progression.stage, "ENTRY");
+  assert.match(resolved.progression.focus ?? "", /locate.*survive.*breach.*reach target.*extract/);
+  assert.equal(resolved.validation.status, "FAIL");
+  assert.ok(resolved.validation.suppressed.includes("helicopter") === false);
+  assert.ok(resolved.validation.conflicts.some(x => x.includes("helicopter")));
+  assert.ok(resolved.effects["01_Camera_Movement"]);
+  assert.ok(resolved.effects["03_Lens_Optical"]);
+  assert.ok(resolved.effects["07_Lighting_Light_Effects"]);
+  assert.ok(resolved.effects["08_VFX_Particles_Atmospherics"]);
+  assert.ok(resolved.effects["12_Sound_Music_VO_SFX"]);
+  assert.equal(resolved.visualStyle?.["Style Name"], "Mythic Cinematic Realism");
+});
