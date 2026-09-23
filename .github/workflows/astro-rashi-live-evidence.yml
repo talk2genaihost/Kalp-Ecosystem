@@ -1,8 +1,6 @@
 name: Astro Rashi Live Evidence Validation
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -20,6 +18,9 @@ jobs:
 
       - name: Verify Node runtime
         run: node --version
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Execute live canonical evidence validation
         env:
