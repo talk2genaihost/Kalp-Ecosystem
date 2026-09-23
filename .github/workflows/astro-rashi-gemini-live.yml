@@ -1,8 +1,6 @@
 name: Astro Rashi Gemini Live Intelligence Validation
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
