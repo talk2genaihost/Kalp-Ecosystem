@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   retro-64-handoff:
-    name: RETRO-64 → Production Control Tower
+    name: RETRO-64 → Published Cinematic Studio
     runs-on: ubuntu-latest
 
     steps:
@@ -23,32 +23,12 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Assemble RETRO-64 browser site
-        run: |
-          set -eu
-          rm -rf /tmp/retro64-site
-          mkdir -p /tmp/retro64-site/cinematic-studio /tmp/retro64-site/production
-          cp -R apps/cinematic-studio/. /tmp/retro64-site/cinematic-studio/
-          cp -R apps/production/. /tmp/retro64-site/production/
-
-      - name: Start local KALP server
-        run: |
-          set -eu
-          python3 -m http.server 4173 --directory /tmp/retro64-site >/tmp/retro64-http.log 2>&1 &
-          echo $! >/tmp/retro64-http.pid
-          for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:4173/cinematic-studio/ >/dev/null; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/retro64-http.log
-          exit 1
-
       - name: Install Playwright Chromium
         run: npx --yes playwright@1.55.0 install --with-deps chromium
 
-      - name: Run RETRO-64 browser handoff gate
+      - name: Run RETRO-64 browser gate against published Cinematic Studio
+        env:
+          KALP_CINEMATIC_URL: https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/
         run: npx playwright test tests/retro-64-browser-smoke.spec.js --workers=1
 
       - name: Upload Playwright report
