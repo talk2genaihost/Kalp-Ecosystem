@@ -18,28 +18,32 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 24
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Build Astro Rashi package
-        run: npm run build:astro-rashi
-
-      - name: Assemble published site
-        run: npm run assemble:pages
+      - name: Assemble RETRO-64 browser site
+        run: |
+          set -eu
+          rm -rf /tmp/retro64-site
+          mkdir -p /tmp/retro64-site/cinematic-studio /tmp/retro64-site/production
+          cp -R apps/cinematic-studio/. /tmp/retro64-site/cinematic-studio/
+          cp -R apps/production/. /tmp/retro64-site/production/
 
       - name: Start local KALP server
         run: |
-          python3 -m http.server 4173 --directory dist &
-          echo $! > /tmp/kalp-server.pid
+          set -eu
+          python3 -m http.server 4173 --directory /tmp/retro64-site >/tmp/retro64-http.log 2>&1 &
+          echo $! >/tmp/retro64-http.pid
           for i in {1..20}; do
             if curl -fsS http://127.0.0.1:4173/cinematic-studio/ >/dev/null; then
-              break
+              exit 0
             fi
             sleep 1
           done
+          cat /tmp/retro64-http.log
+          exit 1
 
       - name: Install Playwright Chromium
         run: npx --yes playwright@1.55.0 install --with-deps chromium
