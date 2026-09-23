@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "2.0",
+  "artifact": "KALP_Retro_64_World_Progression_Knowledge_Base.xlsx",
+  "purpose": "Authoritative authoring schema for Retro 64 world physics, prop intelligence and progression DNA.",
+  "sheets": [
+    {
+      "name": "GAME_REGISTRY",
+      "role": "Game identity and canonical reference metadata",
+      "columns": [
+        "game_id",
+        "game_name",
+        "worksheet",
+        "status",
+        "duration_seconds",
+        "format",
+        "reference_role"
+      ]
+    },
+    {
+      "name": "GAME_DNA",
+      "role": "Canonical game world, enemies, moves, weapons, power-ups, abilities, camera, VFX and audio",
+      "columns": [
+        "game_id",
+        "world",
+        "terrain",
+        "obstacles",
+        "enemies",
+        "moves",
+        "weapons",
+        "power_ups",
+        "abilities",
+        "props",
+        "camera",
+        "vfx",
+        "sound",
+        "realistic_interpretation"
+      ]
+    },
+    {
+      "name": "REFERENCE_FRAMES",
+      "role": "Eight-stage source progression for each game",
+      "columns": [
+        "game_id",
+        "frame",
+        "stage",
+        "title",
+        "action",
+        "progression_purpose"
+      ]
+    },
+    {
+      "name": "WORLD_REGISTRY",
+      "role": "World identity and semantic tokens",
+      "columns": [
+        "world_id",
+        "label",
+        "environment_tokens",
+        "description"
+      ]
+    },
+    {
+      "name": "WORLD_PHYSICS",
+      "role": "Physical dynamics and movement normalization",
+      "columns": [
+        "world_id",
+        "physics_rule",
+        "movement_input",
+        "normalized_movement",
+        "rule_type"
+      ]
+    },
+    {
+      "name": "WORLD_PROPS",
+      "role": "World-compatible prop vocabulary",
+      "columns": [
+        "world_id",
+        "prop",
+        "category",
+        "status",
+        "replacement_prop"
+      ]
+    },
+    {
+      "name": "WORLD_ENTITIES",
+      "role": "World-compatible enemies, creatures and vehicles",
+      "columns": [
+        "world_id",
+        "entity",
+        "category",
+        "status",
+        "notes"
+      ]
+    },
+    {
+      "name": "WORLD_WEAPONS",
+      "role": "Weapon and projectile compatibility",
+      "columns": [
+        "world_id",
+        "weapon",
+        "status",
+        "notes"
+      ]
+    },
+    {
+      "name": "WORLD_VFX",
+      "role": "World-specific visual effects",
+      "columns": [
+        "world_id",
+        "vfx",
+        "status"
+      ]
+    },
+    {
+      "name": "WORLD_AUDIO",
+      "role": "World-specific ambience and sound effects",
+      "columns": [
+        "world_id",
+        "audio_element",
+        "category",
+        "status"
+      ]
+    },
+    {
+      "name": "MOVEMENT_DYNAMICS",
+      "role": "Movement transformations by world",
+      "columns": [
+        "world_id",
+        "input_movement",
+        "output_movement",
+        "physics_reason"
+      ]
+    },
+    {
+      "name": "ENCOUNTER_DYNAMICS",
+      "role": "Encounter construction patterns",
+      "columns": [
+        "game_id",
+        "stage",
+        "encounter_pattern",
+        "allowed_escalation"
+      ]
+    },
+    {
+      "name": "OBSTACLE_DYNAMICS",
+      "role": "World-aware obstacle behavior",
+      "columns": [
+        "world_id",
+        "obstacle",
+        "interaction",
+        "failure_mode",
+        "resolution"
+      ]
+    },
+    {
+      "name": "POWERUP_DYNAMICS",
+      "role": "Capability progression rules",
+      "columns": [
+        "game_id",
+        "power_up",
+        "capability_before",
+        "capability_gain",
+        "capability_after"
+      ]
+    },
+    {
+      "name": "PROGRESSION_DNA",
+      "role": "Canonical eight-stage progression logic",
+      "columns": [
+        "stage_order",
+        "stage",
+        "objective",
+        "escalation_rule",
+        "continuation_rule"
+      ]
+    },
+    {
+      "name": "MISSION_ARCHETYPES",
+      "role": "Mission objective progression",
+      "columns": [
+        "archetype",
+        "stage_sequence",
+        "objective_logic",
+        "completion_condition"
+      ]
+    },
+    {
+      "name": "ESCALATION_RULES",
+      "role": "Threat and capability escalation rules",
+      "columns": [
+        "rule_id",
+        "from_stage",
+        "to_stage",
+        "threat_change",
+        "capability_change"
+      ]
+    },
+    {
+      "name": "WORLD_CONFLICT_MATRIX",
+      "role": "Explicit world-element compatibility decisions",
+      "columns": [
+        "world_id",
+        "element",
+        "decision",
+        "normalization",
+        "reason"
+      ]
+    },
+    {
+      "name": "CAMERA_DNA",
+      "role": "World-safe camera language",
+      "columns": [
+        "world_id",
+        "camera_pattern",
+        "allowed",
+        "notes"
+      ]
+    },
+    {
+      "name": "EPISODE_RULES",
+      "role": "Production constraints and provenance",
+      "columns": [
+        "rule_id",
+        "rule",
+        "severity",
+        "source",
+        "notes"
+      ]
+    }
+  ],
+  "decision_values": {
+    "status": [
+      "ACTIVE",
+      "PLANNED",
+      "ALLOWED",
+      "SUPPRESSED",
+      "PROHIBITED",
+      "CONDITIONAL"
+    ],
+    "rule_type": [
+      "PHYSICS",
+      "MOVEMENT",
+      "PROP",
+      "ENTITY",
+      "WEAPON",
+      "VFX",
+      "AUDIO",
+      "CONFLICT",
+      "PROGRESSION"
+    ]
+  },
+  "authority": "Excel authoring data is normalized into the KALP Retro Knowledge Model before episode generation; generated episodes must retain provenance for the rules applied."
+}
