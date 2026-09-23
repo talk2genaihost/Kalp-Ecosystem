@@ -29,14 +29,23 @@ export interface RetroKnowledgeBase {
   };
 }
 
-const KNOWLEDGE_BASE = kb as RetroKnowledgeBase;
+let ACTIVE_KNOWLEDGE_BASE = structuredClone(kb as RetroKnowledgeBase);
+
+/** Workbook-loaded knowledge overrides the normalized JSON fallback. */
+export function setRetroKnowledgeBase(source: RetroKnowledgeBase): void {
+  ACTIVE_KNOWLEDGE_BASE = structuredClone(source);
+}
+
+export function resetRetroKnowledgeBase(): void {
+  ACTIVE_KNOWLEDGE_BASE = structuredClone(kb as RetroKnowledgeBase);
+}
 
 export function getRetroKnowledgeBase(): RetroKnowledgeBase {
-  return structuredClone(KNOWLEDGE_BASE);
+  return structuredClone(ACTIVE_KNOWLEDGE_BASE);
 }
 
 export function getRetroKnowledgeWorld(worldId: string): RetroKnowledgeWorld {
-  const world = KNOWLEDGE_BASE.worlds.find(x => x.id === worldId.toUpperCase());
+  const world = ACTIVE_KNOWLEDGE_BASE.worlds.find(x => x.id === worldId.toUpperCase());
   if (!world) throw new Error(`Retro world is not registered in the knowledge base: ${worldId}`);
   return structuredClone(world);
 }
@@ -60,7 +69,7 @@ export function normalizeRetroMovement(world: RetroKnowledgeWorld, movement: str
 }
 
 export function resolveRetroConflict(worldId: string, element: string): string | null {
-  const hit = KNOWLEDGE_BASE.conflictRules.find(
+  const hit = ACTIVE_KNOWLEDGE_BASE.conflictRules.find(
     ([id, term]) => id === worldId && element.toLowerCase().includes(term.toLowerCase())
   );
   return hit?.[2] ?? null;
