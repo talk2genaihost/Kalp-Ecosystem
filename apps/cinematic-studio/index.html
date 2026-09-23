@@ -57,7 +57,7 @@
 <div class="viewhead"><div class="ey">ASSET LIBRARY</div><div class="title">Cinematic Assets & Jobs</div><div class="muted">Canonical scene assets, visual jobs and production references.</div></div>
 <div class="viewgrid" id="libraryGrid"></div></div></section><section class="view" data-view="retro"><div class="retro-shell">
 <div class="viewhead"><div class="ey">KALP RETRO 64 · MISSION PRODUCTION STUDIO</div><div class="title">Retro 64 Mission Production Engine v2.0</div><div class="muted">Game progression DNA → intent → mission arc → 12-shot reels → Resume continuity → mission completion. The 8-stage Excel reference is source DNA, not the final reel.</div></div>
-<div class="retro-grid"><aside class="retro-panel"><div class="field"><label>GAME REFERENCE</label><select class="retro-select" id="retroGame"></select></div><div class="field"><label>INTENT MODE</label><select class="retro-select" id="retroMode"><option value="REFERENCE">REFERENCE · Exact reference episode</option><option value="VARIATION" selected>VARIATION · Same game progression, new episode</option><option value="EXPANSION">EXPANSION · Intent-driven new episode</option></select></div><div class="field"><label>USER INTENT</label><textarea id="retroIntent" placeholder="Example: Contra should rescue the U.S. President."></textarea></div><div class="field"><label>MISSION LENGTH</label><select class="retro-select" id="retroReelCount"><option value="2">2 REELS · 24 SHOTS</option><option value="3" selected>3 REELS · 36 SHOTS</option><option value="4">4 REELS · 48 SHOTS</option><option value="5">5 REELS · 60 SHOTS</option><option value="6">6 REELS · 72 SHOTS</option></select></div><div id="retroMissionPlan" class="muted" style="margin-top:8px"></div><button class="primary" id="retroGenerate">Generate Progression Episode</button><button class="primary" id="retroGenerateReel" disabled>▶ Generate Reel 1 · 12 Shots</button><button class="secondary" id="retroResumeReel" disabled>↻ Resume Next Reel · 12 Shots</button><button class="primary" id="retroVisualStoryboard" disabled>▣ Generate Visual Storyboard</button><button class="secondary" id="retroStoryboard" disabled>▣ Open Storyboard Review</button><button class="secondary" id="retroLoad">Load Reference</button><button class="secondary" id="retroExport">Export Production JSON</button><div id="retroStatus" class="muted" style="margin-top:10px">Ready.</div><div id="retroValidationDetails" class="retro-validation" style="display:none"></div></aside>
+<div class="retro-grid"><aside class="retro-panel"><div class="field"><label>GAME REFERENCE</label><select class="retro-select" id="retroGame"></select></div><div class="field"><label>INTENT MODE</label><select class="retro-select" id="retroMode"><option value="REFERENCE">REFERENCE · Exact reference episode</option><option value="VARIATION" selected>VARIATION · Same game progression, new episode</option><option value="EXPANSION">EXPANSION · Intent-driven new episode</option></select></div><div class="field"><label>USER INTENT</label><textarea id="retroIntent" placeholder="Example: Contra should rescue the U.S. President."></textarea></div><div class="field"><label>MISSION LENGTH</label><select class="retro-select" id="retroReelCount"><option value="2">2 REELS · 24 SHOTS</option><option value="3" selected>3 REELS · 36 SHOTS</option><option value="4">4 REELS · 48 SHOTS</option><option value="5">5 REELS · 60 SHOTS</option><option value="6">6 REELS · 72 SHOTS</option></select></div><div id="retroMissionPlan" class="muted" style="margin-top:8px"></div><button class="primary" id="retroGenerate">Generate Progression Episode</button><button class="primary" id="retroGenerateReel" disabled>▶ Generate Reel 1 · 12 Shots</button><button class="secondary" id="retroResumeReel" disabled>↻ Resume Next Reel · 12 Shots</button><button class="primary" id="retroVisualStoryboard" disabled>▣ Generate Visual Storyboard</button><button class="primary" id="retroSendProduction" disabled>⇢ Approve & Send to Production</button><button class="secondary" id="retroStoryboard" disabled>▣ Open Storyboard Review</button><button class="secondary" id="retroLoad">Load Reference</button><button class="secondary" id="retroExport">Export Production JSON</button><div id="retroStatus" class="muted" style="margin-top:10px">Ready.</div><div id="retroValidationDetails" class="retro-validation" style="display:none"></div></aside>
 <section class="retro-panel"><div class="ey">PROGRESSION DNA</div><div id="retroMeta" class="muted">Select a game.</div><div id="retroProgression" class="retro-frames" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">MISSION PRODUCTION · LIVE STATE</div><div id="retroMissionProduction" class="retro-mission-production"><div class="muted">Generate a mission to initialize the production state.</div></div><div class="ey" style="margin-top:14px">REFERENCE DNA · SOURCE</div><div id="retroCards" class="retro-cards" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">8-STAGE PROGRESSION SOURCE MAP</div><div class="muted" style="margin:5px 0 8px">These 8 frames define progression rhythm. They are not the generated 12-shot reel output.</div><div id="retroFrames" class="retro-frames"></div><div class="ey" style="margin-top:14px">PRODUCTION JSON</div><pre id="retroJson" class="retro-json">Generate an episode to create the production contract.</pre></section></div></div></section><div class="toast" id="toast"></div>
 <script>
 const KALP_BACKEND = { endpoint: "https://cfwrgalgscieddkcrtde.supabase.co/functions/v1/kalp-intelligence-gateway", authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmd3JnYWxnc2NpZWRka2NydGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDQyNzYsImV4cCI6MjEwNDE4MDI3Nn0.TwAdY3JdepMp5IFmmogcXJI4VyhN9Yx5iLxqQG7wqrw" };
@@ -525,6 +525,7 @@ function retroLoadReference(){
   document.getElementById("retroGenerate").disabled=false;document.getElementById("retroValidationDetails").style.display="none";
   document.getElementById("retroStoryboard").disabled=!retroEpisode?.storyboard?.length;
   document.getElementById("retroVisualStoryboard").disabled=!retroEpisode?.storyboard?.length;
+  document.getElementById("retroSendProduction").disabled=!(retroEpisode?.validation?.status==="PASS");
   document.getElementById("retroJson").textContent=retroEpisode?JSON.stringify(retroEpisode,null,2):"Generate an episode to create the production contract.";
 }
 function retroAudioDNA(game){const p={Contra:{music:"Aggressive arcade action-rock with driving synth/percussion",rhythm:"Fast 4/4 combat pulse",ambience:"Rain, jungle, radio, engines and helicopter rotor",sfx:["Gunfire","Explosions","Shell casings","Helicopter rotor","Radio chatter"],escalation:"Heavier percussion and armored-engine rumble",transitions:["Threat stinger","Weapon-upgrade cue","Breakthrough impact","Gate-opening rise"],finale:"Abrupt unresolved-threat sting",mix:"Punchy impacts; music must not mask dialogue"},Mario:{music:"Upbeat melodic platform-adventure motif",rhythm:"Bouncy syncopated gameplay pulse",ambience:"Kingdom wind, water, underground reverb and castle tension",sfx:["Jump","Coin","Block hit","Enemy stomp","Power-up"],escalation:"Denser percussion and castle tension",transitions:["Level transition","Power-up flourish","Castle-entry sting"],finale:"Victory resolution then next-world teaser",mix:"Crisp gameplay cues"}, "Road Fighter":{music:"Driving electronic racing pulse",rhythm:"Fast continuous speed pulse",ambience:"Engine RPM, wind, road noise, traffic and tires",sfx:["Engine rev","Acceleration","Tire squeal","Traffic pass","Collision","Fuel warning"],escalation:"Rising engine intensity and traffic density",transitions:["Fuel cue","Road transition","Final-sprint rise"],finale:"High-speed finish sting",mix:"Engine and tire dynamics are primary rhythmic layers"},"Kung Fu":{music:"Tense martial-arts pulse with sparse melody",rhythm:"Short attack/recovery phrases",ambience:"Temple room tone, footsteps and floor transitions",sfx:["Punch","Kick","Jump attack","Weapon throw","Enemy hit","Boss cue"],escalation:"Denser impacts and stronger boss hits",transitions:["Floor transition","Boss arrival","Stairway rise"],finale:"Heavy final impact then rescue resolution",mix:"Impacts remain dry and immediate"},"Legend of Kage":{music:"Japanese-inspired arcade action pulse",rhythm:"Rapid attack pulses with airy climbing transitions",ambience:"Forest wind, leaves, birds, water and fortress air",sfx:["Sword slash","Shuriken","Enemy hit","Jump/land","Tree movement","Castle impact"],escalation:"Faster percussion and stronger fortress impacts",transitions:["Forest transition","Fortress reveal","Rescue cue"],finale:"Rescue flourish with seasonal transition",mix:"Balance weapon cues with spacious forest ambience"}};const a=p[game]||p.Contra;return {...a,reference_fidelity:"Game sonic grammar is preserved; original recordings are not copied."};}
@@ -754,9 +755,64 @@ function wireRetroReelControls(){
     if(current>0)retroGenerateReel(current+1);
   };
 }
+function retroBuildProductionPackage(){
+  if(!retroEpisode?.storyboard?.length)return null;
+  const validation=retroEpisode.validation||{};
+  if(validation.status!=="PASS"){toast("Retro validation must PASS before production handoff.");return null;}
+  const reels=retroEpisode.reels||[];
+  const shots=reels.flatMap(reel=>(reel.shots||[]).map(s=>({
+    frame_id:"R"+String(reel.reel).padStart(2,"0")+"-S"+String(s.shot).padStart(2,"0"),
+    reel:s.reel,shot:s.shot,stage:s.stage,title:s.title,description:s.description,action:s.action,
+    perspective:"RETRO64",purpose:s.objective||retroEpisode.intent||"Retro mission progression",
+    emotion:"Progression-driven",camera:s.camera||retroEpisode.storyboard?.[(s.shot-1)%8]?.camera||"cinematic game camera",
+    dialogue:null,delivery:"not required",voice_persona:"not required",
+    world_state:s.world_state||"",character_state:s.character_state||"",
+    capability_state:s.capability_state||"",threat_state:s.threat_state||"",
+    objective_state:s.objective_state||"",continuity_from:s.continuity_from||"",
+    continuity_to:s.continuity_to||"",characters:s.characters||[],
+    visual_job:{aspect_ratio:retroEpisode.format||"16:9",output_type:"VIDEO",provider_neutral:true,
+      visual:s.description||s.action||"",lighting:"Knowledge-engine governed",vfx:"Knowledge-engine governed",audio:"Knowledge-engine governed"},
+    retro_stage:s.stage,is_resolution_shot:!!s.is_resolution_shot
+  })));
+  return {
+    contract:"KALP-PRODUCTION-PACKAGE-1.0",
+    output_id:"RETRO64-"+(retroEpisode.episode_id||Date.now()),
+    source_studio:"CINEMATIC_STUDIO",
+    production_type:"RETRO64_MISSION",
+    status:"APPROVED",
+    created_at:new Date().toISOString(),
+    scene_id:retroEpisode.episode_id,
+    scene_title:retroEpisode.game+" · "+retroEpisode.intent_mode,
+    objective:retroEpisode.intent||"Retro 64 mission production",
+    format:retroEpisode.format||"16:9",
+    duration_seconds:retroEpisode.duration_seconds||60,
+    frame_count:shots.length,shot_count:shots.length,
+    selected_characters:retroEpisode.reference_elements_used?.character_dna?.character_id?[retroEpisode.reference_elements_used.character_dna.character_id]:[],
+    frames:shots,
+    visual_jobs:shots,
+    retro64:{
+      contract:retroEpisode.contract,engine:retroEpisode.engine,engine_version:retroEpisode.engine_version,
+      game:retroEpisode.game,intent_mode:retroEpisode.intent_mode,progression_model:retroEpisode.progression_model,
+      mission_arc_plan:retroEpisode.mission_arc_plan||null,reels:reels,validation:validation,
+      knowledge_source:retroEpisode.reference_source||retroEpisode.progression_source
+    },
+    governance:{identity:"canonical",continuity:"locked",approval:"APPROVED",source:"RETRO-64 KNOWLEDGE ENGINE v2.0"},
+    render_defaults:{target:"gemini",aspect_ratio:retroEpisode.format||"16:9",output:"video",provider_neutral:true}
+  };
+}
+function retroSendToProduction(){
+  const pkg=retroBuildProductionPackage();
+  if(!pkg)return;
+  localStorage.setItem("KALP_PRODUCTION_PACKAGE",JSON.stringify(pkg));
+  document.getElementById("retroStatus").textContent="PRODUCTION HANDOFF READY · "+pkg.shot_count+" SHOTS · APPROVED";
+  document.getElementById("retroSendProduction").textContent="✓ Sent to Production · "+pkg.shot_count+" Shots";
+  document.getElementById("retroSendProduction").disabled=false;
+  toast("Retro 64 production package sent to Production Control Tower.");
+  setTimeout(()=>{location.href="../production/";},350);
+}
 function retroExport(){if(!retroEpisode){retroGenerate();if(!retroEpisode)return}const b=new Blob([JSON.stringify(retroEpisode,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=retroEpisode.episode_id+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);}
 document.addEventListener("DOMContentLoaded",()=>{document.getElementById("retroLoad").onclick=retroLoadReference;document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;renderStoryboardView();showView("storyboard");toast("Retro 64 storyboard review opened.");};
-document.getElementById("retroVisualStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);renderStoryboardView();showView("storyboard");toast("Retro 64 visual storyboard generated and production JSON refreshed.");};document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroExport").onclick=retroExport;document.getElementById("retroGame").onchange=retroLoadReference;wireRetroReelControls();document.getElementById("retroIntent").oninput=updateRetroMissionPlanUI;document.getElementById("retroReelCount").onchange=updateRetroMissionPlanUI;updateRetroMissionPlanUI();window.__retroReady=retroBoot();});
+document.getElementById("retroVisualStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);renderStoryboardView();showView("storyboard");toast("Retro 64 visual storyboard generated and production JSON refreshed.");};document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroExport").onclick=retroExport;document.getElementById("retroSendProduction").onclick=retroSendToProduction;document.getElementById("retroGame").onchange=retroLoadReference;wireRetroReelControls();document.getElementById("retroIntent").oninput=updateRetroMissionPlanUI;document.getElementById("retroReelCount").onchange=updateRetroMissionPlanUI;updateRetroMissionPlanUI();window.__retroReady=retroBoot();});
 </script><script id="kalp-retro-reference-inline" type="application/json">{
   "schemaVersion": "1.0",
   "sourceArtifact": "KALP_Retro_64_Master_Reference.xlsx",
