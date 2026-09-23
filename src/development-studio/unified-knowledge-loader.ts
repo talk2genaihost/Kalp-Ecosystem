@@ -56,7 +56,9 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
   const physicsRows = rows(workbook, "WORLD_PHYSICS");
   const propsRows = rows(workbook, "WORLD_PROPS");
   const movementRows = rows(workbook, "MOVEMENT_DYNAMICS");
-  const vfxAudioRows = rows(workbook, "VFX_AUDIO");\n  const vfxRows = rows(workbook, "WORLD_VFX");\n  const audioRows = rows(workbook, "WORLD_AUDIO");
+  const vfxAudioRows = rows(workbook, "VFX_AUDIO");
+  const vfxRows = rows(workbook, "WORLD_VFX");
+  const audioRows = rows(workbook, "WORLD_AUDIO");
   const conflictRows = rows(workbook, "CONFLICT_RULES").length ? rows(workbook, "CONFLICT_RULES") : rows(workbook, "WORLD_CONFLICT_MATRIX");
   const progressionRows = rows(workbook, "PROGRESSION_DNA");
   const missionRows = rows(workbook, "MISSION_ARCHETYPES");
