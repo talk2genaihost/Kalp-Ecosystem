@@ -656,6 +656,7 @@ function retroGenerate(){
   document.getElementById("retroStoryboard").disabled=validation.status!=="PASS";
   document.getElementById("retroVisualStoryboard").disabled=validation.status!=="PASS";
   document.getElementById("retroGenerateReel").disabled=validation.status!=="PASS";
+  document.getElementById("retroSendProduction").disabled=!(validation.status==="PASS" && retroEpisode.reels?.length===missionReelCount && retroEpisode.mission_state?.status==="COMPLETE");
   document.getElementById("retroResumeReel").disabled=true;
   renderStoryboardView();
   if(validation.status==="PASS"){showView("storyboard");toast("Retro 64 storyboard generated directly on the Storyboard dashboard.");}
@@ -742,6 +743,8 @@ function retroGenerateReel(reelNumber){
   document.getElementById("retroReelCount").disabled=false;
   document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);
   document.getElementById("retroStatus").textContent="REEL "+reelNumber+" GENERATED · 12 SHOTS · "+(plan.concludes_mission?"MISSION COMPLETE":"STATE SAVED");
+  const send=document.getElementById("retroSendProduction");
+  if(send) send.disabled=!(retroEpisode.validation?.status==="PASS" && retroEpisode.reels.length===count && retroEpisode.mission_state.status==="COMPLETE");
   document.getElementById("retroResumeReel").disabled=plan.concludes_mission;
   document.getElementById("retroResumeReel").textContent=plan.concludes_mission?"✓ Mission Complete":"↻ Resume Reel "+(reelNumber+1)+" · 12 Shots";
   toast(plan.concludes_mission?"Mission completed in Reel "+reelNumber+".":"Reel "+reelNumber+" generated. Story state saved for Resume.");
@@ -758,7 +761,9 @@ function wireRetroReelControls(){
 function retroBuildProductionPackage(){
   if(!retroEpisode?.storyboard?.length)return null;
   const validation=retroEpisode.validation||{};
+  const expectedReels=Number(retroEpisode.mission_arc_plan?.reel_count||0);
   if(validation.status!=="PASS"){toast("Retro validation must PASS before production handoff.");return null;}
+  if(!expectedReels || retroEpisode.reels?.length!==expectedReels || retroEpisode.mission_state?.status!=="COMPLETE"){toast("Complete the final mission reel before production handoff.");return null;}
   const reels=retroEpisode.reels||[];
   const shots=reels.flatMap(reel=>(reel.shots||[]).map(s=>({
     frame_id:"R"+String(reel.reel).padStart(2,"0")+"-S"+String(s.shot).padStart(2,"0"),
