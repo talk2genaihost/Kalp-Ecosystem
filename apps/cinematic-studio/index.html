@@ -434,6 +434,20 @@ document.getElementById('productionDispatch').onclick=()=>{setExecutionMode('pro
 updateWorkflow();
 boot();
 </script><script>
+(function(){
+  try{
+    const ref=document.getElementById("kalp-retro-reference-inline");
+    const select=document.getElementById("retroGame");
+    if(ref && select && !select.options.length){
+      const data=JSON.parse(ref.textContent);
+      if(Array.isArray(data.games) && data.games.length){
+        select.innerHTML=data.games.map(g=>`<option value="${g.id}">${g.name}${g.status==="PLANNED"?" · planned":""}</option>`).join("");
+        select.value=data.games.some(g=>g.id==="G001")?"G001":(data.games[0]?.id||"");
+      }
+    }
+  }catch(error){ console.error("Retro 64 inline reference hydration failed",error); }
+})();
+</script><script>
 const RETRO64_URL="./data/retro-64-reference.json";
 const RETRO64_CACHE_VERSION="2.0.0";
 let retroRegistry=null,retroGame=null,retroEpisode=null;
