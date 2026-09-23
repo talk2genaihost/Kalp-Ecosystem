@@ -70,13 +70,13 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
     String(episodeRows.find(r => String(r.rule_id) === rule)?.rule ?? fallback);
   const episodeNumber = (rule: string, fallback: number): number => {
     const value = episodeValue(rule, "");
-    const match = value.match(/\\b(\\d+)\\b/);
+    const match = value.match(/\b(\\d+)\b/);
     return match ? Number(match[1]) : fallback;
   };
   const episodeBoolean = (rule: string, fallback: boolean): boolean => {
     const value = episodeValue(rule, "").toLowerCase();
-    if (/\\b(true|yes|locked)\\b/.test(value)) return true;
-    if (/\\b(false|no)\\b/.test(value)) return false;
+    if (/\b(true|yes|locked)\b/.test(value)) return true;
+    if (/\b(false|no)\b/.test(value)) return false;
     return fallback;
   };
 
