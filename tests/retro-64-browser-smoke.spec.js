@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+const CINEMATIC_URL = process.env.KALP_CINEMATIC_URL || "http://127.0.0.1:4173/cinematic-studio/";
+
 test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
-  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("${CINEMATIC_URL}", { waitUntil: "networkidle" });
 
   await page.locator('[data-nav="retro"]').click();
   await expect(page.locator('[data-view="retro"]')).toBeVisible();
@@ -29,7 +31,7 @@ test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
 
 
 test("Retro 64 browser smoke: underwater intent uses underwater props and suppresses helicopter", async ({ page }) => {
-  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("${CINEMATIC_URL}", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.evaluate(() => window.__retroReady);
   await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
@@ -52,7 +54,7 @@ test("Retro 64 browser smoke: underwater intent uses underwater props and suppre
 
 
 test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", async ({ page }) => {
-  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("${CINEMATIC_URL}", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
@@ -96,7 +98,7 @@ test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", as
 
 
 test("Retro 64 browser smoke: desert intent overrides reference jungle props", async ({ page }) => {
-  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("${CINEMATIC_URL}", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
@@ -114,7 +116,7 @@ test("Retro 64 browser smoke: desert intent overrides reference jungle props", a
 
 
 test("Retro 64 → Production Control Tower end-to-end handoff", async ({ page }) => {
-  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("${CINEMATIC_URL}", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
