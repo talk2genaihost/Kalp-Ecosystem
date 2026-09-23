@@ -56,8 +56,8 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
   const physicsRows = rows(workbook, "WORLD_PHYSICS");
   const propsRows = rows(workbook, "WORLD_PROPS");
   const movementRows = rows(workbook, "MOVEMENT_DYNAMICS");
-  const vfxAudioRows = rows(workbook, "VFX_AUDIO");
-  const conflictRows = rows(workbook, "CONFLICT_RULES");
+  const vfxAudioRows = rows(workbook, "VFX_AUDIO").length ? rows(workbook, "VFX_AUDIO") : rows(workbook, "WORLD_VFX");
+  const conflictRows = rows(workbook, "CONFLICT_RULES").length ? rows(workbook, "CONFLICT_RULES") : rows(workbook, "WORLD_CONFLICT_MATRIX");
   const progressionRows = rows(workbook, "PROGRESSION_DNA");
   const missionRows = rows(workbook, "MISSION_ARCHETYPES");
   const episodeRows = rows(workbook, "EPISODE_RULES");
@@ -101,7 +101,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
 
   const missionArchetypes: Record<string, string> = {};
   for (const r of missionRows) {
-    missionArchetypes[String(r.archetype).toLowerCase()] = String(r.progression_focus);
+    missionArchetypes[String(r.archetype).toLowerCase()] = String(r.progression_focus ?? r.progression);
   }
 
   const episodeValue = (rule: string, fallback: string) =>
@@ -136,7 +136,7 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
   };
 
   const effects: UnifiedEffectsRegistry = { domains: {} };
-  for (const sheet of workbook.SheetNames.filter(name => /^FX_\d{2}_/.test(name))) {
+  for (const sheet of workbook.SheetNames.filter(name => /^(?:FX_\d{2}_|\d{2}_)/.test(name))) {
     effects.domains[sheet] = rows(workbook, sheet);
   }
 
