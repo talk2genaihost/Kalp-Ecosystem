@@ -68,7 +68,8 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
     const id = String(r.world_id).toUpperCase() as RetroKnowledgeWorld["id"];
     const physics = physicsRows
       .filter(x => String(x.world_id).toUpperCase() === id)
-      .map(x => String(x.physics_rule ?? x.rule ?? ""))\n      .filter(Boolean);
+      .map(x => String(x.physics_rule ?? x.rule ?? ""))
+      .filter(Boolean);
 
     const props = propsRows.find(x => String(x.world_id).toUpperCase() === id);
     const movement: Record<string, string> = {};
