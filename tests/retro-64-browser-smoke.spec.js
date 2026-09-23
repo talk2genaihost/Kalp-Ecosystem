@@ -3,6 +3,8 @@ import { test, expect } from "@playwright/test";
 const CINEMATIC_URL = process.env.KALP_CINEMATIC_URL || "http://127.0.0.1:4173/cinematic-studio/";
 
 async function waitForRetroReady(page) {
+  await page.waitForFunction(() => window.__retroReady && typeof window.__retroReady.then === "function", null, { timeout: 15000 });
+  await page.evaluate(() => window.__retroReady);
   await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
 }
 
@@ -121,7 +123,7 @@ test("Retro 64 browser smoke: desert intent overrides reference jungle props", a
 });
 
 
-test("Retro 64 → Production Control Tower end-to-end handoff", async ({ page }) => {
+test("Retro 64 → Cinematic Studio production handoff", async ({ page }) => {
   await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await waitForRetroReady(page);
