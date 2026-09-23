@@ -89,7 +89,7 @@ test("shared cinematic resolver resolves world, physics, progression, effects, s
   assert.equal(resolved.progression.stage, "ENTRY");
   assert.match(resolved.progression.focus ?? "", /locate.*survive.*breach.*reach target.*extract/);
   assert.equal(resolved.validation.status, "FAIL");
-  assert.ok(resolved.validation.suppressed.includes("helicopter") === false);
+  assert.ok(resolved.validation.suppressed.includes("helicopter"));
   assert.ok(resolved.validation.conflicts.some(x => x.includes("helicopter")));
   assert.ok(resolved.effects["01_Camera_Movement"]);
   assert.ok(resolved.effects["03_Lens_Optical"]);
