@@ -821,8 +821,7 @@ function retroSendToProduction(){
   document.getElementById("retroStatus").textContent="PRODUCTION HANDOFF READY · "+pkg.shot_count+" SHOTS · APPROVED";
   document.getElementById("retroSendProduction").textContent="✓ Sent to Production · "+pkg.shot_count+" Shots";
   document.getElementById("retroSendProduction").disabled=false;
-  toast("Retro 64 production package sent to Production Control Tower.");
-  setTimeout(()=>{location.href="../production/";},350);
+  toast("Retro 64 production package staged for Production.");
 }
 function retroExport(){if(!retroEpisode){retroGenerate();if(!retroEpisode)return}const b=new Blob([JSON.stringify(retroEpisode,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=retroEpisode.episode_id+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);}
 document.addEventListener("DOMContentLoaded",()=>{document.getElementById("retroLoad").onclick=retroLoadReference;document.getElementById("retroGenerate").onclick=retroGenerate;document.getElementById("retroStoryboard").onclick=()=>{if(!retroEpisode?.storyboard?.length)return;renderStoryboardView();showView("storyboard");toast("Retro 64 storyboard review opened.");};
