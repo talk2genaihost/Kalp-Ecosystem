@@ -1,5 +1,6 @@
 import {
   getRetroKnowledgeBase,
+  getRetroKnowledgeSource,
   resolveRetroKnowledgeWorld,
   normalizeRetroMovement,
   resolveRetroConflict,
@@ -44,10 +45,9 @@ export interface RetroKnowledgeResolution {
 /**
  * RETRO-64 KNOWLEDGE ENGINE v2.0
  *
- * Runtime authority is the normalized knowledge model. The Excel workbook is
- * the authoring/source artifact; its sheets are normalized into the same model
- * before episode generation. The normalized JSON remains the deterministic
- * runtime fallback when a workbook is unavailable.
+ * The canonical unified XLSX is loaded by retro-knowledge-base at startup.
+ * Normalized JSON remains the deterministic fallback when the workbook is
+ * unavailable.
  */
 export function resolveRetroKnowledge(intent: string, requestedElements: string[] = []): RetroKnowledgeResolution {
   const kb = getRetroKnowledgeBase();
@@ -57,7 +57,7 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
     .toLowerCase()
     .split(/[^a-z0-9-]+/)
     .filter(Boolean)
-    .filter(token => ["run", "running", "sprint", "sprinting", "walk", "walking", "jump", "jumping", "swim", "dive", "diving"].includes(token));
+    .filter(token => ["run","running","sprint","sprinting","walk","walking","jump","jumping","swim","dive","diving"].includes(token));
 
   const normalizedMovements = movementTokens.map(token => {
     const base = token.replace(/ing$/, "");
@@ -81,11 +81,12 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
     ...conflicts.map(rule => `CONFLICT: ${rule}`)
   ];
 
+  const source = getRetroKnowledgeSource();
   return {
     schemaVersion: kb.schemaVersion,
     sourceArtifact: kb.sourceArtifact,
     world: {
-      source: kb.sourceArtifact.endsWith(".xlsx") ? "EXCEL" : "NORMALIZED_JSON",
+      source: source === "NORMALIZED_JSON" ? "NORMALIZED_JSON" : "EXCEL",
       world: structuredClone(world),
       normalizedMovements,
       allowedProps: [...world.allowedProps],
@@ -102,17 +103,13 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
       productionRules: structuredClone(kb.productionRules)
     },
     provenance: {
-      knowledgeBase: kb.sourceArtifact,
+      knowledgeBase: source,
       worldId: world.id,
       rulesApplied
     }
   };
 }
 
-/**
- * World-aware prop resolver. It returns only props that are legal for the
- * selected world and explicitly reports reference props that must be removed.
- */
 export function resolveRetroProps(
   intent: string,
   candidateProps: string[]
@@ -131,11 +128,6 @@ export function resolveRetroProps(
   };
 }
 
-/**
- * The progression engine consumes progression DNA independently of the
- * reference world's visual details. This is the key separation that prevents
- * a jungle reference from leaking into a desert episode.
- */
 export function resolveRetroProgressionDNA(): RetroProgressionDNA {
   const kb = getRetroKnowledgeBase();
   return {
