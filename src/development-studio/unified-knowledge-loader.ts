@@ -1,0 +1,96 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import XLSX from "xlsx";
+import type { RetroKnowledgeBase, RetroKnowledgeWorld } from "./retro-knowledge-base";
+
+export const UNIFIED_MASTER_WORKBOOK = "KALP_Master_Reference_UNIFIED_v3.xlsx";
+type Row = Record<string, unknown>;
+
+function rows(workbook: XLSX.WorkBook, sheet: string): Row[] {
+  const ws = workbook.Sheets[sheet];
+  return ws ? XLSX.utils.sheet_to_json<Row>(ws, { defval: "" }) : [];
+}
+function list(value: unknown): string[] {
+  return String(value ?? "").split(";").map(x => x.trim()).filter(Boolean);
+}
+function workbookPath(): string {
+  const fromCwd = path.resolve(process.cwd(), "data", UNIFIED_MASTER_WORKBOOK);
+  if (fs.existsSync(fromCwd)) return fromCwd;
+  return fileURLToPath(new URL("../../data/" + UNIFIED_MASTER_WORKBOOK, import.meta.url));
+}
+
+export interface UnifiedEffectsRegistry { domains: Record<string, Row[]>; }
+export interface UnifiedVisualStyleRegistry { entries: Row[]; classifications: Row[]; }
+export interface UnifiedKnowledgeSource {
+  workbookPath: string;
+  retro: RetroKnowledgeBase;
+  effects: UnifiedEffectsRegistry;
+  visualStyles: UnifiedVisualStyleRegistry;
+}
+
+export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKnowledgeSource {
+  const workbook = XLSX.read(fs.readFileSync(filePath), { type: "buffer" });
+  const worldRows = rows(workbook, "WORLD_REGISTRY");
+  const physicsRows = rows(workbook, "WORLD_PHYSICS");
+  const propsRows = rows(workbook, "WORLD_PROPS");
+  const movementRows = rows(workbook, "MOVEMENT_DYNAMICS");
+  const vfxAudioRows = rows(workbook, "VFX_AUDIO");
+  const conflictRows = rows(workbook, "CONFLICT_RULES");
+  const progressionRows = rows(workbook, "PROGRESSION_DNA");
+  const missionRows = rows(workbook, "MISSION_ARCHETYPES");
+  const episodeRows = rows(workbook, "EPISODE_RULES");
+
+  const worlds: RetroKnowledgeWorld[] = worldRows.map(r => {
+    const id = String(r.world_id).toUpperCase() as RetroKnowledgeWorld["id"];
+    const physics = physicsRows.filter(x => String(x.world_id).toUpperCase() === id).map(x => String(x.physics_rule));
+    const props = propsRows.find(x => String(x.world_id).toUpperCase() === id);
+    const movement: Record<string, string> = {};
+    for (const x of movementRows.filter(x => String(x.world_id).toUpperCase() === id)) {
+      movement[String(x.input_movement).toLowerCase()] = String(x.normalized_movement);
+    }
+    const va = vfxAudioRows.find(x => String(x.world_id).toUpperCase() === id);
+    return {
+      id, label: String(r.label),
+      allowedProps: list(props?.allowed_props),
+      suppressedProps: list(props?.suppressed_props),
+      movement, physics, vfx: list(va?.vfx), audio: list(va?.audio)
+    };
+  });
+
+  const conflictRules: [string,string,string][] = conflictRows.map(r => [
+    String(r.world_id).toUpperCase(), String(r.combination), String(r.resolution)
+  ]);
+  const progressionStages = progressionRows
+    .sort((a,b) => Number(a.stage_order) - Number(b.stage_order))
+    .map(r => String(r.stage_id));
+  const missionArchetypes: Record<string,string> = {};
+  for (const r of missionRows) missionArchetypes[String(r.archetype).toLowerCase()] = String(r.progression_focus);
+  const episodeValue = (rule: string, fallback: string) =>
+    String(episodeRows.find(r => String(r.rule_id) === rule)?.rule ?? fallback);
+
+  const retro: RetroKnowledgeBase = {
+    schemaVersion: "3.0",
+    sourceArtifact: UNIFIED_MASTER_WORKBOOK,
+    worlds, conflictRules, progressionStages, missionArchetypes,
+    productionRules: {
+      minimumReels: Number(episodeValue("EP-005","2")),
+      shotsPerReel: Number(episodeValue("EP-006","12")),
+      finalReelConcludesMission: episodeValue("EP-007","true").toLowerCase() === "true",
+      resumeFromPreviousReel: episodeValue("EP-008","true").toLowerCase() === "true"
+    }
+  };
+
+  const effects: UnifiedEffectsRegistry = { domains: {} };
+  for (const sheet of workbook.SheetNames.filter(s => /^\\d{2}_/.test(s))) effects.domains[sheet] = rows(workbook, sheet);
+
+  return {
+    workbookPath: filePath,
+    retro,
+    effects,
+    visualStyles: {
+      entries: rows(workbook, "Style Entry Registry"),
+      classifications: rows(workbook, "Classification Summary")
+    }
+  };
+}
