@@ -1,6 +1,8 @@
 import {
   getRetroKnowledgeBase,
   getRetroKnowledgeSource,
+  getRetroEffectsRegistry,
+  getRetroVisualStyleRegistry,
   resolveRetroKnowledgeWorld,
   normalizeRetroMovement,
   resolveRetroConflict,
@@ -9,10 +11,17 @@ import {
   type RetroKnowledgeWorld,
 } from "./retro-knowledge-base";
 
-export type RetroKnowledgeSource = "EXCEL" | "NORMALIZED_JSON";
+export interface RetroEffectRegistry {
+  domains: Record<string, Record<string, unknown>[]>;
+}
+
+export interface RetroVisualStyleRegistry {
+  entries: Record<string, unknown>[];
+  classifications: Record<string, unknown>[];
+}
 
 export interface RetroWorldResolution {
-  source: RetroKnowledgeSource;
+  source: string;
   world: RetroKnowledgeWorld;
   normalizedMovements: string[];
   allowedProps: string[];
@@ -49,7 +58,10 @@ export interface RetroKnowledgeResolution {
  * Normalized JSON remains the deterministic fallback when the workbook is
  * unavailable.
  */
-export function resolveRetroKnowledge(intent: string, requestedElements: string[] = []): RetroKnowledgeResolution {
+export function resolveRetroKnowledge(
+  intent: string,
+  requestedElements: string[] = []
+): RetroKnowledgeResolution {
   const kb = getRetroKnowledgeBase();
   const world = resolveRetroKnowledgeWorld(intent);
 
@@ -57,7 +69,9 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
     .toLowerCase()
     .split(/[^a-z0-9-]+/)
     .filter(Boolean)
-    .filter(token => ["run","running","sprint","sprinting","walk","walking","jump","jumping","swim","dive","diving"].includes(token));
+    .filter(token =>
+      ["run", "running", "sprint", "sprinting", "walk", "walking", "jump", "jumping", "swim", "dive", "diving"].includes(token)
+    );
 
   const normalizedMovements = movementTokens.map(token => {
     const base = token.replace(/ing$/, "");
@@ -86,7 +100,7 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
     schemaVersion: kb.schemaVersion,
     sourceArtifact: kb.sourceArtifact,
     world: {
-      source: source === "NORMALIZED_JSON" ? "NORMALIZED_JSON" : "EXCEL",
+      source,
       world: structuredClone(world),
       normalizedMovements,
       allowedProps: [...world.allowedProps],
@@ -108,6 +122,29 @@ export function resolveRetroKnowledge(intent: string, requestedElements: string[
       rulesApplied
     }
   };
+}
+
+export function getRetroEffects(): RetroEffectRegistry {
+  return getRetroEffectsRegistry() as RetroEffectRegistry;
+}
+
+export function getRetroVisualStyles(): RetroVisualStyleRegistry {
+  return getRetroVisualStyleRegistry() as RetroVisualStyleRegistry;
+}
+
+export function resolveRetroEffectDomain(domain: string): Record<string, unknown>[] {
+  const effects = getRetroEffects().domains;
+  const key = Object.keys(effects).find(x => x.toLowerCase() === domain.toLowerCase());
+  return key ? structuredClone(effects[key]) : [];
+}
+
+export function findRetroVisualStyles(query = ""): Record<string, unknown>[] {
+  const entries = getRetroVisualStyles().entries;
+  const needle = query.trim().toLowerCase();
+  if (!needle) return structuredClone(entries);
+  return structuredClone(entries.filter(row =>
+    Object.values(row).some(value => String(value).toLowerCase().includes(needle))
+  ));
 }
 
 export function resolveRetroProps(
