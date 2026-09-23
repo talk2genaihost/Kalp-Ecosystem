@@ -1,4 +1,5 @@
 import kb from "../../data/retro-world-progression-kb.json";
+import { loadUnifiedKnowledgeSource, type UnifiedEffectsRegistry, type UnifiedVisualStyleRegistry } from "./unified-knowledge-loader";
 
 export type RetroKnowledgeWorldId =
   | "SURFACE" | "UNDERWATER" | "DESERT" | "SNOW" | "URBAN" | "SPACE";
@@ -29,19 +30,58 @@ export interface RetroKnowledgeBase {
   };
 }
 
-let ACTIVE_KNOWLEDGE_BASE = structuredClone(kb as RetroKnowledgeBase);
+const JSON_FALLBACK = structuredClone(kb as RetroKnowledgeBase);
+let ACTIVE_KNOWLEDGE_BASE = JSON_FALLBACK;
+let ACTIVE_EFFECTS: UnifiedEffectsRegistry = { domains: {} };
+let ACTIVE_VISUAL_STYLES: UnifiedVisualStyleRegistry = { entries: [], classifications: [] };
+let ACTIVE_SOURCE = "NORMALIZED_JSON";
 
-/** Workbook-loaded knowledge overrides the normalized JSON fallback. */
+/** Load the canonical unified XLSX at startup. JSON remains a deterministic fallback. */
+try {
+  const unified = loadUnifiedKnowledgeSource();
+  ACTIVE_KNOWLEDGE_BASE = structuredClone(unified.retro);
+  ACTIVE_EFFECTS = structuredClone(unified.effects);
+  ACTIVE_VISUAL_STYLES = structuredClone(unified.visualStyles);
+  ACTIVE_SOURCE = unified.workbookPath;
+} catch {
+  // The JSON fallback is used when the binary workbook is unavailable.
+}
+
+/** Explicit knowledge override for tests or controlled runtime injection. */
 export function setRetroKnowledgeBase(source: RetroKnowledgeBase): void {
   ACTIVE_KNOWLEDGE_BASE = structuredClone(source);
+  ACTIVE_SOURCE = source.sourceArtifact;
 }
 
 export function resetRetroKnowledgeBase(): void {
-  ACTIVE_KNOWLEDGE_BASE = structuredClone(kb as RetroKnowledgeBase);
+  try {
+    const unified = loadUnifiedKnowledgeSource();
+    ACTIVE_KNOWLEDGE_BASE = structuredClone(unified.retro);
+    ACTIVE_EFFECTS = structuredClone(unified.effects);
+    ACTIVE_VISUAL_STYLES = structuredClone(unified.visualStyles);
+    ACTIVE_SOURCE = unified.workbookPath;
+  } catch {
+    ACTIVE_KNOWLEDGE_BASE = structuredClone(JSON_FALLBACK);
+    ACTIVE_EFFECTS = { domains: {} };
+    ACTIVE_VISUAL_STYLES = { entries: [], classifications: [] };
+    ACTIVE_SOURCE = "NORMALIZED_JSON";
+  }
 }
 
 export function getRetroKnowledgeBase(): RetroKnowledgeBase {
   return structuredClone(ACTIVE_KNOWLEDGE_BASE);
+}
+
+export function getRetroKnowledgeSource(): string {
+  return ACTIVE_SOURCE;
+}
+
+export function getRetroEffectsRegistry(): UnifiedEffectsRegistry {
+  return structuredClone(ACTIVE_EFFECTS);
+}
+
+export function getRetroVisualStyleRegistry(): UnifiedVisualStyleRegistry {
+  return structuredClone(ACTIVE_VISUAL_STYLES);
 }
 
 export function getRetroKnowledgeWorld(worldId: string): RetroKnowledgeWorld {
@@ -57,7 +97,7 @@ export function resolveRetroKnowledgeWorld(intent: string): RetroKnowledgeWorld 
     ["DESERT",["desert","sand","dunes","arid"]],
     ["SNOW",["snow","snowy","ice","arctic","frozen"]],
     ["URBAN",["urban","city","street","rooftop","building"]],
-    ["SPACE",["space","zero-g","zero gravity","station","airlock","orbit"]],
+    ["SPACE",["space","zero-g","zero gravity","station","airlock","orbit"]]
   ];
   for (const [id,tokens] of order) if (tokens.some(token => text.includes(token))) return getRetroKnowledgeWorld(id);
   return getRetroKnowledgeWorld("SURFACE");
