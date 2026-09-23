@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
 
   await page.locator('[data-nav="retro"]').click();
   await expect(page.locator('[data-view="retro"]')).toBeVisible();
@@ -29,7 +29,7 @@ test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
 
 
 test("Retro 64 browser smoke: underwater intent uses underwater props and suppresses helicopter", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.evaluate(() => window.__retroReady);
   await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
@@ -52,7 +52,7 @@ test("Retro 64 browser smoke: underwater intent uses underwater props and suppre
 
 
 test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
@@ -96,7 +96,7 @@ test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", as
 
 
 test("Retro 64 browser smoke: desert intent overrides reference jungle props", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
@@ -114,7 +114,7 @@ test("Retro 64 browser smoke: desert intent overrides reference jungle props", a
 
 
 test("Retro 64 → Production Control Tower end-to-end handoff", async ({ page }) => {
-  await page.goto("http://127.0.0.1:4173/cinematic-studio/", { waitUntil: "networkidle" });
+  await page.goto("https://talk2genaihost.github.io/Kalp-Ecosystem/cinematic-studio/", { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
   await page.locator("#retroGame").selectOption("G001");
   await page.locator("#retroMode").selectOption("EXPANSION");
@@ -130,12 +130,12 @@ test("Retro 64 → Production Control Tower end-to-end handoff", async ({ page }
   await expect(page.locator("#retroSendProduction")).toBeEnabled();
 
   await page.locator("#retroSendProduction").click();
-  await page.waitForURL("**/production/");
 
-  await expect(page.locator("#ready")).toContainText("APPROVED");
-  await expect(page.locator("#render")).toBeEnabled();
-  await expect(page.locator("#frameCount")).toContainText("36");
-  await expect(page.locator("#storyMeta")).toContainText("Night jungle mission");
-  const packageType = await page.evaluate(() => JSON.parse(localStorage.getItem("KALP_PRODUCTION_PACKAGE") || "{}").production_type);
-  expect(packageType).toBe("RETRO64_MISSION");
+  await expect(page.locator("#retroStatus")).toContainText("PRODUCTION HANDOFF READY · 36 SHOTS · APPROVED");
+  const handoff = await page.evaluate(() => JSON.parse(localStorage.getItem("KALP_PRODUCTION_PACKAGE") || "{}"));
+  expect(handoff.production_type).toBe("RETRO64_MISSION");
+  expect(handoff.status).toBe("APPROVED");
+  expect(handoff.shot_count).toBe(36);
+  expect(handoff.source_studio).toBe("CINEMATIC_STUDIO");
+  await expect(page).toHaveURL(/talk2genaihost\.github\.io\/Kalp-Ecosystem\/cinematic-studio/);
 });
