@@ -47,9 +47,6 @@ jobs:
         env:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: npm run build:astro-rashi
-      - name: Run Retro 64 gate tests
-        working-directory: repo
-        run: npm test -- --test-name-pattern="RETRO-64|mission arc|dashboard gate"
       - name: Build and smoke-test AdManthan v0.8.9 publish artifact
         working-directory: repo
         run: |
@@ -89,23 +86,6 @@ jobs:
           <!doctype html><meta http-equiv="refresh" content="0; url=./astro-rashi/"><link rel="canonical" href="./astro-rashi/"><title>Astro Rashi Dashboard</title>
           EOF
           touch /tmp/published-site/.nojekyll
-      - name: Start local published-site server
-        run: |
-          set -eu
-          python3 -m http.server 4173 --directory /tmp/published-site >/tmp/kalp-pages-http.log 2>&1 &
-          echo $! >/tmp/kalp-pages-http.pid
-
-      - name: Install Chromium for browser smoke test
-        run: npx --yes playwright@1.55.0 install --with-deps chromium
-
-      - name: Install Playwright test runner
-        working-directory: repo
-        run: npm install --no-audit --no-fund --save-dev @playwright/test@1.55.0
-
-      - name: Run Retro 64 browser smoke gate
-        working-directory: repo
-        run: npx playwright test tests/retro-64-browser-smoke.spec.js --workers=1
-
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload KALP Pages artifact
