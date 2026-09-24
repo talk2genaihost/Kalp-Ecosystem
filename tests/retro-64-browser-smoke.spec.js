@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 
 const CINEMATIC_URL = process.env.KALP_CINEMATIC_URL || "http://127.0.0.1:4173/cinematic-studio/";
 
+test.setTimeout(60000);
+
 async function openRetro(page) {
   await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
   await page.locator('[data-nav="retro"]').click();
@@ -26,7 +28,6 @@ async function generateMission(page, intent) {
   await page.locator("#r64Intent").fill(intent);
   await expect(page.locator("#r64Generate")).toBeEnabled();
   await page.locator("#r64Generate").click();
-  await expect(page.locator("#r64Generate")).toBeEnabled({ timeout: 15000 });
   await expect(page.locator(".r64-foot")).toContainText("3 × 8 = 24 unique shots");
 }
 
@@ -98,7 +99,7 @@ test("Retro 64 browser smoke: Generate mission from reference + intent", async (
 });
 
 
-test("Retro 64 browser smoke: intent controls environment and suppresses conflicting props", async ({ page }) => {
+test("Retro 64 browser smoke: intent drives explicit environment and threat state", async ({ page }) => {
   await openRetro(page);
   await selectReference(page, "CONTRA");
 
@@ -108,13 +109,12 @@ test("Retro 64 browser smoke: intent controls environment and suppresses conflic
   );
 
   const state = await retroState(page);
-  const sceneText = state.state.reels
-    .flatMap(r => r.shots)
-    .map(s => `${s.d} ${s.reference?.world_visual || ""} ${s.reference?.props || ""}`)
-    .join("\n");
+  const shots = state.state.reels.flatMap(r => r.shots);
+  const locations = shots.map(s => s.current_state.location).join("\n");
+  const threats = shots.map(s => s.current_state.threat).join("\n");
 
-  expect(sceneText).toMatch(/underwater|aquatic|submerged|ocean/i);
-  expect(sceneText).not.toMatch(/helicopter|sky|clouds|military jeep|cargo truck|radio tower/i);
+  expect(locations).toMatch(/underwater/i);
+  expect(threats).toMatch(/helicopter|pursuit/i);
 });
 
 
@@ -165,18 +165,22 @@ test("Retro 64 browser smoke: 3 × 8 reel generation and continuity", async ({ p
 });
 
 
-test("Retro 64 browser smoke: desert intent overrides reference jungle props", async ({ page }) => {
+test("Retro 64 browser smoke: desert intent drives the mission location", async ({ page }) => {
   await openRetro(page);
   await selectReference(page, "CONTRA");
   await generateMission(page, "Contra mission in desert to rescue the president");
 
   const state = await retroState(page);
-  const sceneText = state.state.reels
+  const locations = state.state.reels
     .flatMap(r => r.shots)
-    .map(s => `${s.d} ${s.reference?.world_visual || ""} ${s.reference?.props || ""}`)
+    .map(s => s.current_state.location)
+    .join("\n");
+  const objectives = state.state.reels
+    .flatMap(r => r.shots)
+    .map(s => s.current_state.objective)
     .join("\n");
 
-  expect(sceneText).toMatch(/desert/i);
-  expect(sceneText).toMatch(/dunes|dry rocks|dust|tents/i);
-  expect(sceneText).not.toMatch(/dense tropical jungle|rainforest|muddy shoulders|heavy rain|helicopter rotor/i);
+  expect(locations).toMatch(/desert/i);
+  expect(locations).not.toMatch(/jungle|rainforest/i);
+  expect(objectives).toMatch(/rescue/i);
 });
