@@ -1,0 +1,116 @@
+{
+  "contract": "KALP-PRODUCTION-PACKAGE-1.1",
+  "purpose": "Professional advertising production delivery contract with intent-derived on-screen text and final client-ready package.",
+  "extends": "KALP-PRODUCTION-PACKAGE-1.0",
+  "principles": {
+    "intent_driven": true,
+    "on_screen_text_source": "AI Objective & Strategy / Key Message / Creative Route",
+    "research_does_not_direct_creative": true,
+    "storyboard_is_production_source_of_truth": true,
+    "professional_advertising_delivery": true
+  },
+  "intent_contract": {
+    "required_inputs": [
+      "final_objective",
+      "key_message",
+      "creative_route",
+      "narrative_arc",
+      "audience",
+      "brand",
+      "product",
+      "cta"
+    ],
+    "fallback_rule": "If audience, brand, CTA, or other optional intent fields are unknown, do not invent claims; use neutral product-relevant text or omit the field."
+  },
+  "on_screen_text_contract": {
+    "enabled": true,
+    "derived_from_intent": true,
+    "priority": [
+      "key_message",
+      "product_benefit",
+      "creative_route",
+      "cta",
+      "brand_or_product_name"
+    ],
+    "per_frame_schema": {
+      "text": "string",
+      "role": "HOOK | BENEFIT | DEMONSTRATION | PRODUCT | CTA | END_CARD",
+      "timing": "string",
+      "position": "TOP | CENTER | LOWER_THIRD | SAFE_BOTTOM | CUSTOM",
+      "style": "string",
+      "animation": "NONE | FADE | SLIDE | POP | TYPE_ON | CUSTOM",
+      "voice_alignment": "string"
+    },
+    "rules": [
+      "Text must reinforce the intent and must not contradict the visual action or VO.",
+      "Do not mechanically repeat the VO on every frame; use complementary supers where useful.",
+      "Keep text concise and readable within the frame safe area.",
+      "Claims must be supported by supplied research/evidence or explicit user/brand input.",
+      "CTA and brand/product identification must appear in the final delivery when supplied by intent.",
+      "The final frame must be capable of functioning as an advertising end card when appropriate."
+    ]
+  },
+  "scene_delivery_schema": {
+    "required_per_frame": [
+      "frame_id",
+      "title",
+      "purpose",
+      "action",
+      "camera",
+      "emotion",
+      "dialogue",
+      "voiceover",
+      "on_screen_text",
+      "music",
+      "sound_effects",
+      "product_visibility",
+      "continuity",
+      "identity_lock"
+    ]
+  },
+  "professional_ad_package": {
+    "enabled": true,
+    "delivery_sections": [
+      "01_BRIEF",
+      "02_RESEARCH_EVIDENCE",
+      "03_OBJECTIVE_AND_STRATEGY",
+      "04_CREATIVE_CONCEPT",
+      "05_SCENE_BY_SCENE_STORYBOARD",
+      "06_ON_SCREEN_TEXT_PLAN",
+      "07_VOICEOVER_SCRIPT",
+      "08_MUSIC_AND_SFX_PLAN",
+      "09_VISUAL_AND_CAMERA_SPECIFICATION",
+      "10_PRODUCT_AND_BRAND_USAGE",
+      "11_END_CARD_AND_CTA",
+      "12_PRODUCTION_RENDER_JOBS",
+      "13_CONTINUITY_AND_IDENTITY_QA",
+      "14_FINAL_DELIVERY_MANIFEST"
+    ],
+    "final_delivery_manifest": {
+      "master_storyboard_json": true,
+      "on_screen_text_manifest": true,
+      "voiceover_script": true,
+      "audio_cue_sheet": true,
+      "visual_prompt_sheet": true,
+      "shot_render_manifest": true,
+      "brand_product_usage": true,
+      "cta_end_card": true,
+      "qa_status": true,
+      "exportable_package": true
+    }
+  },
+  "qa_gates": [
+    "INTENT_PRESENT",
+    "ON_SCREEN_TEXT_DERIVED_FROM_INTENT",
+    "NO_UNSUPPORTED_CLAIMS",
+    "VO_TEXT_ALIGNMENT",
+    "VISUAL_TEXT_ALIGNMENT",
+    "BRAND_PRODUCT_PRESENT_WHERE_REQUIRED",
+    "CTA_PRESENT_WHERE_REQUIRED",
+    "IDENTITY_LOCK_VERIFIED",
+    "CONTINUITY_VERIFIED",
+    "FINAL_PACKAGE_COMPLETE"
+  ],
+  "version": "1.1",
+  "status": "ACTIVE_CANDIDATE"
+}
