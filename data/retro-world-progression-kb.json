@@ -12,5 +12,5 @@
   "conflictRules":[["UNDERWATER","helicopter","PROHIBIT"],["UNDERWATER","airplane","PROHIBIT"],["UNDERWATER","military jeep","PROHIBIT"],["UNDERWATER","dry road","PROHIBIT"],["UNDERWATER","run","NORMALIZE_TO_SWIM"],["DESERT","coral","PROHIBIT"],["DESERT","submerged rocks","PROHIBIT"],["DESERT","dense tropical jungle","PROHIBIT"],["SNOW","coral","PROHIBIT"],["SPACE","terrestrial road","PROHIBIT"],["URBAN","helicopter","ALLOW_CONDITIONAL"]],
   "progressionStages":["ENTRY","THREAT_INTRODUCTION","FIRST_ENGAGEMENT","CAPABILITY_ESCALATION","MAJOR_ESCALATION","BREAKTHROUGH","GATE_OR_OBJECTIVE","NEXT_THREAT"],
   "missionArchetypes":{"rescue":"locate → survive → breach → reach target → extract","destruction":"approach → defend → acquire capability → attack → destroy","escape":"entry crisis → pursuit → obstacles → breakthrough → escape","protection":"establish target → defend → escalating threats → safe passage","recovery":"locate → secure → resist escalation → extract"},
-  "productionRules":{"minimumReels":2,"shotsPerReel":12,"finalReelConcludesMission":true,"resumeFromPreviousReel":true}
+  "productionRules":{"minimumReels":3,"shotsPerReel":8,"totalShots":24,"finalReelConcludesMission":true,"resumeFromPreviousReel":true}
 }
