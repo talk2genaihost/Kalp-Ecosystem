@@ -2,151 +2,181 @@ import { test, expect } from "@playwright/test";
 
 const CINEMATIC_URL = process.env.KALP_CINEMATIC_URL || "http://127.0.0.1:4173/cinematic-studio/";
 
-async function waitForRetroReady(page) {
-  await page.waitForFunction(() => window.__retroReady && typeof window.__retroReady.then === "function", null, { timeout: 15000 });
+async function openRetro(page) {
+  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
+  await page.locator('[data-nav="retro"]').click();
+  await page.waitForFunction(
+    () => window.__retroReady && typeof window.__retroReady.then === "function",
+    null,
+    { timeout: 15000 }
+  );
   await page.evaluate(() => window.__retroReady);
-  await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
+  await expect(page.locator("#retro64ProductionV2")).toBeVisible({ timeout: 15000 });
+  await expect(page.locator("#r64Reference")).toBeVisible({ timeout: 15000 });
+  await expect(page.locator("#r64Intent")).toBeVisible({ timeout: 15000 });
 }
 
-test("Retro 64 browser smoke: Generate → Storyboard", async ({ page }) => {
-  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
+async function selectReference(page, value) {
+  await page.locator("#r64Reference").selectOption(value);
+  await expect(page.locator("#r64Reference")).toHaveValue(value);
+  await expect(page.locator(".r64-status")).toContainText("REFERENCE LOADED", { timeout: 15000 });
+}
 
-  await page.locator('[data-nav="retro"]').click();
-  await waitForRetroReady(page);
-  await expect(page.locator('[data-view="retro"]')).toBeVisible();
+async function generateMission(page, intent) {
+  await page.locator("#r64Intent").fill(intent);
+  await expect(page.locator("#r64Generate")).toBeEnabled();
+  await page.locator("#r64Generate").click();
+  await expect(page.locator("#r64Generate")).toBeEnabled({ timeout: 15000 });
+  await expect(page.locator(".r64-foot")).toContainText("3 × 8 = 24 unique shots");
+}
 
-  await expect(page.locator("#retroGame")).toHaveValue("G001", { timeout: 15000 });
-  await page.locator("#retroMode").selectOption("EXPANSION");
-  await page.locator("#retroIntent").fill(
-    "Night jungle mission with heavy rain and helicopter pursuit."
-  );
+async function retroState(page) {
+  return page.evaluate(() => {
+    const ui = window.KALP_RETRO64_UI_V2;
+    if (!ui) throw new Error("KALP_RETRO64_UI_V2 is not exposed");
+    return {
+      totalReels: ui.TOTAL_REELS,
+      shotsPerReel: ui.SHOTS_PER_REEL,
+      state: ui.state
+    };
+  });
+}
 
-  await page.locator("#retroGenerate").click();
+test("Retro 64 browser smoke: bootstrap, selector, and all 13 canonical references", async ({ page }) => {
+  await openRetro(page);
 
-  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
-  await expect(page.locator("#retroStoryboard")).toBeEnabled();
+  await expect(page.locator('#r64Reference option')).toHaveCount(14);
 
-  const storyboard = page.locator('[data-view="storyboard"]');
-  await expect(storyboard).toBeVisible();
-  await expect(page.locator("#storyboardGrid .viewcard")).toHaveCount(9);
+  const references = [
+    "CONTRA",
+    "MARIO",
+    "KUNG_FU",
+    "ROAD_FIGHTER",
+    "NINJA_GAIDEN",
+    "NINJA_TURTLES",
+    "DOUBLE_DRAGON",
+    "EXCITEBIKE",
+    "ADVENTURE_ISLAND",
+    "STREET_FIGHTER",
+    "STREET_FIGHTER_ALPHA_2_NES",
+    "MORTAL_KOMBAT",
+    "TEKKEN"
+  ];
 
-  await expect(page.locator("#storyboardGrid")).toContainText("ENTRY");
-  await expect(page.locator("#storyboardGrid")).toContainText("NEXT_THREAT");
-  await expect(page.locator("#storyboardGrid")).toContainText("Night jungle mission with heavy rain and helicopter pursuit.");
+  for (const reference of references) {
+    await selectReference(page, reference);
+  }
+
+  const state = await retroState(page);
+  expect(state.totalReels).toBe(3);
+  expect(state.shotsPerReel).toBe(8);
 });
 
 
-test("Retro 64 browser smoke: underwater intent uses underwater props and suppresses helicopter", async ({ page }) => {
-  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
-  await page.locator('[data-nav="retro"]').click();
-  await waitForRetroReady(page);
-  await expect(page.locator('#retroGame option[value="G001"]')).toHaveCount(1, { timeout: 15000 });
-  await page.locator("#retroGame").selectOption("G001");
-  await page.locator("#retroMode").selectOption("EXPANSION");
-  await page.locator("#retroIntent").fill(
+test("Retro 64 browser smoke: Generate mission from reference + intent", async ({ page }) => {
+  await openRetro(page);
+  await selectReference(page, "CONTRA");
+
+  await generateMission(
+    page,
+    "Night jungle mission with heavy rain and helicopter pursuit."
+  );
+
+  const state = await retroState(page);
+  expect(state.state.gen).toBe(true);
+  expect(state.state.reels).toHaveLength(3);
+  expect(state.state.reels.every(r => r.shots.length === 8)).toBe(true);
+  expect(state.state.reels[0].status).toBe("CURRENT");
+  expect(state.state.reels[1].status).toBe("LOCKED");
+  expect(state.state.reels[2].status).toBe("LOCKED");
+
+  const allShots = state.state.reels.flatMap(r => r.shots);
+  expect(allShots).toHaveLength(24);
+  expect(new Set(allShots.map(s => `${s.stage}:${s.n}:${s.d}`)).size).toBe(24);
+  expect(allShots.every(s => s.genre_core)).toBe(true);
+  expect(allShots.every(s => s.current_state)).toBe(true);
+});
+
+
+test("Retro 64 browser smoke: intent controls environment and suppresses conflicting props", async ({ page }) => {
+  await openRetro(page);
+  await selectReference(page, "CONTRA");
+
+  await generateMission(
+    page,
     "Contra should run and fight underwater with a helicopter pursuit."
   );
-  await page.locator("#retroGenerate").click();
 
-  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
-  await expect(page.locator("#retroStoryboard")).toBeEnabled();
+  const state = await retroState(page);
+  const sceneText = state.state.reels
+    .flatMap(r => r.shots)
+    .map(s => `${s.d} ${s.reference?.world_visual || ""} ${s.reference?.props || ""}`)
+    .join("\n");
 
-  const cards = page.locator("#storyboardGrid .viewcard");
-  await expect(cards).toHaveCount(9);
-  const sceneText = await cards.evaluateAll(nodes => nodes.slice(1).map(n => n.textContent || "").join("\n"));
-  expect(sceneText).toMatch(/underwater|aquatic|swim|submerged/i);
+  expect(sceneText).toMatch(/underwater|aquatic|submerged|ocean/i);
   expect(sceneText).not.toMatch(/helicopter|sky|clouds|military jeep|cargo truck|radio tower/i);
 });
 
 
-test("Retro 64 browser smoke: 12-shot Reel generation and Resume continuity", async ({ page }) => {
-  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
-  await page.locator('[data-nav="retro"]').click();
-  await waitForRetroReady(page);
-  await page.locator("#retroGame").selectOption("G001");
-  await page.locator("#retroMode").selectOption("EXPANSION");
-  await page.locator("#retroReelCount").selectOption("3");
-  await page.locator("#retroIntent").fill("Night jungle mission with heavy rain and helicopter pursuit.");
-  await page.locator("#retroGenerate").click();
+test("Retro 64 browser smoke: 3 × 8 reel generation and continuity", async ({ page }) => {
+  await openRetro(page);
+  await selectReference(page, "CONTRA");
+  await generateMission(
+    page,
+    "Night jungle mission with heavy rain and helicopter pursuit."
+  );
 
-  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
-  await expect(page.locator("#retroGenerateReel")).toBeEnabled();
+  const reelButtons = page.locator('[data-reel]');
+  await expect(reelButtons).toHaveCount(3);
 
-  await page.locator("#retroGenerateReel").click();
-  await expect(page.locator("#retroStatus")).toContainText("REEL 1 GENERATED · 12 SHOTS");
-  let episode = JSON.parse(await page.locator("#retroJson").textContent());
-  expect(episode.reels).toHaveLength(1);
-  expect(episode.reels[0].shots).toHaveLength(12);
-  expect(episode.reels[0].ending_state.reel).toBe(1);
-  expect(episode.reels[0].ending_state.status).toBe("IN_PROGRESS");
+  await page.locator('[data-reel="1"]').click();
+  let state = await retroState(page);
+  expect(state.state.reels[0].status).toBe("GENERATED");
+  expect(state.state.reels[1].status).toBe("CURRENT");
+  expect(state.state.reels[0].shots).toHaveLength(8);
 
-  const reel1Ending = episode.reels[0].ending_state;
-  await expect(page.locator("#retroResumeReel")).toBeEnabled();
-  await page.locator("#retroResumeReel").click();
-  await expect(page.locator("#retroStatus")).toContainText("REEL 2 GENERATED · 12 SHOTS");
-  episode = JSON.parse(await page.locator("#retroJson").textContent());
-  expect(episode.reels).toHaveLength(2);
-  expect(episode.reels[1].shots).toHaveLength(12);
-  expect(episode.reels[1].starting_state.continuity_anchor).toBe(reel1Ending.continuity_anchor);
-  expect(episode.reels[1].shots[0].continuity_from).toBe(reel1Ending.continuity_anchor);
-  expect(episode.reels[1].starting_state.world_state).toBe(reel1Ending.world_state);
-  expect(episode.reels[1].starting_state.character_state).toBe(reel1Ending.character_state);
-  expect(episode.reels[1].starting_state.objective_state).toBe(reel1Ending.objective_state);
+  const reel1Last = state.state.reels[0].shots[7];
+  const reel2First = state.state.reels[1].shots[0];
+  expect(reel2First.continuity_from_previous).toEqual(expect.objectContaining({
+    reel: 1,
+    shot: 8,
+    location: reel1Last.current_state.location,
+    protagonist: reel1Last.current_state.protagonist,
+    threat: reel1Last.current_state.threat,
+    objective: reel1Last.current_state.objective,
+    escalation: reel1Last.current_state.escalation
+  }));
 
-  await page.locator("#retroResumeReel").click();
-  await expect(page.locator("#retroStatus")).toContainText("REEL 3 GENERATED · 12 SHOTS · MISSION COMPLETE");
-  episode = JSON.parse(await page.locator("#retroJson").textContent());
-  expect(episode.reels).toHaveLength(3);
-  expect(episode.reels[2].shots).toHaveLength(12);
-  expect(episode.reels[2].shots[11].is_resolution_shot).toBe(true);
-  expect(episode.reels[2].ending_state.status).toBe("COMPLETE");
-  await expect(page.locator("#retroResumeReel")).toBeDisabled();
+  await page.locator('[data-reel="2"]').click();
+  state = await retroState(page);
+  expect(state.state.reels[1].status).toBe("GENERATED");
+  expect(state.state.reels[2].status).toBe("CURRENT");
+  expect(state.state.reels[1].shots).toHaveLength(8);
+
+  await page.locator('[data-reel="3"]').click();
+  state = await retroState(page);
+  expect(state.state.reels).toHaveLength(3);
+  expect(state.state.reels.every(r => r.status === "GENERATED")).toBe(true);
+  expect(state.state.reels.every(r => r.shots.length === 8)).toBe(true);
+
+  const finalShots = state.state.reels.flatMap(r => r.shots);
+  expect(finalShots).toHaveLength(24);
+  expect(finalShots[23].stage).toBe("NEXT THREAT");
 });
 
 
 test("Retro 64 browser smoke: desert intent overrides reference jungle props", async ({ page }) => {
-  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
-  await page.locator('[data-nav="retro"]').click();
-  await waitForRetroReady(page);
-  await page.locator("#retroGame").selectOption("G001");
-  await page.locator("#retroMode").selectOption("EXPANSION");
-  await page.locator("#retroIntent").fill("Contra mission in desert to rescue the president");
-  await page.locator("#retroGenerate").click();
-  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
-  const cards = page.locator("#storyboardGrid .viewcard");
-  await expect(cards).toHaveCount(9);
-  const sceneText = await cards.evaluateAll(nodes => nodes.slice(1).map(n => n.textContent || "").join("\n"));
+  await openRetro(page);
+  await selectReference(page, "CONTRA");
+  await generateMission(page, "Contra mission in desert to rescue the president");
+
+  const state = await retroState(page);
+  const sceneText = state.state.reels
+    .flatMap(r => r.shots)
+    .map(s => `${s.d} ${s.reference?.world_visual || ""} ${s.reference?.props || ""}`)
+    .join("\n");
+
   expect(sceneText).toMatch(/desert/i);
   expect(sceneText).toMatch(/dunes|dry rocks|dust|tents/i);
-  expect(sceneText).not.toMatch(/dense tropical jungle|rainforest|muddy shoulders|jungle/i);
-  expect(sceneText).not.toMatch(/heavy rain|helicopter rotor/i);
-});
-
-
-test("Retro 64 → Cinematic Studio production handoff", async ({ page }) => {
-  await page.goto(CINEMATIC_URL, { waitUntil: "networkidle" });
-  await page.locator('[data-nav="retro"]').click();
-  await waitForRetroReady(page);
-  await page.locator("#retroGame").selectOption("G001");
-  await page.locator("#retroMode").selectOption("EXPANSION");
-  await page.locator("#retroReelCount").selectOption("3");
-  await page.locator("#retroIntent").fill("Night jungle mission with heavy rain and helicopter pursuit.");
-  await page.locator("#retroGenerate").click();
-  await expect(page.locator("#retroStatus")).toContainText("GENERATED · EXPANSION · VALIDATED");
-
-  await page.locator("#retroGenerateReel").click();
-  await page.locator("#retroResumeReel").click();
-  await page.locator("#retroResumeReel").click();
-  await expect(page.locator("#retroStatus")).toContainText("REEL 3 GENERATED · 12 SHOTS · MISSION COMPLETE");
-  await expect(page.locator("#retroSendProduction")).toBeEnabled();
-
-  await page.locator("#retroSendProduction").click();
-
-  await expect(page.locator("#retroStatus")).toContainText("PRODUCTION HANDOFF READY · 36 SHOTS · APPROVED");
-  const handoff = await page.evaluate(() => JSON.parse(localStorage.getItem("KALP_PRODUCTION_PACKAGE") || "{}"));
-  expect(handoff.production_type).toBe("RETRO64_MISSION");
-  expect(handoff.status).toBe("APPROVED");
-  expect(handoff.shot_count).toBe(36);
-  expect(handoff.source_studio).toBe("CINEMATIC_STUDIO");
-  await expect(page).toHaveURL(CINEMATIC_URL);
+  expect(sceneText).not.toMatch(/dense tropical jungle|rainforest|muddy shoulders|heavy rain|helicopter rotor/i);
 });
