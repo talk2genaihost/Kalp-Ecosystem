@@ -4,6 +4,26 @@
   const V4_REFERENCE_URL = './data/retro64-reference-sync-v4.json';
   const REQUIRED_GAME = { value: 'G001', label: 'Contra' };
 
+  // GitHub Pages serves the Cinematic Studio app from /cinematic-studio/.
+  // The legacy Retro UI used ../data/... which resolves to the site root
+  // (/data/...) and therefore returned HTTP 404. Normalize only the Retro
+  // reference-sync asset so the existing UI can continue to use the same
+  // runtime contract without changing unrelated fetches.
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    const raw = String(input && input.url ? input.url : input || '');
+    const match = raw.match(/(?:^|\/)data\/(retro64-reference-sync-v4\.json)(?:[?#].*)?$/);
+    if (match) {
+      const target = new URL('./data/' + match[1], location.href).href;
+      if (typeof input === 'string' || input instanceof URL) return nativeFetch(target, init);
+      if (typeof Request !== 'undefined' && input instanceof Request) {
+        return nativeFetch(new Request(target, input), init);
+      }
+      return nativeFetch(target, init);
+    }
+    return nativeFetch(input, init);
+  };
+
   function waitForDom() {
     if (document.readyState !== 'loading') return Promise.resolve();
     return new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
@@ -125,7 +145,7 @@
 
     populated = populated || !!findGameSelect();
     window.__retroBootstrap = {
-      version: '1.5',
+      version: '1.6',
       readyAt: new Date().toISOString(),
       gameSelect: '#retroGame',
       selectedGame: (findGameSelect() && findGameSelect().value) || REQUIRED_GAME.value,
@@ -133,7 +153,8 @@
       directViewActivation: true,
       referenceSync: 'v4-direct',
       referenceSyncCount: games.length,
-      selectorPopulated: populated
+      selectorPopulated: populated,
+      referencePathFix: true
     };
     return window.__retroBootstrap;
   })();
