@@ -62,9 +62,15 @@ jobs:
         run: |
           set -eu
           rm -rf /tmp/published-site
-          mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio/data /tmp/published-site/production
+          mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio/data /tmp/published-site/data /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
           cp apps/cinematic-studio/data/retro-64-reference.json /tmp/published-site/cinematic-studio/data/retro-64-reference.json
+          # Publish the canonical Excel workbooks at the root data path expected by Retro-64 UI v2.
+          cp data/KALP_Retro_64_Master_Reference.xlsx /tmp/published-site/data/KALP_Retro_64_Master_Reference.xlsx
+          cp data/KALP_Master_Reference_UNIFIED_v3.xlsx /tmp/published-site/data/KALP_Master_Reference_UNIFIED_v3.xlsx
+          cp data/KALP_Master_Reference_UNIFIED_v3.manifest.json /tmp/published-site/data/KALP_Master_Reference_UNIFIED_v3.manifest.json
+          test -s /tmp/published-site/data/KALP_Retro_64_Master_Reference.xlsx
+          test -s /tmp/published-site/data/KALP_Master_Reference_UNIFIED_v3.xlsx
           cp -R apps/production/. /tmp/published-site/production/
           cp -R /tmp/weather-source/weather-dashboard/. /tmp/published-site/weather-dashboard/
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
