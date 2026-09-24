@@ -4,11 +4,6 @@
   const V4_REFERENCE_URL = './data/retro64-reference-sync-v4.json';
   const REQUIRED_GAME = { value: 'G001', label: 'Contra' };
 
-  // GitHub Pages serves the Cinematic Studio app from /cinematic-studio/.
-  // The legacy Retro UI used ../data/... which resolves to the site root
-  // (/data/...) and therefore returned HTTP 404. Normalize only the Retro
-  // reference-sync asset so the existing UI can continue to use the same
-  // runtime contract without changing unrelated fetches.
   const nativeFetch = window.fetch.bind(window);
   window.fetch = function (input, init) {
     const raw = String(input && input.url ? input.url : input || '');
@@ -91,53 +86,58 @@
     return true;
   }
 
-  function activateRetroView() {
-    const retroView = document.querySelector('[data-view="retro"]');
-    if (!retroView) return false;
+  function activateView(viewName) {
+    const target = document.querySelector(`[data-view="${viewName}"]`);
+    if (!target) return false;
 
     document.querySelectorAll('[data-view]').forEach(view => {
-      const active = view === retroView;
+      const active = view === target;
       view.classList.toggle('active', active);
-      if (active) {
-        view.style.display = 'block';
-      } else {
-        view.style.display = 'none';
-      }
+      view.style.display = active ? 'block' : 'none';
     });
 
     document.querySelectorAll('[data-nav]').forEach(button => {
-      button.classList.toggle('nav-active', button.dataset.nav === 'retro');
+      button.classList.toggle('nav-active', button.dataset.nav === viewName);
     });
 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return true;
   }
 
-  function installNavigationBridge() {
-    const activate = () => {
-      activateRetroView();
-      requestAnimationFrame(activateRetroView);
-      setTimeout(activateRetroView, 0);
-      setTimeout(activateRetroView, 100);
-    };
+  function activateRetroView() {
+    return activateView('retro');
+  }
 
+  function installNavigationBridge() {
     document.addEventListener('click', event => {
-      const nav = event.target && event.target.closest && event.target.closest('[data-nav="retro"]');
-      if (nav) {
-        event.preventDefault();
-        activate();
+      const nav = event.target && event.target.closest && event.target.closest('[data-nav]');
+      if (!nav) return;
+
+      const viewName = nav.dataset.nav;
+      if (!viewName) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (viewName === 'retro') {
+        activateRetroView();
+      } else {
+        activateView(viewName);
       }
     }, true);
 
-    window.__openRetro64Direct = activate;
+    window.__openRetro64Direct = activateRetroView;
+    window.__kalpDashboardNavigate = activateView;
   }
 
   window.__retroReady = (async () => {
     await waitForDom();
+    installNavigationBridge();
+
     const payload = await loadV4();
     const games = payload.games.map(normalizeGame);
 
     let populated = ensureRetroGameOptions(games);
-    installNavigationBridge();
 
     [0, 50, 150, 300, 600, 1000].forEach(delay => {
       setTimeout(() => ensureRetroGameOptions(games), delay);
@@ -145,11 +145,12 @@
 
     populated = populated || !!findGameSelect();
     window.__retroBootstrap = {
-      version: '1.6',
+      version: '1.7',
       readyAt: new Date().toISOString(),
       gameSelect: '#retroGame',
       selectedGame: (findGameSelect() && findGameSelect().value) || REQUIRED_GAME.value,
       navigationBridge: true,
+      dashboardNavigationBridge: true,
       directViewActivation: true,
       referenceSync: 'v4-direct',
       referenceSyncCount: games.length,
