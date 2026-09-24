@@ -72,18 +72,24 @@
   }
 
   function activateRetroView() {
-    const select = findGameSelect();
-    if (!select) return false;
-    let node = select;
-    while (node && node !== document.body) {
-      if (node.classList && node.classList.contains('view')) {
-        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
-        node.classList.add('active');
-        return true;
+    const retroView = document.querySelector('[data-view="retro"]');
+    if (!retroView) return false;
+
+    document.querySelectorAll('[data-view]').forEach(view => {
+      const active = view === retroView;
+      view.classList.toggle('active', active);
+      if (active) {
+        view.style.display = 'block';
+      } else {
+        view.style.display = 'none';
       }
-      node = node.parentElement;
-    }
-    return false;
+    });
+
+    document.querySelectorAll('[data-nav]').forEach(button => {
+      button.classList.toggle('nav-active', button.dataset.nav === 'retro');
+    });
+
+    return true;
   }
 
   function installNavigationBridge() {
@@ -93,10 +99,16 @@
       setTimeout(activateRetroView, 0);
       setTimeout(activateRetroView, 100);
     };
+
     document.addEventListener('click', event => {
       const nav = event.target && event.target.closest && event.target.closest('[data-nav="retro"]');
-      if (nav) activate();
+      if (nav) {
+        event.preventDefault();
+        activate();
+      }
     }, true);
+
+    window.__openRetro64Direct = activate;
   }
 
   window.__retroReady = (async () => {
@@ -107,19 +119,18 @@
     let populated = ensureRetroGameOptions(games);
     installNavigationBridge();
 
-    // retroBoot() may rebuild the selector after its own initialization. Re-apply
-    // the authoritative v4 registry for a short startup window so G001-G014 win.
     [0, 50, 150, 300, 600, 1000].forEach(delay => {
       setTimeout(() => ensureRetroGameOptions(games), delay);
     });
 
     populated = populated || !!findGameSelect();
     window.__retroBootstrap = {
-      version: '1.4',
+      version: '1.5',
       readyAt: new Date().toISOString(),
       gameSelect: '#retroGame',
       selectedGame: (findGameSelect() && findGameSelect().value) || REQUIRED_GAME.value,
       navigationBridge: true,
+      directViewActivation: true,
       referenceSync: 'v4-direct',
       referenceSyncCount: games.length,
       selectorPopulated: populated
