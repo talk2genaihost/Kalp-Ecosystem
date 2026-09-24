@@ -65,6 +65,12 @@ jobs:
           mkdir -p /tmp/published-site/weather-dashboard /tmp/published-site/astro-rashi /tmp/published-site/admanthan /tmp/published-site/market-to-revenue /tmp/published-site/cinematic-studio/data /tmp/published-site/data /tmp/published-site/production
           cp -R apps/cinematic-studio/. /tmp/published-site/cinematic-studio/
           cp apps/cinematic-studio/data/retro-64-reference.json /tmp/published-site/cinematic-studio/data/retro-64-reference.json
+          # Publish the Retro-64 readiness bootstrap as a real Pages asset.
+          cp apps/cinematic-studio/retro64-ready-bootstrap.js /tmp/published-site/cinematic-studio/retro64-ready-bootstrap.js
+          # Inject the bootstrap into the published Cinematic Studio HTML and fail the build if it is absent.
+          sed -i 's#</head>#<script src="./retro64-ready-bootstrap.js"></script></head>#' /tmp/published-site/cinematic-studio/index.html
+          grep -q 'retro64-ready-bootstrap.js' /tmp/published-site/cinematic-studio/index.html
+          test -s /tmp/published-site/cinematic-studio/retro64-ready-bootstrap.js
           # Publish the canonical Excel workbooks at the root data path expected by Retro-64 UI v2.
           cp data/KALP_Retro_64_Master_Reference.xlsx /tmp/published-site/data/KALP_Retro_64_Master_Reference.xlsx
           cp data/KALP_Master_Reference_UNIFIED_v3.xlsx /tmp/published-site/data/KALP_Master_Reference_UNIFIED_v3.xlsx
@@ -76,6 +82,7 @@ jobs:
           cp -R dist/astro-rashi/. /tmp/published-site/astro-rashi/
           cp -R docs/admanthan-dashboard/. /tmp/published-site/admanthan/
           cp /tmp/admanthan-v089/admanthan_browser.py /tmp/published-site/admanthan/admanthan_browser.py
+          sed -i 's/admanthan_browser.py?v=0.8.5/admanthan_browser.py?v=0.8.9/' /tmp/published-site/admanthan/index.html
           cp docs/admanthan-dashboard/studio.html /tmp/published-site/admanthan/index.html
           sed -i 's/admanthan_browser.py?v=0.8.5/admanthan_browser.py?v=0.8.9/' /tmp/published-site/admanthan/index.html
           cp -R docs/market-to-revenue/. /tmp/published-site/market-to-revenue/
