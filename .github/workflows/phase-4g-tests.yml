@@ -1,0 +1,39 @@
+name: KALP Phase-4G Tests
+
+on:
+  push:
+    branches: [main, phase-4g-6-tests-ci]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  phase-4g-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run Phase-4G tests
+        run: python -m pytest -q phase4g/4g-5-observability/tests
+
+      - name: Emit gate receipt
+        if: success()
+        run: |
+          echo "4G-6 TEST GATE: PASS"
+          echo "4G-5 OBSERVABILITY TEST TARGET: PASS"
