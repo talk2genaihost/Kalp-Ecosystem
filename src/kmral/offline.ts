@@ -5,6 +5,8 @@ export interface KMRALMutation<Payload = unknown> {
   readonly payload: Payload;
 }
 
+export type KMRALMutationPredicate<Payload> = (mutation: KMRALMutation<Payload>) => boolean;
+
 export class InMemoryKMRALMutationQueue<Payload = unknown> {
   private readonly pendingMutations: KMRALMutation<Payload>[] = [];
 
@@ -23,6 +25,17 @@ export class InMemoryKMRALMutationQueue<Payload = unknown> {
 
   drain(): KMRALMutation<Payload>[] {
     return this.pendingMutations.splice(0).map((mutation) => structuredClone(mutation));
+  }
+
+  drainWhere(predicate: KMRALMutationPredicate<Payload>): KMRALMutation<Payload>[] {
+    const selected: KMRALMutation<Payload>[] = [];
+    for (let index = this.pendingMutations.length - 1; index >= 0; index -= 1) {
+      if (predicate(this.pendingMutations[index])) {
+        selected.unshift(this.pendingMutations[index]);
+        this.pendingMutations.splice(index, 1);
+      }
+    }
+    return selected.map((mutation) => structuredClone(mutation));
   }
 
   size(): number {
@@ -81,6 +94,20 @@ export class LocalStorageKMRALMutationQueue<Payload = unknown> {
     const queue = this.read();
     this.write([]);
     return queue.map((mutation) => structuredClone(mutation));
+  }
+
+  drainWhere(predicate: KMRALMutationPredicate<Payload>): KMRALMutation<Payload>[] {
+    const queue = this.read();
+    const selected: KMRALMutation<Payload>[] = [];
+    const remaining: KMRALMutation<Payload>[] = [];
+
+    for (const mutation of queue) {
+      if (predicate(mutation)) selected.push(mutation);
+      else remaining.push(mutation);
+    }
+
+    this.write(remaining);
+    return selected.map((mutation) => structuredClone(mutation));
   }
 
   size(): number {
