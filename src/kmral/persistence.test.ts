@@ -13,7 +13,7 @@ test("KMRAL durable state store survives a new store instance", () => {
     "test:state:",
   );
 
-  first.save({ id: "experiment-1", value: 42 });
+  first.save("experiment-1", { id: "experiment-1", value: 42 });
 
   const second = new LocalStorageKMRALStateStore<{ id: string; value: number }, string>(
     storage,
