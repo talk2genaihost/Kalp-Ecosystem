@@ -1,0 +1,72 @@
+name: KMRAL Mobile Runtime Gate
+
+on:
+  push:
+    branches:
+      - feature/kmrl-migration-v1
+  workflow_dispatch:
+
+jobs:
+  mobile-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build KMRL
+        run: npm run build:kmrl
+
+      - name: Build KMRAL mobile web runtime
+        run: npm run build:kmrl-mobile
+
+      - name: Browser composition smoke test
+        run: |
+          npx playwright install --with-deps chromium
+          npx vite --host 127.0.0.1 --port 4174 --config apps/kmral-science-mobile/vite.config.ts > mobile-vite.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          npx playwright test tests/kmral-mobile-composition.spec.js --workers=1
+
+      - name: Add Android native runtime
+        run: npx cap add android
+
+      - name: Sync Android runtime
+        run: npx cap sync android
+
+      - name: Android emulator smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            cd android
+            ./gradlew assembleDebug
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            adb shell am force-stop com.kalp.sciencesandbox
+            adb shell monkey -p com.kalp.sciencesandbox 1
+            sleep 8
+            adb shell pidof com.kalp.sciencesandbox
+            adb shell uiautomator dump /sdcard/window.xml
+            adb shell cat /sdcard/window.xml | grep -E "Science Sandbox Mobile|science-sandbox|KMRL-EXPERIMENT|CREATED"
+            adb exec-out screencap -p > ../kmral-mobile-runtime.png
+
+      - name: Upload mobile runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-mobile-runtime-evidence
+          path: |
+            kmral-mobile-runtime.png
+            mobile-vite.log
