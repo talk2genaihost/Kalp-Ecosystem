@@ -85,3 +85,71 @@ jobs:
           path: |
             capacitor.config.ts
             package.json
+
+  ios-runtime:
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build KMRL
+        run: npm run build:kmrl
+
+      - name: Build KMRAL mobile web runtime
+        run: npm run build:kmrl-mobile
+
+      - name: Add iOS native runtime
+        run: npx cap add ios
+
+      - name: Sync iOS runtime
+        run: npx cap sync ios
+
+      - name: Select available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIMULATOR_UDID="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; d=json.load(sys.stdin); devices=[x for group in d["devices"].values() for x in group if x.get("isAvailable") and x.get("name","").startswith("iPhone")]; print(devices[0]["udid"])')"
+          test -n "$SIMULATOR_UDID"
+          echo "udid=$SIMULATOR_UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Boot iOS simulator
+        run: |
+          set -euo pipefail
+          xcrun simctl boot "${{ steps.simulator.outputs.udid }}" || true
+          xcrun simctl bootstatus "${{ steps.simulator.outputs.udid }}" -b
+
+      - name: Build iOS simulator app
+        run: |
+          set -euo pipefail
+          xcodebuild             -workspace ios/App/App.xcworkspace             -scheme App             -configuration Debug             -sdk iphonesimulator             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}"             -derivedDataPath ios/build             CODE_SIGNING_ALLOWED=NO             build
+
+      - name: Install and launch iOS simulator app
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find ios/build/Build/Products -type d -name 'App.app' | head -n 1)"
+          test -n "$APP_PATH"
+          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist")"
+          test "$BUNDLE_ID" = "com.kalp.sciencesandbox"
+          xcrun simctl install "${{ steps.simulator.outputs.udid }}" "$APP_PATH"
+          xcrun simctl launch "${{ steps.simulator.outputs.udid }}" "$BUNDLE_ID"
+          sleep 8
+          xcrun simctl spawn "${{ steps.simulator.outputs.udid }}" launchctl print system | grep -F "$BUNDLE_ID"
+          xcrun simctl io "${{ steps.simulator.outputs.udid }}" screenshot kmral-ios-runtime.png
+
+      - name: Upload iOS runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-ios-runtime-evidence
+          path: kmral-ios-runtime.png
