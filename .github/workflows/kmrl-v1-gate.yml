@@ -2,9 +2,9 @@ name: KMRL v1.0 Integration Gate
 
 on:
   push:
-    branches: [feat/kmrl-v1-integration]
+    branches: [feature/kmrl-migration-v1]
   pull_request:
-    branches: [main, feat/kmrl-v1-integration]
+    branches: [feature/kmral-active-impl, main]
 
 jobs:
   kmrl-gate:
