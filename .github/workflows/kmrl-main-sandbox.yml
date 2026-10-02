@@ -1,0 +1,24 @@
+name: KMRL MainSandbox Validation
+
+on:
+  push:
+    branches: [feature/kmrl-migration-v1]
+  workflow_dispatch:
+
+jobs:
+  main-sandbox:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Build repository
+        run: npm run build
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start static server
+        run: python3 -m http.server 4173 > kmrl-server.log 2>&1 &
+      - name: Run KMRL MainSandbox browser validation
+        run: npx playwright test tests/kmrl-main-sandbox.spec.js --workers=1
