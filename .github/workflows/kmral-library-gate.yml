@@ -1,0 +1,30 @@
+name: KMRAL Library Gate
+
+on:
+  push:
+    branches:
+      - feature/kmrl-migration-v1
+  workflow_dispatch:
+
+jobs:
+  kmral-library:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build KMRAL
+        run: npm run build:kmral
+
+      - name: Test KMRAL
+        run: npm run test:kmral
