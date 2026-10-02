@@ -7,6 +7,7 @@ import { MainSandboxScreen } from "../ui/main-sandbox-screen.js";
 import { createMainSandboxSyncPort } from "./remote-sync.js";
 import { ExperimentLibraryScreen } from "../learning/experiment-library-screen.js";
 import { getExperiment, GuidedExperimentSession, type ExperimentDefinition } from "../learning/experiment-library.js";
+import { createScienceSandboxApp } from "./science-sandbox-app.js";
 
 const repository = new LocalExperimentRepository();
 const offline = new LocalMutationQueue();
@@ -17,8 +18,9 @@ const syncPort = createMainSandboxSyncPort(repository, offline);
 
 const launch = (experiment: ExperimentDefinition): void => {
   const runtime = new ExperimentRuntime({ experimentId: experiment.id, initialScience: experiment.initialState, science: new UnifiedScienceKernel(scienceTick), repository, offline });
+  const sandbox = createScienceSandboxApp(runtime);
   const guided = new GuidedExperimentSession(experiment, experiment.id);
-  new MainSandboxScreen(runtime, offline, syncPort, { onOpenLibrary: showLibrary }, guided).mount(root);
+  new MainSandboxScreen(sandbox.application.domain, offline, syncPort, { onOpenLibrary: showLibrary }, guided).mount(root);
 };
 
 function showLibrary(): void {
