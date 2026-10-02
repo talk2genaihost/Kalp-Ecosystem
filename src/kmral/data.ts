@@ -13,7 +13,7 @@ export interface KMRALKeyValueStore {
 
 export interface KMRALStateStore<Entity, Id> {
   load(id: Id): Entity | undefined;
-  save(entity: Entity): void;
+  save(id: Id, entity: Entity): void;
   remove(id: Id): void;
 }
 
@@ -49,7 +49,7 @@ export class LocalStorageKMRALKeyValueStore implements KMRALKeyValueStore {
   }
 }
 
-export class InMemoryKMRALStateStore<Entity extends { id: Id }, Id>
+export class InMemoryKMRALStateStore<Entity, Id>
   implements KMRALStateStore<Entity, Id>
 {
   private readonly records = new Map<Id, Entity>();
@@ -59,8 +59,8 @@ export class InMemoryKMRALStateStore<Entity extends { id: Id }, Id>
     return value ? structuredClone(value) : undefined;
   }
 
-  save(entity: Entity): void {
-    this.records.set(entity.id, structuredClone(entity));
+  save(id: Id, entity: Entity): void {
+    this.records.set(id, structuredClone(entity));
   }
 
   remove(id: Id): void {
@@ -93,8 +93,8 @@ export class LocalStorageKMRALStateStore<
     }
   }
 
-  save(entity: Entity): void {
-    this.store.set(this.key(entity.id), JSON.stringify(entity));
+  save(id: Id, entity: Entity): void {
+    this.store.set(this.key(id), JSON.stringify(entity));
   }
 
   remove(id: Id): void {
