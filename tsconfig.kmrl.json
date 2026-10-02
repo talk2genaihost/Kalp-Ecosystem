@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "rootDir": "src",
     "outDir": "dist",
     "noEmit": false
   },
   "include": [
-    "src/kmrl/**/*.ts"
+    "kmrl/**/*.ts"
   ],
   "exclude": [
     "node_modules",
