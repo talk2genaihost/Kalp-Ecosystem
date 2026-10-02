@@ -1,0 +1,30 @@
+name: KMRL v1.0 Integration Gate
+
+on:
+  push:
+    branches: [feat/kmrl-v1-integration]
+  pull_request:
+    branches: [main, feat/kmrl-v1-integration]
+
+jobs:
+  kmrl-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Repository build
+        run: npm run build 2>&1 | tee build.log
+      - name: KMRL tests
+        run: npm test 2>&1 | tee test.log
+      - name: Upload gate logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmrl-v1-gate-logs
+          path: |
+            build.log
+            test.log
+          if-no-files-found: ignore

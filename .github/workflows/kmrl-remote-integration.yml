@@ -1,0 +1,26 @@
+name: KMRL Remote Integration
+
+on:
+  push:
+    branches: [feat/kmrl-v1-integration]
+  workflow_dispatch:
+
+jobs:
+  remote-sync:
+    runs-on: ubuntu-latest
+    env:
+      KMRL_SUPABASE_URL: ${{ secrets.KMRL_SUPABASE_URL }}
+      KMRL_SUPABASE_KEY: ${{ secrets.KMRL_SUPABASE_KEY }}
+      KMRL_REMOTE_REQUIRED: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Build repository
+        run: npm run build
+      - name: Run KMRL hardening and unit tests
+        run: npm test
+      - name: Run live KMRL remote integration
+        run: npx tsx --test src/kmrl/sync/remote-integration.test.ts
