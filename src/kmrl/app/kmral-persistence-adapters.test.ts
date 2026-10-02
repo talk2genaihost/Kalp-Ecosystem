@@ -1,11 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  InMemoryKMRALStateStore,
-} from "../../kmral/data.js";
-import {
-  InMemoryKMRALMutationQueue,
-} from "../../kmral/offline.js";
+import { InMemoryKMRALStateStore } from "../../kmral/data.js";
+import { InMemoryKMRALMutationQueue } from "../../kmral/offline.js";
 import type { ExperimentSnapshot } from "../runtime/types.js";
 import type { OfflineMutation } from "../contracts/offline.js";
 import {
@@ -20,11 +16,14 @@ const snapshot: ExperimentSnapshot = {
   revision: 2,
   science: {
     timeS: { value: 0.1, unit: "s" },
+    temperature: { value: 20, unit: "degC" },
     physics: {
       massKg: { value: 1, unit: "kg" },
       velocityMps: { value: 0.2, unit: "m/s" },
+      accelerationMps2: { value: 2, unit: "m/s2" },
       positionM: { value: 0.01, unit: "m" },
     },
+    materials: [],
   },
   checkpoints: [],
   measurements: [],
