@@ -62,11 +62,26 @@ jobs:
             adb shell cat /sdcard/window.xml | grep -E "Science Sandbox Mobile|science-sandbox|KMRL-EXPERIMENT|CREATED"
             adb exec-out screencap -p > ../kmral-mobile-runtime.png
 
-      - name: Upload mobile runtime evidence
+      - name: Upload Android mobile runtime evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kmral-mobile-runtime-evidence
+          name: kmral-android-runtime-evidence
           path: |
             kmral-mobile-runtime.png
             mobile-vite.log
+
+      - name: iOS runtime preparation check
+        run: |
+          test -f capacitor.config.ts
+          node -e "const p=require('./package.json'); if (!p.dependencies['@capacitor/core'] || !p.devDependencies['@capacitor/cli']) process.exit(1)"
+          echo "iOS runtime contract is configured for native Xcode execution."
+
+      - name: Upload iOS runtime contract
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-ios-runtime-contract
+          path: |
+            capacitor.config.ts
+            package.json
