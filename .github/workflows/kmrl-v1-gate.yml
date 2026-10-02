@@ -16,9 +16,9 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Repository build
-        run: npm run build 2>&1 | tee build.log
+        run: set -o pipefail; npm run build 2>&1 | tee build.log
       - name: KMRL tests
-        run: npm test 2>&1 | tee test.log
+        run: set -o pipefail; npm test 2>&1 | tee test.log
       - name: Upload gate logs
         if: failure()
         uses: actions/upload-artifact@v4
