@@ -16,7 +16,9 @@
     "test": "tsx --test \"tests/**/*.test.ts\" \"src/kmrl/**/*.test.ts\"",
     "test:kmrl": "tsx --test \"src/kmrl/**/*.test.ts\"",
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
-    "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
+    "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts",
+    "build:kmral": "tsc -p tsconfig.kmral.json",
+    "test:kmral": "tsx --test \"src/kmral/**/*.test.ts\""
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
