@@ -9,7 +9,7 @@
     "dev:mtr-gateway": "tsx src/market-to-revenue/runtime-gateway-main.ts",
     "build": "tsc",
     "build:astro-rashi": "vite build",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test \"tests/**/*.test.ts\" \"src/kmrl/**/*.test.ts\"",
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
     "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },
