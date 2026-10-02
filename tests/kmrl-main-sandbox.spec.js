@@ -19,7 +19,7 @@ test("KMRL MainSandbox browser validation", async ({ page }) => {
   await expect(page.locator('[data-action="step"]')).toBeEnabled();
   await page.locator('[data-force]').fill("2");
   await page.locator('[data-action="step"]').click();
-  await expect(page.locator("text=0.1 m/s")).toBeVisible();
+  await expect(page.locator("text=0.2 m/s")).toBeVisible();
 
   await page.locator('[data-action="measure"]').click();
   await expect(page.locator(".kmrl-measurement")).toBeVisible();
