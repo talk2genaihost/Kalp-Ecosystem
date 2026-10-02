@@ -7,7 +7,17 @@ export interface KMRALMutation<Payload = unknown> {
 
 export type KMRALMutationPredicate<Payload> = (mutation: KMRALMutation<Payload>) => boolean;
 
-export class InMemoryKMRALMutationQueue<Payload = unknown> {
+export interface KMRALMutationQueue<Payload = unknown> {
+  enqueue(mutation: KMRALMutation<Payload>): void;
+  peek(): KMRALMutation<Payload> | undefined;
+  pending(): KMRALMutation<Payload>[];
+  drain(): KMRALMutation<Payload>[];
+  drainWhere(predicate: KMRALMutationPredicate<Payload>): KMRALMutation<Payload>[];
+  size(): number;
+}
+
+export class InMemoryKMRALMutationQueue<Payload = unknown>
+  implements KMRALMutationQueue<Payload> {
   private readonly pendingMutations: KMRALMutation<Payload>[] = [];
 
   enqueue(mutation: KMRALMutation<Payload>): void {
@@ -43,7 +53,8 @@ export class InMemoryKMRALMutationQueue<Payload = unknown> {
   }
 }
 
-export class LocalStorageKMRALMutationQueue<Payload = unknown> {
+export class LocalStorageKMRALMutationQueue<Payload = unknown>
+  implements KMRALMutationQueue<Payload> {
   constructor(
     private readonly store: {
       get(key: string): string | null;
