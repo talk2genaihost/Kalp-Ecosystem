@@ -35,6 +35,12 @@ jobs:
       - name: Test KMRAL
         run: npm run test:kmral
 
+      - name: Build KMRAL
+        run: npm run build:kmral
+
+      - name: Test KMRAL
+        run: npm run test:kmral
+
       - name: Build KMRL
         run: npm run build:kmrl
 
@@ -144,8 +150,30 @@ jobs:
       - name: Build iOS simulator app
         run: |
           set -euo pipefail
-          xcodebuild             -workspace ios/App/App.xcworkspace             -scheme App             -configuration Debug             -sdk iphonesimulator             -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}"             -derivedDataPath ios/build             CODE_SIGNING_ALLOWED=NO             build
-
+          if test -f ios/App/App.xcworkspace; then
+            xcodebuild \
+              -workspace ios/App/App.xcworkspace \
+              -scheme App \
+              -configuration Debug \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,id="${{ steps.simulator.outputs.udid }}" \
+              -derivedDataPath ios/build \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          elif test -f ios/App/App.xcodeproj/project.pbxproj; then
+            xcodebuild \
+              -project ios/App/App.xcodeproj \
+              -scheme App \
+              -configuration Debug \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,id="${{ steps.simulator.outputs.udid }}" \
+              -derivedDataPath ios/build \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          else
+            echo "No generated Capacitor iOS workspace/project found"
+            exit 1
+          fi
       - name: Install and launch iOS simulator app
         run: |
           set -euo pipefail
