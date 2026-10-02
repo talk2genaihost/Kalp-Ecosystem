@@ -17,12 +17,12 @@
     "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },
   "dependencies": {
-    "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.3",
+    "@capacitor/cli": "^8.0.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
