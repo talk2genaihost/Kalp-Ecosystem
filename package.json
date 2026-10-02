@@ -10,6 +10,8 @@
     "build": "tsc",
     "build:kmrl": "tsc -p tsconfig.kmrl.json",
     "build:kmrl-mobile": "vite --config apps/kmral-science-mobile/vite.config.ts build",
+    "mobile:add:ios": "npx cap add ios",
+    "mobile:sync:ios": "npx cap sync ios",
     "build:astro-rashi": "vite build",
     "test": "tsx --test \"tests/**/*.test.ts\" \"src/kmrl/**/*.test.ts\"",
     "test:kmrl": "tsx --test \"src/kmrl/**/*.test.ts\"",
