@@ -1,6 +1,6 @@
 import { quantity } from "../simulation/v1-a/quantity.js";
-import type { ExperimentRuntime } from "../runtime/experiment-runtime.js";
-import type { ExperimentCommand } from "../runtime/types.js";
+import type { KMRALDomainPort } from "../../kmral/application.js";
+import type { ExperimentCommand, ExperimentSnapshot } from "../runtime/types.js";
 import type { OfflineQueuePort } from "../contracts/offline.js";
 import type { MainSandboxSyncPort, MainSandboxViewModel } from "./main-sandbox-controller.js";
 import { MainSandboxController } from "./main-sandbox-controller.js";
@@ -11,7 +11,7 @@ export interface MainSandboxScreenOptions { readonly onOpenLibrary?: () => void;
 
 export class MainSandboxScreen {
   private readonly controller:MainSandboxController; private forceN=0; private root?:HTMLElement;
-  constructor(runtime:ExperimentRuntime,offline:OfflineQueuePort,syncPort?:MainSandboxSyncPort,private readonly options:MainSandboxScreenOptions={},private readonly guided?:GuidedExperimentSession){this.controller=new MainSandboxController(runtime,offline,syncPort);}
+  constructor(domain:KMRALDomainPort<ExperimentSnapshot, ExperimentCommand>,offline:OfflineQueuePort,syncPort?:MainSandboxSyncPort,private readonly options:MainSandboxScreenOptions={},private readonly guided?:GuidedExperimentSession){this.controller=new MainSandboxController(domain,offline,syncPort);}
   mount(root:HTMLElement):void{this.root=root;this.bindNetworkState();this.render();}
   render():void{if(!this.root)return;this.root.innerHTML=renderMainSandbox(this.view());this.bindEvents();}
   private view():MainSandboxViewModel{const base=this.controller.view();if(!this.guided)return base;const definition=this.guided.definition();const progress=this.guided.progress();return{...base,guided:{title:definition.title,objective:definition.objective,currentStep:this.guided.currentStep(),completed:progress.completed,total:progress.total}};}
