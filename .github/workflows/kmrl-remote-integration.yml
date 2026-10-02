@@ -2,7 +2,7 @@ name: KMRL Remote Integration
 
 on:
   push:
-    branches: [feat/kmrl-v1-integration]
+    branches: [feature/kmrl-migration-v1]
   workflow_dispatch:
 
 jobs:
