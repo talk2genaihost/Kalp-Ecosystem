@@ -14,7 +14,7 @@ export class KMRALExperimentRepositoryAdapter implements ExperimentRepositoryPor
   }
 
   save(snapshot: ExperimentSnapshot): void {
-    this.store.save(snapshot);
+    this.store.save(snapshot.experimentId, snapshot);
   }
 
   remove(experimentId: string): void {
