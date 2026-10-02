@@ -5,6 +5,7 @@ import { scienceTick } from "../../src/kmrl/simulation/v1-d/science/index.js";
 import { ExperimentRuntime } from "../../src/kmrl/runtime/experiment-runtime.js";
 import { getExperiment } from "../../src/kmrl/learning/experiment-library.js";
 import { createScienceSandboxApp } from "../../src/kmrl/app/science-sandbox-app.js";
+import { KMRALUIController } from "../../src/kmral/ui.js";
 import "./styles.css";
 
 const experiment = getExperiment("physics-constant-force");
@@ -20,6 +21,7 @@ const runtime = new ExperimentRuntime({
 const sandbox = createScienceSandboxApp(runtime);
 const application = sandbox.application;
 const domain = application.domain;
+const controller = new KMRALUIController(domain);
 
 const root = document.querySelector<HTMLDivElement>("#app");
 if (!root) {
@@ -27,7 +29,7 @@ if (!root) {
 }
 
 function render(): void {
-  const state = domain.getState();
+  const state = controller.getState();
   const velocity = state.science.physics.velocityMps.value;
 
   root.innerHTML = `
@@ -63,9 +65,9 @@ function render(): void {
     button.addEventListener("click", () => {
       const action = button.dataset.action;
       if (action === "START" || action === "PAUSE" || action === "RESET") {
-        domain.dispatch({ type: action });
+        controller.dispatch({ type: action });
       } else if (action === "STEP") {
-        domain.dispatch({
+        controller.dispatch({
           type: "STEP",
           input: { dtS: 0.1, netForce: { value: 2, unit: "N" } },
         });
