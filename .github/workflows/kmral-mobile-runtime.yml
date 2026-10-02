@@ -29,6 +29,12 @@ jobs:
       - name: Test KMRAL
         run: npm run test:kmral
 
+      - name: Build KMRAL
+        run: npm run build:kmral
+
+      - name: Test KMRAL
+        run: npm run test:kmral
+
       - name: Build KMRL
         run: npm run build:kmrl
 
