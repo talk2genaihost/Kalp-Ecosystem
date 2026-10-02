@@ -1,11 +1,8 @@
 import type { KMRALStateStore } from "../../kmral/data.js";
 import type { KMRALMutation, KMRALMutationQueue } from "../../kmral/offline.js";
 import type { ExperimentSnapshot } from "../runtime/types.js";
-import type {
-  ExperimentRepositoryPort,
-  OfflineQueuePort,
-  OfflineMutation,
-} from "../contracts/index.js";
+import type { ExperimentRepositoryPort } from "../contracts/data.js";
+import type { OfflineQueuePort, OfflineMutation } from "../contracts/offline.js";
 
 export class KMRALExperimentRepositoryAdapter implements ExperimentRepositoryPort {
   constructor(
