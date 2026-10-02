@@ -79,7 +79,7 @@ export class MixMaterialsExperimentAdapter {
   }
 
   materialSnapshot(): MaterialAmount[] {
-    return structuredClone(this.state.materials);
+    return this.state.materials.map((material) => structuredClone(material));
   }
 
   measure(): MixMaterialsMeasurement[] {
