@@ -50,7 +50,7 @@ export class MixMaterialsExperimentAdapter {
     this.initialState = {
       timeS: quantity(0, "s"),
       temperature: initialTemperature,
-      materials: structuredClone(options.initialMaterials),
+      materials: options.initialMaterials.map((material) => structuredClone(material)),
       physics: {
         positionM: quantity(0, "m"),
         velocityMps: quantity(0, "m/s"),
