@@ -5,6 +5,7 @@ on:
     branches: [feature/kmrl-migration-v1]
   pull_request:
     branches: [feature/kmral-active-impl, main]
+  workflow_dispatch:
 
 jobs:
   kmrl-gate:

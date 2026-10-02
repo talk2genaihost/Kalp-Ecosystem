@@ -8,10 +8,8 @@
     "dev:astro-rashi": "vite",
     "dev:mtr-gateway": "tsx src/market-to-revenue/runtime-gateway-main.ts",
     "build": "tsc",
-    "build:kmrl": "tsc -p tsconfig.kmrl.json",
     "build:astro-rashi": "vite build",
     "test": "tsx --test \"tests/**/*.test.ts\" \"src/kmrl/**/*.test.ts\"",
-    "test:kmrl": "tsx --test \"src/kmrl/**/*.test.ts\"",
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
     "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },
