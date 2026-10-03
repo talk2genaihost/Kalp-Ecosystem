@@ -11,6 +11,7 @@ jobs:
     env:
       KMRL_SUPABASE_URL: ${{ secrets.KMRL_SUPABASE_URL }}
       KMRL_SUPABASE_KEY: ${{ secrets.KMRL_SUPABASE_KEY }}
+      KMRL_SUPABASE_ACCESS_TOKEN: ${{ secrets.KMRL_SUPABASE_ACCESS_TOKEN }}
       KMRL_REMOTE_REQUIRED: "true"
     steps:
       - uses: actions/checkout@v4
