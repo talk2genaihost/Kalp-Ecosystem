@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/kmrl-migration-v1
+      - feature/kmral-active-impl
   workflow_dispatch:
 
 jobs:
