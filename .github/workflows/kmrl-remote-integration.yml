@@ -23,6 +23,6 @@ jobs:
       - name: Build repository
         run: npm run build:kmrl
       - name: Run KMRL hardening and unit tests
-        run: npm test
+        run: npm run test:kmrl
       - name: Run live KMRL remote integration
         run: npx tsx --test src/kmrl/sync/remote-integration.test.ts
