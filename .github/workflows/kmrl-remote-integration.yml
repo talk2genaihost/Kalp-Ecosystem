@@ -21,7 +21,7 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Build repository
-        run: npm run build
+        run: npm run build:kmrl
       - name: Run KMRL hardening and unit tests
         run: npm test
       - name: Run live KMRL remote integration
