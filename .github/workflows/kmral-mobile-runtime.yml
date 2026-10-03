@@ -179,7 +179,7 @@ jobs:
           xcrun simctl install "${{ steps.simulator.outputs.udid }}" "$APP_PATH"
           xcrun simctl launch "${{ steps.simulator.outputs.udid }}" "$BUNDLE_ID"
           sleep 8
-          xcrun simctl spawn "${{ steps.simulator.outputs.udid }}" launchctl print system | grep -F "$BUNDLE_ID"
+          xcrun simctl listapps "${{ steps.simulator.outputs.udid }}" | grep -F ""$BUNDLE_ID"" 
           xcrun simctl io "${{ steps.simulator.outputs.udid }}" screenshot kmral-ios-runtime.png || true
 
       - name: Upload iOS runtime evidence
