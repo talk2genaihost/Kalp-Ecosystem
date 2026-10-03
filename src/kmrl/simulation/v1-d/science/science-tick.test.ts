@@ -1,0 +1,11 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {scienceTick} from "../science/index.js";
+import {quantity} from "../../v1-a/quantity.js";
+import type {ScienceState} from "../science/types.js";
+const base=():ScienceState=>({timeS:quantity(0,"s"),physics:{positionM:quantity(0,"m"),velocityMps:quantity(0,"m/s"),accelerationMps2:quantity(0,"m/s2"),massKg:quantity(1,"kg")},materials:[{materialId:"hydrogen",amount:quantity(2,"mol")},{materialId:"oxygen",amount:quantity(1,"mol")}],temperature:quantity(25,"degC")});
+const reaction={id:"combustion-h2",name:"Hydrogen Combustion",reactants:[{materialId:"hydrogen",coefficient:2},{materialId:"oxygen",coefficient:1}],products:[{materialId:"water",coefficient:2}],conditions:[{type:"MIN_TEMPERATURE" as const,temperature:quantity(20,"degC")}]};
+test("physics and chemistry participate in one deterministic tick",()=>{const r=scienceTick(base(),{dtS:1,netForce:quantity(1,"N"),reaction});assert.equal(r.state.timeS.value,1);assert.equal(r.state.physics.velocityMps.value,1);assert.equal(r.state.physics.positionM.value,.5);assert.equal(r.chemistry.status,"COMPLETED");assert.equal(r.state.materials.find(x=>x.materialId==="water")?.amount.value,2);});
+test("chemistry condition failure does not roll back physics",()=>{const s=base();s.temperature=quantity(10,"degC");const r=scienceTick(s,{dtS:1,netForce:quantity(1,"N"),reaction});assert.equal(r.state.physics.velocityMps.value,1);assert.equal(r.chemistry.status,"CONDITION_NOT_MET");assert.equal(r.state.materials[0].amount.value,2);});
+test("input state is not mutated",()=>{const s=base();const before=structuredClone(s);scienceTick(s,{dtS:1,netForce:quantity(1,"N"),reaction});assert.deepEqual(s,before);});
+test("identical state and input produce identical result",()=>{assert.deepEqual(scienceTick(base(),{dtS:1,netForce:quantity(1,"N"),reaction}),scienceTick(base(),{dtS:1,netForce:quantity(1,"N"),reaction}));});

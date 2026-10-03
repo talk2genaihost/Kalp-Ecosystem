@@ -8,15 +8,26 @@
     "dev:astro-rashi": "vite",
     "dev:mtr-gateway": "tsx src/market-to-revenue/runtime-gateway-main.ts",
     "build": "tsc",
+    "build:kmrl": "tsc -p tsconfig.kmrl.json",
+    "build:kmrl-mobile": "vite --config apps/kmral-science-mobile/vite.config.ts build",
+    "mobile:add:ios": "npx cap add ios",
+    "mobile:sync:ios": "npx cap sync ios",
     "build:astro-rashi": "vite build",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test \"tests/**/*.test.ts\" \"src/kmrl/**/*.test.ts\"",
+    "test:kmrl": "tsx --test \"src/kmrl/**/*.test.ts\"",
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
-    "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
+    "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts",
+    "build:kmral": "tsc -p tsconfig.kmral.json",
+    "test:kmral": "tsx --test \"src/kmral/**/*.test.ts\""
   },
   "dependencies": {
-    "xlsx": "^0.18.5"
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "xlsx": "^0.18.5",
+    "@capacitor/ios": "^8.0.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",

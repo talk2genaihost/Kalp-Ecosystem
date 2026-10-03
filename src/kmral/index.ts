@@ -26,3 +26,10 @@ export function createAppManifest(
     modules: modules.map((module) => module.id),
   };
 }
+
+export * from './application.js';
+export * from './data.js';
+export * from './offline.js';
+export * from './ui.js';
+export * from './media.js';
+export * from './documents.js';

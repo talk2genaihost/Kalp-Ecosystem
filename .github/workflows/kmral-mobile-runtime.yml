@@ -1,0 +1,189 @@
+name: KMRAL Mobile Runtime Gate
+
+on:
+  push:
+    branches:
+      - feature/kmrl-migration-v1
+  workflow_dispatch:
+
+jobs:
+  mobile-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build KMRAL
+        run: npm run build:kmral
+
+      - name: Test KMRAL
+        run: npm run test:kmral
+
+      - name: Build KMRL
+        run: npm run build:kmrl
+
+      - name: Build KMRAL mobile web runtime
+        run: npm run build:kmrl-mobile
+
+      - name: Browser composition smoke test
+        run: |
+          npx playwright install --with-deps chromium
+          npx vite --host 127.0.0.1 --port 4174 --config apps/kmral-science-mobile/vite.config.ts > mobile-vite.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          npx playwright test tests/kmral-mobile-composition.spec.js --workers=1
+
+      - name: Add Android native runtime
+        run: npx cap add android
+
+      - name: Sync Android runtime
+        run: npx cap sync android
+
+      - name: Android emulator smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            cd android
+            ./gradlew assembleDebug
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
+            adb shell am force-stop com.kalp.sciencesandbox
+            adb shell monkey -p com.kalp.sciencesandbox 1
+            sleep 8
+            adb shell pidof com.kalp.sciencesandbox
+            adb shell uiautomator dump /sdcard/window.xml
+            adb shell cat /sdcard/window.xml | grep -E "Science Sandbox Mobile|science-sandbox|KMRL-EXPERIMENT|CREATED"
+            adb exec-out screencap -p > ../kmral-mobile-runtime.png
+
+      - name: Upload Android mobile runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-android-runtime-evidence
+          path: |
+            kmral-mobile-runtime.png
+            mobile-vite.log
+
+      - name: iOS runtime preparation check
+        run: |
+          test -f capacitor.config.ts
+          node -e "const p=require('./package.json'); if (!p.dependencies['@capacitor/core'] || !p.devDependencies['@capacitor/cli']) process.exit(1)"
+          echo "iOS runtime contract is configured for native Xcode execution."
+
+      - name: Upload iOS runtime contract
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-ios-runtime-contract
+          path: |
+            capacitor.config.ts
+            package.json
+
+  ios-runtime:
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build KMRAL
+        run: npm run build:kmral
+
+      - name: Test KMRAL
+        run: npm run test:kmral
+
+      - name: Build KMRL
+        run: npm run build:kmrl
+
+      - name: Build KMRAL mobile web runtime
+        run: npm run build:kmrl-mobile
+
+      - name: Add iOS native runtime
+        run: npx cap add ios
+
+      - name: Sync iOS runtime
+        run: npx cap sync ios
+
+      - name: Select available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          SIMULATOR_UDID="$(xcrun simctl list devices available --json | python3 -c 'import json,sys; d=json.load(sys.stdin); devices=[x for group in d["devices"].values() for x in group if x.get("isAvailable") and x.get("name","").startswith("iPhone")]; print(devices[0]["udid"])')"
+          test -n "$SIMULATOR_UDID"
+          echo "udid=$SIMULATOR_UDID" >> "$GITHUB_OUTPUT"
+
+      - name: Boot iOS simulator
+        run: |
+          set -euo pipefail
+          xcrun simctl boot "${{ steps.simulator.outputs.udid }}" || true
+          xcrun simctl bootstatus "${{ steps.simulator.outputs.udid }}" -b
+
+      - name: Build iOS simulator app
+        run: |
+          set -euo pipefail
+          if test -f ios/App/App.xcworkspace; then
+            xcodebuild \
+              -workspace ios/App/App.xcworkspace \
+              -scheme App \
+              -configuration Debug \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+              -derivedDataPath ios/build \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          elif test -f ios/App/App.xcodeproj/project.pbxproj; then
+            xcodebuild \
+              -project ios/App/App.xcodeproj \
+              -scheme App \
+              -configuration Debug \
+              -sdk iphonesimulator \
+              -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+              -derivedDataPath ios/build \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          else
+            echo "No generated Capacitor iOS workspace/project found"
+            exit 1
+          fi
+      - name: Install and launch iOS simulator app
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find ios/build/Build/Products -type d -name 'App.app' | head -n 1)"
+          test -n "$APP_PATH"
+          BUNDLE_ID="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/Info.plist")"
+          test "$BUNDLE_ID" = "com.kalp.sciencesandbox"
+          xcrun simctl install "${{ steps.simulator.outputs.udid }}" "$APP_PATH"
+          xcrun simctl launch "${{ steps.simulator.outputs.udid }}" "$BUNDLE_ID"
+          sleep 8
+          xcrun simctl spawn "${{ steps.simulator.outputs.udid }}" launchctl print system | grep -F "$BUNDLE_ID"
+          xcrun simctl io "${{ steps.simulator.outputs.udid }}" screenshot kmral-ios-runtime.png || true
+
+      - name: Upload iOS runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmral-ios-runtime-evidence
+          path: kmral-ios-runtime.png
