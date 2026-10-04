@@ -28,7 +28,6 @@ jobs:
 
       - name: Synchronize approved PHY-MEC-007 catalog
         id: sync
-        continue-on-error: true
         run: |
           set +e
           node scripts/kmrl/sync-approved-collision-catalog.mjs > /tmp/kmrl-catalog-sync.log 2>&1
@@ -39,7 +38,6 @@ jobs:
           exit "$rc"
 
       - name: Export synchronized catalog as UTF-8 transfer artifact
-        if: steps.sync.outcome == 'success'
         run: |
           set -euo pipefail
           mkdir -p docs/kmrl
