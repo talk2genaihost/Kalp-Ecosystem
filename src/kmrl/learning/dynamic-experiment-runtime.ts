@@ -10,7 +10,7 @@ import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
 import type { CatalogValidationResult } from "./excel-catalog-validator.js";
-import type { MaterialAmount, ReactionDefinition } from "../simulation/v1-d/chemistry/types.js";
+import type { MaterialAmount, ReactionDefinition, ReactionCondition } from "../simulation/v1-d/chemistry/types.js";
 
 export type DynamicExperimentStatus = "CREATED" | "RUNNING" | "PAUSED" | "COMPLETED";
 
@@ -112,7 +112,10 @@ function parseReactionDefinition(definition: DynamicExperimentDefinition, experi
       const temperature = Number(temperatureText);
       if (type !== "MIN_TEMPERATURE" && type !== "MAX_TEMPERATURE") throw new Error(`Unsupported reaction condition: ${value}`);
       if (!Number.isFinite(temperature)) throw new Error(`Invalid reaction condition temperature: ${value}`);
-      return { type, temperature: quantity(temperature, "degC") } as ReactionDefinition["conditions"] extends readonly (infer T)[] ? T : never;
+      const condition: ReactionCondition = type === "MIN_TEMPERATURE"
+        ? { type: "MIN_TEMPERATURE", temperature: quantity(temperature, "degC") }
+        : { type: "MAX_TEMPERATURE", temperature: quantity(temperature, "degC") };
+      return condition;
     }),
   };
 }
