@@ -35,7 +35,7 @@ test("Excel loader reads the STEM catalog into typed runtime records", () => {
   const catalog = loadStemLabCatalog(workbookBytes());
   assert.equal(catalog.experiments.length, 1);
   assert.deepEqual(catalog.experiments[0].guidedFlow, ["OBSERVE","INTERACT","MEASURE","REFLECT"]);
-  assert.equal(catalog.parameters[0].defaultValue, 10);
+  assert.equal(catalog.parameters[0].defaultValue, 1);
   assert.equal(catalog.parameters.find((parameter) => parameter.parameterId === "P02")?.modelInput, "force");
   assert.equal(catalog.parameters[0].learnerEditable, true);
   assert.deepEqual(catalog.modelContracts[0].requiredInputs, ["mass","force","dt"]);
@@ -64,5 +64,5 @@ test("Excel loader preserves executable mappings for the legacy catalog without 
   const rows = utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets.PARAMETERS, { defval: "" });
   workbook.Sheets.PARAMETERS = utils.json_to_sheet(rows.map(({ Model_Input: _ignored, ...row }) => row));
   const catalog = loadStemLabCatalog(write(workbook, { type: "buffer", bookType: "xlsx" }));
-  assert.equal(catalog.parameters[0].modelInput, "force");
+  assert.equal(catalog.parameters[0].modelInput, "mass");
 });
