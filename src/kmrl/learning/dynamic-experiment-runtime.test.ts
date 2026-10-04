@@ -282,3 +282,29 @@ test("spring-mass catalog experiment launches through the same generic runtime",
   assert.equal(measured.tick, 1);
   assert.equal(measured.measurements[0].id, "displacement");
 });
+
+test("pendulum catalog experiment executes the Excel-defined closed-form calculation", () => {
+  const experimentId = "PHY-MEC-005";
+  const catalog = catalogFixture();
+  catalog.experiments[0] = { ...catalog.experiments[0], experimentId, experimentName: "Pendulum", modelType: "pendulum", modelId: "pendulum", safetyRef: "PHY-MEC-005-SAFE" };
+  catalog.modelContracts[0] = { modelId: "pendulum", domain: "PHYSICS", requiredInputs: ["length", "gravity"], stateOutputs: ["period"], ruleOrEquation: "T=2*pi*sqrt(L/g)" };
+  catalog.parameters = [
+    { experimentId, parameterId: "PHY-MEC-005-P01", parameterName: "length", modelInput: "length", defaultValue: 1, min: 0.1, max: 100, unit: "m", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-005-P02", parameterName: "gravity", modelInput: "gravity", defaultValue: 9.81, min: 0.1, max: 30, unit: "m/s2", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-005-P03", parameterName: "time_step", modelInput: "", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+  ];
+  catalog.procedureSteps = [{ experimentId, stepNo: 1, stepType: "MEASURE", instruction: "Calculate pendulum period", runtimeAction: "MODEL_DEFINED" }];
+  catalog.measurements = [{ measurementId: "PHY-MEC-005-M01", experimentId, measurementName: "Period", unit: "s", source: "period" }];
+  catalog.safety = [{ safetyId: "PHY-MEC-005-SAFE", experimentId, level: "LOW", hazards: "Pendulum motion", restrictions: "Use controlled setup" }];
+  catalog.outcomes = [{ experimentId, outcomeId: "PHY-MEC-005-O01", type: "CALCULATION", condition: "measure", expectedResult: "Period follows T=2*pi*sqrt(L/g)" }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+
+  runtime.dispatch({ type: "START" });
+  const measured = runtime.dispatch({ type: "MEASURE" });
+  assert.equal(measured.measurements[0].id, "period");
+  assert.ok(Math.abs(measured.measurements[0].quantity.value - 2 * Math.PI * Math.sqrt(1 / 9.81)) < 1e-12);
+});
