@@ -30,9 +30,9 @@ function catalogFixture(): StemLabCatalog {
       ruleOrEquation: "F=m*a",
     }],
     parameters: [
-      { experimentId, parameterId: `${experimentId}-P01`, parameterName: "primary_parameter", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
-      { experimentId, parameterId: `${experimentId}-P02`, parameterName: "secondary_parameter", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
-      { experimentId, parameterId: `${experimentId}-P03`, parameterName: "time_step", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+      { experimentId, parameterId: `${experimentId}-P01`, parameterName: "primary_parameter", modelInput: "mass", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
+      { experimentId, parameterId: `${experimentId}-P02`, parameterName: "secondary_parameter", modelInput: "force", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
+      { experimentId, parameterId: `${experimentId}-P03`, parameterName: "time_step", modelInput: "dt", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
     ],
     procedureSteps: [{ experimentId, stepNo: 1, stepType: "INTERACT", instruction: "Apply force", runtimeAction: "MODEL_DEFINED" }],
     measurements: [
@@ -147,8 +147,8 @@ test("heating-water catalog experiment launches through the same generic runtime
     ruleOrEquation: "Q=m*c*dT",
   });
   catalog.parameters = [
-    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P01", parameterName: "primary_parameter", defaultValue: 1, min: 0.1, max: 100, unit: "kg", learnerEditable: true },
-    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P02", parameterName: "secondary_parameter", defaultValue: 1000, min: 1, max: 100000, unit: "J", learnerEditable: true },
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P01", parameterName: "primary_parameter", modelInput: "mass", defaultValue: 1, min: 0.1, max: 100, unit: "kg", learnerEditable: true },
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P02", parameterName: "secondary_parameter", modelInput: "energy", defaultValue: 1000, min: 1, max: 100000, unit: "J", learnerEditable: true },
     { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P03", parameterName: "time_step", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
   ];
   catalog.procedureSteps = [{ experimentId: "CHE-THM-001", stepNo: 1, stepType: "INTERACT", instruction: "Apply heat", runtimeAction: "MODEL_DEFINED" }];
