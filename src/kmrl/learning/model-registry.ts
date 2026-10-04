@@ -21,6 +21,7 @@ const BUILTIN_IMPLEMENTATIONS: Readonly<Record<string, string>> = {
   constant_force: "ConstantForceExperimentAdapter",
   heating_water: "HeatingWaterExperimentAdapter",
   free_fall: "FreeFallExperimentAdapter",
+  projectile_motion: "ProjectileMotionExperimentAdapter",
   registered_reaction: "MixMaterialsExperimentAdapter",
 };
 
