@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: kmrl-approved-catalog-sync
+  cancel-in-progress: true
+
 jobs:
   sync-catalog:
     runs-on: ubuntu-latest
@@ -40,7 +44,8 @@ jobs:
           else
             git add apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
             git commit -m "chore(kmrl): synchronize approved PHY-MEC-007 catalog"
-            git push
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
             exit 0
           fi
           if [ "${{ steps.sync.outcome }}" != "success" ]; then
@@ -48,6 +53,7 @@ jobs:
             cp /tmp/kmrl-catalog-sync-status.txt docs/kmrl/PHY_MEC_007_CATALOG_SYNC_STATUS.txt
             git add docs/kmrl/PHY_MEC_007_CATALOG_SYNC_STATUS.txt
             git commit -m "chore(kmrl): record catalog synchronization diagnostic"
-            git push
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
             exit 1
           fi
