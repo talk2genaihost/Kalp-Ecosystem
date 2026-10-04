@@ -2,6 +2,7 @@ import { quantity, type Quantity } from "../simulation/v1-a/quantity.js";
 import { ConstantForceExperimentAdapter } from "./constant-force-adapter.js";
 import { HeatingWaterExperimentAdapter } from "./heating-water-adapter.js";
 import { FreeFallExperimentAdapter } from "./free-fall-adapter.js";
+import { ProjectileMotionExperimentAdapter } from "./projectile-motion-adapter.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
@@ -128,6 +129,29 @@ function createModelSession(
         adapter.setGravity(quantity(Number(gravity.value), "m/s2"));
         adapter.step(dt);
       },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id,
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
+  }
+
+  if (modelId === "projectile_motion") {
+    const speed = numericMappedParameter(definition.parameters, "speed");
+    const angle = numericMappedParameter(definition.parameters, "angle");
+    const gravity = numericMappedParameter(definition.parameters, "gravity");
+    const adapter = new ProjectileMotionExperimentAdapter({
+      initialSpeedMps: quantity(speed, "m/s"),
+      launchAngleDeg: angle,
+      gravityMps2: gravity,
+    });
+    return {
+      setInput() {},
+      step(dt) { adapter.step(dt); },
       measure() {
         return adapter.measure().map((item) => ({
           id: item.id,
