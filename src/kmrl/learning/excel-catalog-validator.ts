@@ -119,7 +119,9 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     nonEmpty(p.experimentId, errors, "EXPERIMENT_REFERENCE_REQUIRED", "PARAMETERS", row, "Experiment_ID");
     nonEmpty(p.parameterId, errors, "PARAMETER_ID_REQUIRED", "PARAMETERS", row, "Parameter_ID");
     nonEmpty(p.parameterName, errors, "PARAMETER_NAME_REQUIRED", "PARAMETERS", row, "Parameter_Name");
-    if (!p.modelInput.trim()) {\n      warnings.push({ code: "MODEL_INPUT_UNMAPPED", sheet: "PARAMETERS", row, field: "Model_Input", message: "Parameter has no semantic model-input mapping yet; this is allowed for catalog seed experiments that are not executable." });\n    }
+    if (!p.modelInput.trim()) {
+      warnings.push({ code: "MODEL_INPUT_UNMAPPED", sheet: "PARAMETERS", row, field: "Model_Input", message: "Parameter has no semantic model-input mapping yet; this is allowed for catalog seed experiments that are not executable." });
+    }
     nonEmpty(p.unit, errors, "UNIT_REQUIRED", "PARAMETERS", row, "Unit");
     if (p.experimentId && !experimentIds.has(p.experimentId)) issue(errors, "EXPERIMENT_REFERENCE_MISSING", "PARAMETERS", `Unknown experiment "${p.experimentId}"`, row, "Experiment_ID");
     const key = `${p.experimentId}::${p.parameterId}`;
