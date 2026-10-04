@@ -25,19 +25,20 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Verify approved PHY-MEC-007 catalog before synchronization
+        id: verify
+        continue-on-error: true
         run: node scripts/kmrl/verify-approved-collision-catalog.mjs
       - name: Commit catalog verification receipt
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/kmrl/PHY_MEC_007_CATALOG_VERIFICATION.txt
-          if git diff --cached --quiet; then
-            echo "Verification receipt unchanged"
-            exit 0
-          fi
           git commit -m "test(kmrl): record approved catalog verification"
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Stop on failed catalog verification
+        if: steps.verify.outcome != 'success'
+        run: exit 1
 
       - name: Synchronize approved PHY-MEC-007 catalog
         id: sync
