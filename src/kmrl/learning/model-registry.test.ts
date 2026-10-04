@@ -11,7 +11,7 @@ function catalog(): StemLabCatalog {
       { modelId:"heating_water",domain:"CHEMISTRY",requiredInputs:["mass","specific_heat","energy"],stateOutputs:["temperature"],ruleOrEquation:"Q=m*c*dT" },
       { modelId:"future_model",domain:"PHYSICS",requiredInputs:["x"],stateOutputs:["y"],ruleOrEquation:"future" }
     ],
-    parameters:[],procedureSteps:[],measurements:[],safety:[],materials:[],outcomes:[],curriculumMap:[],mediaAssets:[]
+    parameters:[],procedureSteps:[],measurements:[],safety:[],materials:[],outcomes:[],curriculumMap:[],mediaAssets:[],reactionDefinitions:[]
   };
 }
 
