@@ -27,6 +27,7 @@ function workbookBytes(): Uint8Array {
   add("OUTCOMES", [{Experiment_ID:"PHY-MEC-001",Outcome_ID:"O01",Type:"EXPECTED",Condition:"valid parameter range",Expected_Result:"Model-defined result"}]);
   add("CURRICULUM_MAP", [{Curriculum_ID:"PHYSICS-FOUNDATION",Domain:"PHYSICS",Level:"FOUNDATION",Topics:"Mechanics,Thermodynamics",Seed_Count:1}]);
   add("MEDIA_ASSETS", [{Media_ID:"MEDIA-01",Experiment_ID:"PHY-MEC-001",Asset_Type:"diagram",Asset_Key:"PHY-MEC-001_diagram",Required:"NO"}]);
+  add("REACTION_DEFINITIONS", [{Reaction_ID:"RXN-001",Experiment_ID:"PHY-MEC-001",Reaction_Name:"Test Reaction",Reactants:"MAT-A:1,MAT-B:2",Products:"MAT-C:1",Conditions:"MIN_TEMPERATURE:25",Status:"PROPOSED"}]);
 
   return write(workbook, { type:"buffer", bookType:"xlsx" });
 }
@@ -41,6 +42,10 @@ test("Excel loader reads the STEM catalog into typed runtime records", () => {
   assert.deepEqual(catalog.modelContracts[0].requiredInputs, ["mass","force","dt"]);
   assert.equal(catalog.procedureSteps[0].stepNo, 1);
   assert.deepEqual(catalog.materials[0].keyProperties, ["specific_heat","density"]);
+  assert.equal(catalog.reactionDefinitions.length, 1);
+  assert.equal(catalog.reactionDefinitions[0].reactionId, "RXN-001");
+  assert.deepEqual(catalog.reactionDefinitions[0].reactants, ["MAT-A:1","MAT-B:2"]);
+  assert.equal(catalog.reactionDefinitions[0].status, "PROPOSED");
 });
 
 test("Excel loader rejects a missing required sheet", () => {
@@ -65,4 +70,12 @@ test("Excel loader preserves executable mappings for the legacy catalog without 
   workbook.Sheets.PARAMETERS = utils.json_to_sheet(rows.map(({ Model_Input: _ignored, ...row }) => row));
   const catalog = loadStemLabCatalog(write(workbook, { type: "buffer", bookType: "xlsx" }));
   assert.equal(catalog.parameters[0].modelInput, "mass");
+});
+
+
+test("Excel loader accepts and parses the optional reaction definition source", () => {
+  const catalog = loadStemLabCatalog(workbookBytes());
+  assert.equal(catalog.reactionDefinitions[0].experimentId, "PHY-MEC-001");
+  assert.deepEqual(catalog.reactionDefinitions[0].products, ["MAT-C:1"]);
+  assert.deepEqual(catalog.reactionDefinitions[0].conditions, ["MIN_TEMPERATURE:25"]);
 });
