@@ -108,6 +108,7 @@ export interface StemLabCatalog {
 const LEGACY_MODEL_INPUTS: Readonly<Record<string, readonly string[]>> = {
   constant_force: ["mass", "force", "dt"],
   heating_water: ["mass", "energy", "dt"],
+  free_fall: ["gravity", "dt"],
 };
 
 const SHEETS = {
