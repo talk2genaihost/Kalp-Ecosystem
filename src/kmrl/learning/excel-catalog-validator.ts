@@ -162,9 +162,11 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     declaredInputs.forEach((input) => {
       if (!mapped.has(input)) issue(errors, "MODEL_INPUT_MAPPING_MISSING", "PARAMETERS", `Experiment "${e.experimentId}" does not map required model input "${input}"`, i + 2, "Model_Input");
     });
-    mapped.forEach((input) => {
-      if (!model.requiredInputs.some((declared) => declared.toLowerCase() === input.toLowerCase())) issue(errors, "MODEL_INPUT_MAPPING_UNKNOWN", "PARAMETERS", `Parameter maps to "${input}", which is not declared by model "${model.modelId}"`, i + 2, "Model_Input");
-    });
+    if (declaredInputs.length > 0) {
+      mapped.forEach((input) => {
+        if (!model.requiredInputs.some((declared) => declared.toLowerCase() === input.toLowerCase())) issue(errors, "MODEL_INPUT_MAPPING_UNKNOWN", "PARAMETERS", `Parameter maps to "${input}", which is not declared by model "${model.modelId}"`, i + 2, "Model_Input");
+      });
+    }
   });
 
   const stepKeys = new Set<string>();
