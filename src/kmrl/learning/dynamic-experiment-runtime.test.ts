@@ -255,3 +255,30 @@ test("projectile-motion catalog experiment launches through the same generic run
   const stepped = runtime.dispatch({ type: "STEP" });
   assert.equal(stepped.tick, 1);
 });
+
+test("spring-mass catalog experiment launches through the same generic runtime", () => {
+  const experimentId = "PHY-MEC-004";
+  const catalog = catalogFixture();
+  catalog.experiments[0] = { ...catalog.experiments[0], experimentId, experimentName: "Spring-Mass Oscillation", modelType: "spring_mass", modelId: "spring_mass", safetyRef: "PHY-MEC-004-SAFE" };
+  catalog.modelContracts[0] = { modelId: "spring_mass", domain: "PHYSICS", requiredInputs: ["mass", "spring_constant", "dt"], stateOutputs: ["displacement", "velocity", "acceleration"], ruleOrEquation: "F=-k*x" };
+  catalog.parameters = [
+    { experimentId, parameterId: "PHY-MEC-004-P01", parameterName: "mass", modelInput: "mass", defaultValue: 1, min: 0.1, max: 100, unit: "kg", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-004-P02", parameterName: "spring_constant", modelInput: "spring_constant", defaultValue: 10, min: 0.1, max: 1000, unit: "N/m", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-004-P03", parameterName: "time_step", modelInput: "dt", defaultValue: 0.01, min: 0.001, max: 1, unit: "s", learnerEditable: false },
+  ];
+  catalog.procedureSteps = [{ experimentId, stepNo: 1, stepType: "INTERACT", instruction: "Release spring", runtimeAction: "MODEL_DEFINED" }];
+  catalog.measurements = [{ measurementId: "PHY-MEC-004-M01", experimentId, measurementName: "Displacement", unit: "m", source: "displacement" }];
+  catalog.safety = [{ safetyId: "PHY-MEC-004-SAFE", experimentId, level: "LOW", hazards: "Stored spring energy", restrictions: "Use controlled displacement" }];
+  catalog.outcomes = [{ experimentId, outcomeId: "PHY-MEC-004-O01", type: "OBSERVATION", condition: "step", expectedResult: "Oscillatory displacement changes" }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+
+  runtime.dispatch({ type: "START" });
+  runtime.dispatch({ type: "STEP" });
+  const measured = runtime.dispatch({ type: "MEASURE" });
+  assert.equal(measured.tick, 1);
+  assert.equal(measured.measurements[0].id, "displacement");
+});
