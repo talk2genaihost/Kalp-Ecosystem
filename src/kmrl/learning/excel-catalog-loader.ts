@@ -59,6 +59,16 @@ export interface SafetyRow {
   restrictions: string;
 }
 
+export interface ReactionDefinitionRow {
+  reactionId: string;
+  experimentId: string;
+  reactionName: string;
+  reactants: string[];
+  products: string[];
+  conditions: string[];
+  status: string;
+}
+
 export interface MaterialRow {
   materialId: string;
   materialName: string;
@@ -100,6 +110,7 @@ export interface StemLabCatalog {
   measurements: MeasurementRow[];
   safety: SafetyRow[];
   materials: MaterialRow[];
+  reactionDefinitions: ReactionDefinitionRow[];
   outcomes: OutcomeRow[];
   curriculumMap: CurriculumMapRow[];
   mediaAssets: MediaAssetRow[];
@@ -135,6 +146,7 @@ const SHEETS = {
   outcomes: "OUTCOMES",
   curriculumMap: "CURRICULUM_MAP",
   mediaAssets: "MEDIA_ASSETS",
+  reactionDefinitions: "REACTION_DEFINITIONS",
 } as const;
 
 type Cell = string | number | boolean | Date | null | undefined;
@@ -202,6 +214,12 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
   requireColumns(SHEETS.curriculumMap, workbook.Sheets[SHEETS.curriculumMap], [
     "Curriculum_ID","Domain","Level","Topics","Seed_Count"
   ]);
+  if (workbook.Sheets[SHEETS.reactionDefinitions]) {
+    requireColumns(SHEETS.reactionDefinitions, workbook.Sheets[SHEETS.reactionDefinitions], [
+      "Reaction_ID","Experiment_ID","Reaction_Name","Reactants","Products","Conditions","Status"
+    ]);
+  }
+
   requireColumns(SHEETS.mediaAssets, workbook.Sheets[SHEETS.mediaAssets], [
     "Media_ID","Experiment_ID","Asset_Type","Asset_Key","Required"
   ]);
@@ -288,6 +306,17 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
       topics: list(r.Topics),
       seedCount: number(r.Seed_Count, "Seed_Count"),
     })),
+    reactionDefinitions: workbook.Sheets[SHEETS.reactionDefinitions]
+      ? rows(workbook, SHEETS.reactionDefinitions).map((r) => ({
+          reactionId: text(r.Reaction_ID),
+          experimentId: text(r.Experiment_ID),
+          reactionName: text(r.Reaction_Name),
+          reactants: list(r.Reactants),
+          products: list(r.Products),
+          conditions: list(r.Conditions),
+          status: text(r.Status),
+        }))
+      : [],
     mediaAssets: rows(workbook, SHEETS.mediaAssets).map((r) => ({
       mediaId: text(r.Media_ID),
       experimentId: text(r.Experiment_ID),
