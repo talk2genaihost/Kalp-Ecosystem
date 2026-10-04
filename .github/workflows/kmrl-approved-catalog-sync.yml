@@ -1,4 +1,5 @@
 name: KMRL Approved Catalog Synchronization
+# Governed synchronization workflow for the approved PHY-MEC-007 catalog.
 
 on:
   push:
