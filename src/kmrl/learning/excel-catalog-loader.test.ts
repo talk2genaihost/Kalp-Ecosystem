@@ -41,13 +41,13 @@ test("Excel loader reads the STEM catalog into typed runtime records", () => {
 
 test("Excel loader rejects a missing required sheet", () => {
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X"}]), "EXPERIMENT_CATALOG");
+  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X",Domain:"PHYSICS",Experiment_Name:"X",Category:"Mechanics",Model_Type:"constant_force",Model_ID:"constant_force",Guided_Flow:"OBSERVE",Level:"FOUNDATION",Status:"DEFINED",Input_Refs:"",Measurement_Refs:"",Safety_Ref:"S"}]), "EXPERIMENT_CATALOG");
   assert.throws(() => loadStemLabCatalog(write(workbook, {type:"buffer",bookType:"xlsx"})), /Missing required sheet: MODEL_CONTRACTS/);
 });
 
 test("Excel loader rejects missing required columns", () => {
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X"}]), "EXPERIMENT_CATALOG");
+  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X",Domain:"PHYSICS",Experiment_Name:"X",Category:"Mechanics",Model_Type:"constant_force",Model_ID:"constant_force",Guided_Flow:"OBSERVE",Level:"FOUNDATION",Status:"DEFINED",Input_Refs:"",Measurement_Refs:"",Safety_Ref:"S"}]), "EXPERIMENT_CATALOG");
   assert.throws(
     () => loadStemLabCatalog(write(workbook, {type:"buffer",bookType:"xlsx"})),
     /Sheet EXPERIMENT_CATALOG is missing columns: Domain/
