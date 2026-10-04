@@ -35,25 +35,18 @@ jobs:
           printf "exit_code=%s\n" "$rc" > /tmp/kmrl-catalog-sync-status.txt
           cat /tmp/kmrl-catalog-sync.log >> /tmp/kmrl-catalog-sync-status.txt
           exit "$rc"
-      - name: Commit synchronized binary catalog or diagnostic
+      - name: Export synchronized catalog as UTF-8 transfer artifact
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          set -euo pipefail
           if git diff --quiet -- apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx; then
             echo "Catalog unchanged"
-          else
-            git add apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
-            git commit -m "chore(kmrl): synchronize approved PHY-MEC-007 catalog"
-            git pull --rebase origin "$GITHUB_REF_NAME"
-            git push origin "HEAD:$GITHUB_REF_NAME"
             exit 0
           fi
-          if [ "${{ steps.sync.outcome }}" != "success" ]; then
-            mkdir -p docs/kmrl
-            cp /tmp/kmrl-catalog-sync-status.txt docs/kmrl/PHY_MEC_007_CATALOG_SYNC_STATUS.txt
-            git add docs/kmrl/PHY_MEC_007_CATALOG_SYNC_STATUS.txt
-            git commit -m "chore(kmrl): record catalog synchronization diagnostic"
-            git pull --rebase origin "$GITHUB_REF_NAME"
-            git push origin "HEAD:$GITHUB_REF_NAME"
-            exit 1
-          fi
+          mkdir -p docs/kmrl
+          base64 -w0 apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx > docs/kmrl/PHY_MEC_007_CATALOG_BASE64.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/kmrl/PHY_MEC_007_CATALOG_BASE64.txt
+          git commit -m "chore(kmrl): stage synchronized catalog transfer artifact"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
