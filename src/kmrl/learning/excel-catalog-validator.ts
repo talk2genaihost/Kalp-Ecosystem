@@ -192,6 +192,23 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
       if (!experimentIds.has(item.experimentId)) issue(errors, "EXPERIMENT_REFERENCE_MISSING", sheet, `Unknown experiment "${item.experimentId}"`, i + 2, "Experiment_ID");
     });
   };
+  uniqueIds(catalog.reactionDefinitions.map((r) => ({ id: r.reactionId })), errors, "REACTION_DEFINITIONS", "DUPLICATE_REACTION_ID");
+  catalog.reactionDefinitions.forEach((reaction, i) => {
+    const row = i + 2;
+    nonEmpty(reaction.reactionId, errors, "REACTION_ID_REQUIRED", "REACTION_DEFINITIONS", row, "Reaction_ID");
+    nonEmpty(reaction.experimentId, errors, "REACTION_EXPERIMENT_REQUIRED", "REACTION_DEFINITIONS", row, "Experiment_ID");
+    nonEmpty(reaction.reactionName, errors, "REACTION_NAME_REQUIRED", "REACTION_DEFINITIONS", row, "Reaction_Name");
+    nonEmpty(reaction.status, errors, "REACTION_STATUS_REQUIRED", "REACTION_DEFINITIONS", row, "Status");
+    if (reaction.experimentId && !experimentIds.has(reaction.experimentId)) {
+      issue(errors, "EXPERIMENT_REFERENCE_MISSING", "REACTION_DEFINITIONS", `Unknown experiment "${reaction.experimentId}"`, row, "Experiment_ID");
+    }
+    if (!reaction.reactants.length) issue(errors, "REACTION_REACTANTS_REQUIRED", "REACTION_DEFINITIONS", "Reaction must declare at least one reactant", row, "Reactants");
+    if (!reaction.products.length) issue(errors, "REACTION_PRODUCTS_REQUIRED", "REACTION_DEFINITIONS", "Reaction must declare at least one product", row, "Products");
+    if (!["PROPOSED", "CANONICAL"].includes(reaction.status.toUpperCase())) {
+      issue(errors, "INVALID_REACTION_STATUS", "REACTION_DEFINITIONS", `Unsupported reaction status "${reaction.status}"`, row, "Status");
+    }
+  });
+
   validateExperimentRefRows(catalog.measurements, "MEASUREMENTS");
   validateExperimentRefRows(catalog.safety, "SAFETY");
   validateExperimentRefRows(catalog.outcomes, "OUTCOMES");
