@@ -51,36 +51,39 @@ jobs:
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:$GITHUB_REF_NAME"
 
-      - name: Export synchronized catalog as PR transfer artifact
-        run: |
-          set -euo pipefail
-          base64 -w0 apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx > /tmp/PHY_MEC_007_CATALOG_BASE64.txt
-
-      - name: Publish synchronized binary transfer artifact
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          node - <<'NODE'
-          const fs = require("fs");
-          const base64 = fs.readFileSync("/tmp/PHY_MEC_007_CATALOG_BASE64.txt", "utf8").trim();
-          const body = [
-            "<!-- KMRL-PHY-MEC-007-CATALOG-TRANSFER -->",
-            "KMRL PHY-MEC-007 synchronized binary catalog transfer artifact.",
-            "Generated from the approved contract synchronization workflow.",
-            "BEGIN_BASE64",
-            base64,
-            "END_BASE64"
-          ].join("\n");
-          fs.writeFileSync("/tmp/kmrl-comment.json", JSON.stringify({ body }));
-          NODE
-          curl --fail --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            --data-binary @/tmp/kmrl-comment.json \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/35/comments"
+      - name: Commit synchronized binary catalog through Git data API
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require("fs");
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = context.ref.replace("refs/heads/", "");
+            const path = "apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
+            const ref = await github.rest.git.getRef({ owner, repo, ref: `heads/${branch}` });
+            const parentSha = ref.data.object.sha;
+            const parentCommit = await github.rest.git.getCommit({ owner, repo, commit_sha: parentSha });
+            const content = fs.readFileSync(path).toString("base64");
+            const blob = await github.rest.git.createBlob({
+              owner, repo, content, encoding: "base64"
+            });
+            const tree = await github.rest.git.createTree({
+              owner, repo,
+              base_tree: parentCommit.data.tree.sha,
+              tree: [{ path, mode: "100644", type: "blob", sha: blob.data.sha }]
+            });
+            const commit = await github.rest.git.createCommit({
+              owner, repo,
+              message: "chore(kmrl): synchronize approved PHY-MEC-007 binary catalog",
+              tree: tree.data.sha,
+              parents: [parentSha]
+            });
+            await github.rest.git.updateRef({
+              owner, repo, ref: `heads/${branch}`, sha: commit.data.sha, force: false
+            });
+            core.info(`Synchronized binary catalog commit: ${commit.data.sha}`);
+            core.info(`Binary catalog blob: ${blob.data.sha}`);
 
       - name: Verify approved PHY-MEC-007 catalog after synchronization
         id: verify
