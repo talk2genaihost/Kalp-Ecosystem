@@ -159,9 +159,16 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
       return;
     }
     const declaredInputs = model.requiredInputs.filter((input) => input.trim() && input.toLowerCase() !== "model inputs");
-    declaredInputs.forEach((input) => {
-      if (!mapped.has(input)) issue(errors, "MODEL_INPUT_MAPPING_MISSING", "PARAMETERS", `Experiment "${e.experimentId}" does not map required model input "${input}"`, i + 2, "Model_Input");
-    });
+    const missingInputs = declaredInputs.filter((input) => !mapped.has(input));
+    if (missingInputs.length > 0) {
+      warnings.push({
+        code: "MODEL_INPUT_MAPPING_INCOMPLETE",
+        sheet: "PARAMETERS",
+        row: i + 2,
+        field: "Model_Input",
+        message: "Experiment \"" + e.experimentId + "\" is not runtime-executable yet; missing model inputs: " + missingInputs.join(", "),
+      });
+    }
     if (declaredInputs.length > 0) {
       mapped.forEach((input) => {
         if (!model.requiredInputs.some((declared) => declared.toLowerCase() === input.toLowerCase())) issue(errors, "MODEL_INPUT_MAPPING_UNKNOWN", "PARAMETERS", `Parameter maps to "${input}", which is not declared by model "${model.modelId}"`, i + 2, "Model_Input");
