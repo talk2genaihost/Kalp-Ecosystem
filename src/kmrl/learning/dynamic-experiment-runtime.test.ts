@@ -89,7 +89,7 @@ test("a second Excel-defined experiment using the same registered model needs no
     ...clone.experiments[0],
     experimentId: "PHY-MEC-001-CLONE",
     experimentName: "Constant Force Motion — Catalog Clone",
-    safetyRef: "PHY-MEC-001-SAFE",
+    safetyRef: "PHY-MEC-001-CLONE-SAFE",
   });
   clone.parameters = clone.parameters
     .filter((parameter) => parameter.experimentId === "PHY-MEC-001")
@@ -149,7 +149,7 @@ test("heating-water catalog experiment launches through the same generic runtime
   catalog.parameters = [
     { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P01", parameterName: "primary_parameter", modelInput: "mass", defaultValue: 1, min: 0.1, max: 100, unit: "kg", learnerEditable: true },
     { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P02", parameterName: "secondary_parameter", modelInput: "energy", defaultValue: 1000, min: 1, max: 100000, unit: "J", learnerEditable: true },
-    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P03", parameterName: "time_step", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P03", parameterName: "time_step", modelInput: "dt", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
   ];
   catalog.procedureSteps = [{ experimentId: "CHE-THM-001", stepNo: 1, stepType: "INTERACT", instruction: "Apply heat", runtimeAction: "MODEL_DEFINED" }];
   catalog.measurements = [{ measurementId: "CHE-THM-001-M01", experimentId: "CHE-THM-001", measurementName: "Temperature", unit: "degC", source: "temperature" }];
