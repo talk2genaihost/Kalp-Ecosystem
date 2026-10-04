@@ -3,6 +3,7 @@ import { ConstantForceExperimentAdapter } from "./constant-force-adapter.js";
 import { HeatingWaterExperimentAdapter } from "./heating-water-adapter.js";
 import { FreeFallExperimentAdapter } from "./free-fall-adapter.js";
 import { ProjectileMotionExperimentAdapter } from "./projectile-motion-adapter.js";
+import { SpringMassExperimentAdapter } from "./spring-mass-adapter.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
@@ -148,6 +149,27 @@ function createModelSession(
       initialSpeedMps: quantity(speed, "m/s"),
       launchAngleDeg: angle,
       gravityMps2: gravity,
+    });
+    return {
+      setInput() {},
+      step(dt) { adapter.step(dt); },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id,
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
+  }
+
+  if (modelId === "spring_mass") {
+    const mass = numericMappedParameter(definition.parameters, "mass");
+    const springConstant = numericMappedParameter(definition.parameters, "spring_constant");
+    const adapter = new SpringMassExperimentAdapter({
+      massKg: quantity(mass, "kg"),
+      springConstantNpm: springConstant,
     });
     return {
       setInput() {},
