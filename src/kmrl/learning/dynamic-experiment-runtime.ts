@@ -117,7 +117,7 @@ function createModelSession(
   }
 
   if (modelId === "heating_water") {
-    const mass = numericParameter(definition.parameters, "mass", 0);
+    const mass = numericMappedParameter(definition.parameters, "mass");
     const adapter = new HeatingWaterExperimentAdapter({ massKg: quantity(mass, "kg") });
     return {
       setInput(name, value) {
