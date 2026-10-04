@@ -484,6 +484,7 @@ export class DynamicExperimentRuntime {
           this.require(numeric >= parameter.min && numeric <= parameter.max, `Parameter ${action.parameterId} is outside its declared range`);
         }
         this.parameters[index] = { ...parameter, value: action.value };
+        this.model.setInput(parameter.modelInput, action.value);
         break;
       }
       case "STEP": {
