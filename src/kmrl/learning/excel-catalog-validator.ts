@@ -206,6 +206,11 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     }
     if (!reaction.reactants.length) issue(errors, "REACTION_REACTANTS_REQUIRED", "REACTION_DEFINITIONS", "Reaction must declare at least one reactant", row, "Reactants");
     if (!reaction.products.length) issue(errors, "REACTION_PRODUCTS_REQUIRED", "REACTION_DEFINITIONS", "Reaction must declare at least one product", row, "Products");
+    const materialIds = new Set(catalog.materials.map((material) => material.materialId));
+    [...reaction.reactants, ...reaction.products].forEach((participant) => {
+      const materialId = participant.split(":")[0]?.trim();
+      if (materialId && !materialIds.has(materialId)) issue(errors, "REACTION_MATERIAL_REFERENCE_MISSING", "REACTION_DEFINITIONS", `Reaction references unknown material "${materialId}"`, row, "Reactants/Products");
+    });
     if (!["PROPOSED", "CANONICAL"].includes(reaction.status.toUpperCase())) {
       issue(errors, "INVALID_REACTION_STATUS", "REACTION_DEFINITIONS", `Unsupported reaction status "${reaction.status}"`, row, "Status");
     }
