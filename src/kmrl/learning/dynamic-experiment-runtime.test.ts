@@ -91,26 +91,31 @@ test("a second Excel-defined experiment using the same registered model needs no
     experimentName: "Constant Force Motion — Catalog Clone",
     safetyRef: "PHY-MEC-001-CLONE-SAFE",
   });
-  clone.parameters = clone.parameters
-    .filter((parameter) => parameter.experimentId === "PHY-MEC-001")
-    .map((parameter) => ({ ...parameter, experimentId: "PHY-MEC-001-CLONE" }))
-    .concat(clone.parameters.filter((parameter) => parameter.experimentId !== "PHY-MEC-001"));
-  clone.procedureSteps = clone.procedureSteps
-    .filter((step) => step.experimentId === "PHY-MEC-001")
-    .map((step) => ({ ...step, experimentId: "PHY-MEC-001-CLONE" }))
-    .concat(clone.procedureSteps.filter((step) => step.experimentId !== "PHY-MEC-001"));
-  clone.measurements = clone.measurements
-    .filter((measurement) => measurement.experimentId === "PHY-MEC-001")
-    .map((measurement) => ({ ...measurement, experimentId: "PHY-MEC-001-CLONE", measurementId: measurement.measurementId.replace("PHY-MEC-001", "PHY-MEC-001-CLONE") }))
-    .concat(clone.measurements.filter((measurement) => measurement.experimentId !== "PHY-MEC-001"));
-  clone.safety = clone.safety
-    .filter((safety) => safety.experimentId === "PHY-MEC-001")
-    .map((safety) => ({ ...safety, experimentId: "PHY-MEC-001-CLONE", safetyId: "PHY-MEC-001-CLONE-SAFE" }))
-    .concat(clone.safety.filter((safety) => safety.experimentId !== "PHY-MEC-001"));
-  clone.outcomes = clone.outcomes
-    .filter((outcome) => outcome.experimentId === "PHY-MEC-001")
-    .map((outcome) => ({ ...outcome, experimentId: "PHY-MEC-001-CLONE", outcomeId: outcome.outcomeId.replace("PHY-MEC-001", "PHY-MEC-001-CLONE") }))
-    .concat(clone.outcomes.filter((outcome) => outcome.experimentId !== "PHY-MEC-001"));
+  clone.parameters = clone.parameters.concat(
+    clone.parameters
+      .filter((parameter) => parameter.experimentId === "PHY-MEC-001")
+      .map((parameter) => ({ ...parameter, experimentId: "PHY-MEC-001-CLONE" })),
+  );
+  clone.procedureSteps = clone.procedureSteps.concat(
+    clone.procedureSteps
+      .filter((step) => step.experimentId === "PHY-MEC-001")
+      .map((step) => ({ ...step, experimentId: "PHY-MEC-001-CLONE" })),
+  );
+  clone.measurements = clone.measurements.concat(
+    clone.measurements
+      .filter((measurement) => measurement.experimentId === "PHY-MEC-001")
+      .map((measurement) => ({ ...measurement, experimentId: "PHY-MEC-001-CLONE", measurementId: measurement.measurementId.replace("PHY-MEC-001", "PHY-MEC-001-CLONE") })),
+  );
+  clone.safety = clone.safety.concat(
+    clone.safety
+      .filter((safety) => safety.experimentId === "PHY-MEC-001")
+      .map((safety) => ({ ...safety, experimentId: "PHY-MEC-001-CLONE", safetyId: "PHY-MEC-001-CLONE-SAFE" })),
+  );
+  clone.outcomes = clone.outcomes.concat(
+    clone.outcomes
+      .filter((outcome) => outcome.experimentId === "PHY-MEC-001")
+      .map((outcome) => ({ ...outcome, experimentId: "PHY-MEC-001-CLONE", outcomeId: outcome.outcomeId.replace("PHY-MEC-001", "PHY-MEC-001-CLONE") })),
+  );
 
   const clonedValidation = validateStemLabCatalog(clone);
   assert.equal(clonedValidation.valid, true, JSON.stringify(clonedValidation.errors));
