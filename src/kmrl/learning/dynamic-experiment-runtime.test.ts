@@ -1,14 +1,53 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createDynamicExperimentRuntime } from "./dynamic-experiment-runtime.js";
-import { loadStemLabCatalog } from "./excel-catalog-loader.js";
 import { validateStemLabCatalog } from "./excel-catalog-validator.js";
 import { createKMRLModelRegistry } from "./model-registry.js";
-import { readFileSync } from "node:fs";
+import type { StemLabCatalog } from "./excel-catalog-loader.js";
+
+function catalogFixture(): StemLabCatalog {
+  const experimentId = "PHY-MEC-001";
+  return {
+    experiments: [{
+      experimentId,
+      domain: "PHYSICS",
+      experimentName: "Constant Force Motion",
+      category: "Mechanics",
+      modelType: "constant_force",
+      modelId: "constant_force",
+      guidedFlow: ["OBSERVE", "INTERACT", "MEASURE", "REFLECT"],
+      level: "FOUNDATION",
+      status: "DEFINED",
+      inputRefs: "Parameters sheet",
+      measurementRefs: "Measurements sheet",
+      safetyRef: `${experimentId}-SAFE`,
+    }],
+    modelContracts: [{
+      modelId: "constant_force",
+      domain: "PHYSICS",
+      requiredInputs: ["mass", "force", "dt"],
+      stateOutputs: ["position", "velocity", "acceleration"],
+      ruleOrEquation: "F=m*a",
+    }],
+    parameters: [
+      { experimentId, parameterId: `${experimentId}-P01`, parameterName: "primary_parameter", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
+      { experimentId, parameterId: `${experimentId}-P02`, parameterName: "secondary_parameter", defaultValue: 1, min: 0, max: 100, unit: "DOMAIN", learnerEditable: true },
+      { experimentId, parameterId: `${experimentId}-P03`, parameterName: "time_step", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+    ],
+    procedureSteps: [{ experimentId, stepNo: 1, stepType: "INTERACT", instruction: "Apply force", runtimeAction: "MODEL_DEFINED" }],
+    measurements: [
+      { measurementId: `${experimentId}-M01`, experimentId, measurementName: "Position", unit: "m", source: "position" },
+    ],
+    safety: [{ safetyId: `${experimentId}-SAFE`, experimentId, level: "LOW", hazards: "None", restrictions: "Standard lab rules" }],
+    materials: [],
+    outcomes: [{ experimentId, outcomeId: `${experimentId}-O01`, type: "OBSERVATION", condition: "step", expectedResult: "Motion changes" }],
+    curriculumMap: [{ curriculumId: "PHY-MEC", domain: "PHYSICS", level: "FOUNDATION", topics: ["Mechanics"], seedCount: 1 }],
+    mediaAssets: [],
+  };
+}
 
 test("catalog experiment launches through generic runtime without experiment-specific UI code", () => {
-  const workbook = readFileSync("/mnt/data/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx");
-  const catalog = loadStemLabCatalog(workbook);
+  const catalog = catalogFixture();
   const validation = validateStemLabCatalog(catalog);
   assert.equal(validation.valid, true);
 
@@ -41,8 +80,7 @@ test("catalog experiment launches through generic runtime without experiment-spe
 });
 
 test("a second Excel-defined experiment using the same registered model needs no new runtime implementation", () => {
-  const workbook = readFileSync("/mnt/data/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx");
-  const catalog = loadStemLabCatalog(workbook);
+  const catalog = catalogFixture();
   const validation = validateStemLabCatalog(catalog);
   assert.equal(validation.valid, true);
 
