@@ -82,11 +82,12 @@ test("validator allows completely unmapped seed experiments", () => {
   assert.ok(result.warnings.some((warning) => warning.code === "EXPERIMENT_MODEL_INPUTS_UNMAPPED"));
 });
 
-test("validator rejects missing semantic model-input mappings", () => {
+test("validator warns on incomplete semantic model-input mappings", () => {
   const catalog = validCatalog();
   catalog.parameters = catalog.parameters.filter((parameter) => parameter.modelInput !== "force");
   const result = validateStemLabCatalog(catalog);
-  assert.ok(result.errors.some((e) => e.code === "MODEL_INPUT_MAPPING_MISSING"));
+  assert.equal(result.valid, true);
+  assert.ok(result.warnings.some((e) => e.code === "MODEL_INPUT_MAPPING_INCOMPLETE"));
 });
 
 test("validator rejects duplicate semantic model-input mappings", () => {
