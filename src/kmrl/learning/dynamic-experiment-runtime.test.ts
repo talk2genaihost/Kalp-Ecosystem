@@ -127,3 +127,44 @@ test("a second Excel-defined experiment using the same registered model needs no
   assert.equal(result.tick, 1);
   assert.equal(result.modelId, "constant_force");
 });
+
+test("heating-water catalog experiment launches through the same generic runtime", () => {
+  const catalog = catalogFixture();
+  catalog.experiments[0] = {
+    ...catalog.experiments[0],
+    experimentId: "CHE-THM-001",
+    experimentName: "Heating Water",
+    domain: "CHEMISTRY",
+    modelType: "heating_water",
+    modelId: "heating_water",
+    safetyRef: "CHE-THM-001-SAFE",
+  };
+  catalog.modelContracts.push({
+    modelId: "heating_water",
+    domain: "CHEMISTRY",
+    requiredInputs: ["mass", "energy", "dt"],
+    stateOutputs: ["temperature"],
+    ruleOrEquation: "Q=m*c*dT",
+  });
+  catalog.parameters = [
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P01", parameterName: "primary_parameter", defaultValue: 1, min: 0.1, max: 100, unit: "kg", learnerEditable: true },
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P02", parameterName: "secondary_parameter", defaultValue: 1000, min: 1, max: 100000, unit: "J", learnerEditable: true },
+    { experimentId: "CHE-THM-001", parameterId: "CHE-THM-001-P03", parameterName: "time_step", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+  ];
+  catalog.procedureSteps = [{ experimentId: "CHE-THM-001", stepNo: 1, stepType: "INTERACT", instruction: "Apply heat", runtimeAction: "MODEL_DEFINED" }];
+  catalog.measurements = [{ measurementId: "CHE-THM-001-M01", experimentId: "CHE-THM-001", measurementName: "Temperature", unit: "degC", source: "temperature" }];
+  catalog.safety = [{ safetyId: "CHE-THM-001-SAFE", experimentId: "CHE-THM-001", level: "LOW", hazards: "Heat", restrictions: "Handle carefully" }];
+  catalog.outcomes = [{ experimentId: "CHE-THM-001", outcomeId: "CHE-THM-001-O01", type: "OBSERVATION", condition: "step", expectedResult: "Temperature increases" }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true);
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, "CHE-THM-001");
+
+  runtime.dispatch({ type: "START" });
+  runtime.dispatch({ type: "SET_PARAMETER", parameterId: "CHE-THM-001-P02", value: 4186 });
+  const result = runtime.dispatch({ type: "STEP" });
+  assert.equal(result.tick, 1);
+  const measured = runtime.dispatch({ type: "MEASURE" });
+  assert.equal(measured.measurements[0].id, "temperature");
+});
