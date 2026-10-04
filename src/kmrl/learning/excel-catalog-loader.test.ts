@@ -15,7 +15,11 @@ function workbookBytes(): Uint8Array {
     Input_Refs:"Parameters sheet",Measurement_Refs:"Measurements sheet",Safety_Ref:"PHY-MEC-001-SAFE"
   }]);
   add("MODEL_CONTRACTS", [{Model_ID:"constant_force",Domain:"PHYSICS",Required_Inputs:"mass, force, dt",State_Outputs:"position, velocity, acceleration",Rule_or_Equation:"F=m*a"}]);
-  add("PARAMETERS", [{Experiment_ID:"PHY-MEC-001",Parameter_ID:"P02",Parameter_Name:"Force",Model_Input:"force",Default:10,Min:0,Max:100,Unit:"N",Learner_Editable:"YES"}]);
+  add("PARAMETERS", [
+    {Experiment_ID:"PHY-MEC-001",Parameter_ID:"P01",Parameter_Name:"Mass",Model_Input:"mass",Default:1,Min:0.1,Max:100,Unit:"kg",Learner_Editable:"YES"},
+    {Experiment_ID:"PHY-MEC-001",Parameter_ID:"P02",Parameter_Name:"Force",Model_Input:"force",Default:10,Min:0,Max:100,Unit:"N",Learner_Editable:"YES"},
+    {Experiment_ID:"PHY-MEC-001",Parameter_ID:"P03",Parameter_Name:"Time Step",Model_Input:"dt",Default:0.1,Min:0.01,Max:1,Unit:"s",Learner_Editable:"YES"}
+  ]);
   add("PROCEDURE_STEPS", [{Experiment_ID:"PHY-MEC-001",Step_No:1,Step_Type:"OBSERVE",Instruction:"Observe motion",Runtime_Action:"Model/UI defined"}]);
   add("MEASUREMENTS", [{Measurement_ID:"M01",Experiment_ID:"PHY-MEC-001",Measurement_Name:"Velocity",Unit:"m/s",Source:"runtime state"}]);
   add("SAFETY", [{Safety_ID:"S01",Experiment_ID:"PHY-MEC-001",Level:"LOW",Hazards:"Simulation only",Restrictions:"No physical procedure"}]);
@@ -32,7 +36,7 @@ test("Excel loader reads the STEM catalog into typed runtime records", () => {
   assert.equal(catalog.experiments.length, 1);
   assert.deepEqual(catalog.experiments[0].guidedFlow, ["OBSERVE","INTERACT","MEASURE","REFLECT"]);
   assert.equal(catalog.parameters[0].defaultValue, 10);
-  assert.equal(catalog.parameters[0].modelInput, "force");
+  assert.equal(catalog.parameters.find((parameter) => parameter.parameterId === "P02")?.modelInput, "force");
   assert.equal(catalog.parameters[0].learnerEditable, true);
   assert.deepEqual(catalog.modelContracts[0].requiredInputs, ["mass","force","dt"]);
   assert.equal(catalog.procedureSteps[0].stepNo, 1);
