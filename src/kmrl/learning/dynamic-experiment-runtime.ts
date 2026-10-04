@@ -396,7 +396,7 @@ export class DynamicExperimentRuntime {
   constructor(definition: DynamicExperimentDefinition, context: DynamicExperimentModelContext = {}) {
     this.definition = definition;
     this.parameters = definition.parameters.map((parameter) => ({ ...parameter }));
-    this.model = createModelSession(definition, context);
+    this.model = createModelSession(definition);
   }
 
   getDefinition(): DynamicExperimentDefinition {
@@ -490,7 +490,7 @@ export function createDynamicExperimentRuntime(
   registry: KMRLModelRegistry,
   validation: CatalogValidationResult,
   experimentId: string,
-  context: DynamicExperimentModelContext = {},
+  _context: DynamicExperimentModelContext = {},
 ): DynamicExperimentRuntime {
   return new DynamicExperimentRuntime(
     buildDynamicExperimentDefinition(catalog, registry, validation, experimentId),
