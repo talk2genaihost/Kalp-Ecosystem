@@ -5,35 +5,53 @@ const KMRL_URL = process.env.KMRL_SANDBOX_URL || "http://127.0.0.1:4173/apps/kmr
 test.setTimeout(60000);
 
 test("KMRL MainSandbox browser validation", async ({ page }) => {
+  const pageErrors = [];
+  const consoleErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(String(error)));
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
   await page.goto(KMRL_URL, { waitUntil: "networkidle" });
 
   await expect(page).toHaveTitle("KMRL Main Sandbox");
-  await expect(page.locator('[data-kmrl="main-sandbox"]')).toBeVisible();
-  await expect(page.locator("h1")).toHaveText("Main Sandbox");
-  await expect(page.locator("text=physics-constant-force")).toBeVisible();
+  await expect(page.locator('[data-kmrl="dynamic-experiment"]')).toHaveCount(0);
+
+  const startupAlert = page.locator('[role="alert"]');
+  if (await startupAlert.count()) {
+    throw new Error(`Science Sandbox startup failed: ${await startupAlert.first().innerText()}`);
+  }
+
+  if (pageErrors.length || consoleErrors.length) {
+    throw new Error(
+      `Science Sandbox browser startup errors. pageerror=${JSON.stringify(pageErrors)} console=${JSON.stringify(consoleErrors)} body=${JSON.stringify(await page.locator("body").innerText())}`,
+    );
+  }
+
+  await expect(page.locator(".kmrl-experiment-library")).toBeVisible();
+  await expect(page.locator("h1")).toHaveText("Science Sandbox");
+  const constantForceCard = page.locator('[data-domain="physics"]').filter({ hasText: "Constant Force Motion" }).first();
+  await expect(constantForceCard).toBeVisible();
+  await constantForceCard.locator('[data-action="start-experiment"]').click();
+
+  await expect(page.locator('[data-kmrl="dynamic-experiment"]')).toBeVisible();
+  await expect(page.locator("h1")).toHaveText("Constant Force Motion");
   await expect(page.locator('[data-action="start"]')).toBeEnabled();
 
   await page.locator('[data-action="start"]').click();
   await expect(page.locator(".status-running")).toBeVisible();
-
-  await expect(page.locator('[data-action="step"]')).toBeEnabled();
-  await page.locator('[data-force]').fill("2");
   await page.locator('[data-action="step"]').click();
-  await expect(page.locator("text=0.2 m/s")).toBeVisible();
-
+  await expect(page.locator("text=Tick 1")).toBeVisible();
   await page.locator('[data-action="measure"]').click();
-  await expect(page.locator(".kmrl-measurement")).toBeVisible();
-
+  await expect(page.locator(".kmrl-dynamic-measurement")).toHaveCount(3);
+  await expect(page.getByText("Position 0.005 m")).toBeVisible();
+  await expect(page.getByText("Velocity 0.1 m/s")).toBeVisible();
+  await expect(page.getByText("Acceleration 1 m/s2")).toBeVisible();
   await page.locator('[data-action="pause"]').click();
   await expect(page.locator(".status-paused")).toBeVisible();
-
   await page.locator('[data-action="reset"]').click();
   await expect(page.locator(".status-created")).toBeVisible();
-
-  await page.locator('[data-action="open-library"]').click();
+  await page.locator('[data-action="back"]').click();
   await expect(page.locator(".kmrl-experiment-library")).toBeVisible();
-  await expect(page.locator("text=Experiment Library")).toBeVisible();
-
-  await page.locator('button', { hasText: "Start Experiment" }).first().click();
-  await expect(page.locator('[data-kmrl="main-sandbox"]')).toBeVisible();
+  await expect(page.locator("text=Science Sandbox")).toBeVisible();
 });

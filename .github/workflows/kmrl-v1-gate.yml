@@ -2,7 +2,7 @@ name: KMRL v1.0 Integration Gate
 
 on:
   push:
-    branches: [feature/kmrl-migration-v1]
+    branches: [feature/kmrl-migration-v1, feature/kmrl-reaction-definition-source]
   pull_request:
     branches: [feature/kmral-active-impl, main]
   workflow_dispatch:
@@ -22,6 +22,21 @@ jobs:
 
       - name: KMRL scoped TypeScript build
         run: set -o pipefail; npm run build:kmrl 2>&1 | tee kmrl-build.log
+
+      - name: KMRL browser asset preflight
+        run: |
+          set -euo pipefail
+          test -f dist/kmrl/app/main-sandbox-app.js
+          test -f apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
+          python3 -m http.server 4173 >/tmp/kmrl-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 1
+          curl --fail --silent --show-error --head http://127.0.0.1:4173/apps/kmrl-sandbox/index.html
+          curl --fail --silent --show-error --head http://127.0.0.1:4173/dist/kmrl/app/main-sandbox-app.js
+          curl --fail --silent --show-error --head http://127.0.0.1:4173/apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
+          kill $SERVER_PID
+          trap - EXIT
 
       - name: KMRL MainSandbox browser validation
         run: |
