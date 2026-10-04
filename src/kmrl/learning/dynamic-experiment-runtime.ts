@@ -1,6 +1,7 @@
 import { quantity, type Quantity } from "../simulation/v1-a/quantity.js";
 import { ConstantForceExperimentAdapter } from "./constant-force-adapter.js";
 import { HeatingWaterExperimentAdapter } from "./heating-water-adapter.js";
+import { FreeFallExperimentAdapter } from "./free-fall-adapter.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
@@ -103,6 +104,28 @@ function createModelSession(
       step(dt) {
         const force = mappedParameter(definition.parameters, "force");
         adapter.applyConstantForce(quantity(Number(force.value), "N"));
+        adapter.step(dt);
+      },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id,
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
+  }
+
+  if (modelId === "free_fall") {
+    const adapter = new FreeFallExperimentAdapter();
+    return {
+      setInput(name, value) {
+        if (name === "gravity") adapter.setGravity(quantity(Number(value), "m/s2"));
+      },
+      step(dt) {
+        const gravity = mappedParameter(definition.parameters, "gravity");
+        adapter.setGravity(quantity(Number(gravity.value), "m/s2"));
         adapter.step(dt);
       },
       measure() {
