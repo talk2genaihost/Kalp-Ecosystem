@@ -5,6 +5,7 @@ on:
     branches:
       - feature/kmrl-migration-v1
       - feature/kmral-active-impl
+      - feature/kmral-excel-loader
   workflow_dispatch:
 
 jobs:
