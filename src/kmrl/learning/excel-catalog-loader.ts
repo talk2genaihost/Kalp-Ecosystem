@@ -145,7 +145,7 @@ function rows(workbook: WorkBook, sheetName: string): Record<string, Cell>[] {
 }
 
 function requireColumns(sheetName: string, sheet: WorkSheet, required: string[]): void {
-  const headerRows = utils.sheet_to_json<Record<string, Cell>>(sheet, { header: 1, defval: "" }) as Cell[][];
+  const headerRows = utils.sheet_to_json(sheet, { header: 1, defval: "" }) as unknown as Cell[][];
   const headers = new Set((headerRows[0] ?? []).map((value) => text(value)));
   const missing = required.filter((column) => !headers.has(column));
   if (missing.length) throw new Error(`Sheet ${sheetName} is missing columns: ${missing.join(", ")}`);
