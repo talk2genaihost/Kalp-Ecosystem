@@ -20,6 +20,7 @@ export interface ModelRegistryEntry {
 const BUILTIN_IMPLEMENTATIONS: Readonly<Record<string, string>> = {
   constant_force: "ConstantForceExperimentAdapter",
   heating_water: "HeatingWaterExperimentAdapter",
+  free_fall: "FreeFallExperimentAdapter",
   registered_reaction: "MixMaterialsExperimentAdapter",
 };
 
