@@ -4,6 +4,7 @@ import { HeatingWaterExperimentAdapter } from "./heating-water-adapter.js";
 import { FreeFallExperimentAdapter } from "./free-fall-adapter.js";
 import { ProjectileMotionExperimentAdapter } from "./projectile-motion-adapter.js";
 import { SpringMassExperimentAdapter } from "./spring-mass-adapter.js";
+import { PendulumExperimentAdapter } from "./pendulum-adapter.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
@@ -173,6 +174,29 @@ function createModelSession(
     });
     return {
       setInput() {},
+      step(dt) { adapter.step(dt); },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id,
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
+  }
+
+  if (modelId === "pendulum") {
+    const length = numericMappedParameter(definition.parameters, "length");
+    const gravity = numericMappedParameter(definition.parameters, "gravity");
+    const adapter = new PendulumExperimentAdapter({
+      lengthM: quantity(length, "m"),
+      gravityMps2: gravity,
+    });
+    return {
+      setInput(name, value) {
+        if (name === "gravity") adapter.setGravity(quantity(Number(value), "m/s2"));
+      },
       step(dt) { adapter.step(dt); },
       measure() {
         return adapter.measure().map((item) => ({
