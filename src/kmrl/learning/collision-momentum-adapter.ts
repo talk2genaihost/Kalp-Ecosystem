@@ -8,10 +8,10 @@ export interface CollisionMomentumInputs {
 }
 
 export class CollisionMomentumExperimentAdapter {
-  private mass1Kg: number;
-  private mass2Kg: number;
-  private velocity1Mps: number;
-  private velocity2Mps: number;
+  private mass1Kg = 0;
+  private mass2Kg = 0;
+  private velocity1Mps = 0;
+  private velocity2Mps = 0;
 
   constructor(inputs: CollisionMomentumInputs) {
     this.setInputs(inputs);
