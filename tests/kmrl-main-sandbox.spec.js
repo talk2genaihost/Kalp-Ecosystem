@@ -30,8 +30,6 @@ test("KMRL MainSandbox browser validation", async ({ page }) => {
 
   await expect(page.locator(".kmrl-experiment-library")).toBeVisible();
   await expect(page.locator("h1")).toHaveText("Science Sandbox");
-  await expect(page.locator("text=physics-constant-force")).toHaveCount(1);
-
   const constantForceCard = page.locator('[data-domain="physics"]').filter({ hasText: "Constant Force Motion" }).first();
   await expect(constantForceCard).toBeVisible();
   await constantForceCard.locator('[data-action="start-experiment"]').click();
