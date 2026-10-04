@@ -2,7 +2,7 @@ name: KMRL v1.0 Integration Gate
 
 on:
   push:
-    branches: [feature/kmrl-migration-v1]
+    branches: [feature/kmrl-migration-v1, feature/kmrl-reaction-definition-source]
   pull_request:
     branches: [feature/kmral-active-impl, main]
   workflow_dispatch:
