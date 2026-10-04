@@ -7,6 +7,7 @@ import { SpringMassExperimentAdapter } from "./spring-mass-adapter.js";
 import { PendulumExperimentAdapter } from "./pendulum-adapter.js";
 import { InclineFrictionExperimentAdapter, WorkEnergyExperimentAdapter, PowerExperimentAdapter, CircularMotionExperimentAdapter, ThermalExpansionExperimentAdapter } from "./physics-calculation-adapters.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
+import { CollisionMomentumExperimentAdapter } from "./collision-momentum-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
 import type { CatalogValidationResult } from "./excel-catalog-validator.js";
@@ -306,6 +307,39 @@ function createModelSession(
         adapter.applyHeatEnergy(quantity(Number(heat.value), "J"));
         adapter.step(dt);
       },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id,
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
+  }
+
+  if (modelId === "collision_momentum") {
+    const adapter = new CollisionMomentumExperimentAdapter({
+      mass1Kg: numericMappedParameter(definition.parameters, "m1"),
+      mass2Kg: numericMappedParameter(definition.parameters, "m2"),
+      velocity1Mps: numericMappedParameter(definition.parameters, "v1"),
+      velocity2Mps: numericMappedParameter(definition.parameters, "v2"),
+    });
+    return {
+      setInput(name, value) {
+        const current = {
+          mass1Kg: numericMappedParameter(definition.parameters, "m1"),
+          mass2Kg: numericMappedParameter(definition.parameters, "m2"),
+          velocity1Mps: numericMappedParameter(definition.parameters, "v1"),
+          velocity2Mps: numericMappedParameter(definition.parameters, "v2"),
+        };
+        if (name === "m1") current.mass1Kg = Number(value);
+        if (name === "m2") current.mass2Kg = Number(value);
+        if (name === "v1") current.velocity1Mps = Number(value);
+        if (name === "v2") current.velocity2Mps = Number(value);
+        adapter.setInputs(current);
+      },
+      step(dt) { adapter.step(dt); },
       measure() {
         return adapter.measure().map((item) => ({
           id: item.id,
