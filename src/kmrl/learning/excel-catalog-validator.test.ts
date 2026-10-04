@@ -23,7 +23,11 @@ function validCatalog(): StemLabCatalog {
     procedureSteps: [{experimentId:"PHY-MEC-001",stepNo:1,stepType:"OBSERVE",instruction:"Observe motion",runtimeAction:"Model/UI defined"}],
     measurements: [{measurementId:"M01",experimentId:"PHY-MEC-001",measurementName:"Velocity",unit:"m/s",source:"runtime state"}],
     safety: [{safetyId:"S01",experimentId:"PHY-MEC-001",level:"LOW",hazards:"Simulation only",restrictions:"No physical procedure"}],
-    materials: [{materialId:"MAT-H2O",materialName:"Water",domain:"CHEMISTRY",unit:"kg",state:"liquid",keyProperties:["specific_heat","density"]}],
+    materials: [
+      {materialId:"MAT-H2O",materialName:"Water",domain:"CHEMISTRY",unit:"kg",state:"liquid",keyProperties:["specific_heat","density"]},
+      {materialId:"MAT-A",materialName:"Material A",domain:"CHEMISTRY",unit:"mol",state:"aqueous",keyProperties:[]},
+      {materialId:"MAT-B",materialName:"Material B",domain:"CHEMISTRY",unit:"mol",state:"aqueous",keyProperties:[]}
+    ],
     outcomes: [{experimentId:"PHY-MEC-001",outcomeId:"O01",type:"EXPECTED",condition:"valid parameter range",expectedResult:"Model-defined result"}],
     curriculumMap: [{curriculumId:"PHYSICS-FOUNDATION",domain:"PHYSICS",level:"FOUNDATION",topics:["Mechanics"],seedCount:1}],
     mediaAssets: [{mediaId:"MEDIA-01",experimentId:"PHY-MEC-001",assetType:"diagram",assetKey:"PHY-MEC-001_diagram",required:false}]
