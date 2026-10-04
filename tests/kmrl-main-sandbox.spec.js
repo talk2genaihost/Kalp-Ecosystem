@@ -43,7 +43,10 @@ test("KMRL MainSandbox browser validation", async ({ page }) => {
   await page.locator('[data-action="step"]').click();
   await expect(page.locator("text=Tick 1")).toBeVisible();
   await page.locator('[data-action="measure"]').click();
-  await expect(page.locator(".kmrl-dynamic-measurement")).toBeVisible();
+  await expect(page.locator(".kmrl-dynamic-measurement")).toHaveCount(3);
+  await expect(page.getByText("Position 0.005 m")).toBeVisible();
+  await expect(page.getByText("Velocity 0.1 m/s")).toBeVisible();
+  await expect(page.getByText("Acceleration 1 m/s2")).toBeVisible();
   await page.locator('[data-action="pause"]').click();
   await expect(page.locator(".status-paused")).toBeVisible();
   await page.locator('[data-action="reset"]').click();
