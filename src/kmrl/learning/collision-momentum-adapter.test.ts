@@ -58,3 +58,24 @@ test("collision momentum adapter accepts runtime timestep quantity", () => {
   });
   assert.doesNotThrow(() => adapter.step(quantity(0.1, "s")));
 });
+
+test("collision momentum adapter reset restores constructor inputs", () => {
+  const adapter = new CollisionMomentumExperimentAdapter({
+    mass1Kg: 1,
+    mass2Kg: 1,
+    velocity1Mps: 2,
+    velocity2Mps: -1,
+  });
+
+  adapter.setInputs({
+    mass1Kg: 2,
+    mass2Kg: 1,
+    velocity1Mps: 3,
+    velocity2Mps: -1,
+  });
+  adapter.reset();
+
+  const measurements = adapter.measure();
+  assert.equal(measurements.find((item) => item.id === "final_velocity_1")?.quantity.value, -1);
+  assert.equal(measurements.find((item) => item.id === "final_velocity_2")?.quantity.value, 2);
+});
