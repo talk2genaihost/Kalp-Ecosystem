@@ -1,4 +1,4 @@
-import * as XLSX from "xlsx";
+// Governed one-time synchronization helper for the approved PHY-MEC-007 contract.\nimport * as XLSX from "xlsx";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const path = "apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
