@@ -9,6 +9,10 @@ test("KMRL MainSandbox browser validation", async ({ page }) => {
 
   await expect(page).toHaveTitle("KMRL Main Sandbox");
   await expect(page.locator('[data-kmrl="dynamic-experiment"]')).toHaveCount(0);
+  const startupAlert = page.locator('[role="alert"]');
+  if (await startupAlert.count()) {
+    throw new Error(`Science Sandbox startup failed: ${await startupAlert.first().innerText()}`);
+  }
   await expect(page.locator(".kmrl-experiment-library")).toBeVisible();
   await expect(page.locator("h1")).toHaveText("Science Sandbox");
   await expect(page.locator("text=physics-constant-force")).toHaveCount(1);
