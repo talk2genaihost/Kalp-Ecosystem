@@ -1,6 +1,7 @@
 import { quantity, type Quantity } from "../simulation/v1-a/quantity.js";
 import { ConstantForceExperimentAdapter } from "./constant-force-adapter.js";
 import { HeatingWaterExperimentAdapter } from "./heating-water-adapter.js";
+import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
 import type { CatalogValidationResult } from "./excel-catalog-validator.js";
@@ -147,7 +148,22 @@ function createModelSession(
     if (!context.reaction || !context.initialMaterials) {
       throw new Error("registered_reaction requires reaction and initialMaterials model context");
     }
-    throw new Error("registered_reaction dynamic binding is reserved until reaction configuration is catalog-backed");
+    const adapter = new MixMaterialsExperimentAdapter({
+      initialMaterials: context.initialMaterials,
+      reaction: context.reaction,
+    });
+    return {
+      setInput() {},
+      step(dt) { adapter.step(dt); },
+      measure() {
+        return adapter.measure().map((item) => ({
+          id: item.id + (item.materialId ? `:${item.materialId}` : ""),
+          label: item.label,
+          quantity: item.quantity,
+        }));
+      },
+      reset() { adapter.reset(); },
+    };
   }
 
   throw new Error(`No dynamic model executor is registered for model "${modelId}"`);
