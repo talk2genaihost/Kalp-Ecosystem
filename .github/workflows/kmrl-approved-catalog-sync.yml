@@ -42,10 +42,6 @@ jobs:
         if: steps.sync.outcome == 'success'
         run: |
           set -euo pipefail
-          if git diff --quiet -- apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx; then
-            echo "Catalog unchanged after governed synchronization"
-            exit 0
-          fi
           mkdir -p docs/kmrl
           base64 -w0 apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx > docs/kmrl/PHY_MEC_007_CATALOG_BASE64.txt
           git config user.name "github-actions[bot]"
