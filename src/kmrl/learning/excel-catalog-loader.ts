@@ -168,7 +168,7 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
     "Model_ID","Domain","Required_Inputs","State_Outputs","Rule_or_Equation"
   ]);
   requireColumns(SHEETS.parameters, workbook.Sheets[SHEETS.parameters], [
-    "Experiment_ID","Parameter_ID","Parameter_Name","Model_Input","Default","Min","Max","Unit","Learner_Editable"
+    "Experiment_ID","Parameter_ID","Parameter_Name","Default","Min","Max","Unit","Learner_Editable"
   ]);
   requireColumns(SHEETS.procedureSteps, workbook.Sheets[SHEETS.procedureSteps], [
     "Experiment_ID","Step_No","Step_Type","Instruction","Runtime_Action"
