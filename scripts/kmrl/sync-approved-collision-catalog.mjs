@@ -11,30 +11,33 @@ const ensureSheet = (name, headers) => {
   return workbook.Sheets[name];
 };
 
-const upsertRows = (sheetName, keyColumn, rows) => {
+const upsertRows = (sheetName, keyColumn, rowsToUpsert) => {
   const sheet = workbook.Sheets[sheetName];
-  const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-  const headers = data[0] ?? [];
-  const keyIndex = headers.indexOf(keyColumn);
-  if (keyIndex < 0) throw new Error(`Sheet ${sheetName} is missing key column ${keyColumn}`);
-  const indexByKey = new Map();
-  for (let i = 1; i < data.length; i++) {
-    const key = String(data[i]?.[keyIndex] ?? "").trim();
-    if (key) indexByKey.set(key, i);
-  }
-  for (const row of rows) {
-    const key = String(row[keyColumn] ?? "").trim();
-    if (!key) throw new Error(`Missing ${keyColumn} in ${sheetName} synchronization row`);
-    const values = headers.map((header) => row[header] ?? "");
-    const existingIndex = indexByKey.get(key);
-    if (existingIndex === undefined) {
-      data.push(values);
-      indexByKey.set(key, data.length - 1);
-    } else {
-      data[existingIndex] = values;
+  const existing = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const existingHeaders = (XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })[0] ?? []).map(String);
+  const headers = [...existingHeaders];
+  for (const row of rowsToUpsert) {
+    for (const key of Object.keys(row)) {
+      if (!headers.includes(key)) headers.push(key);
     }
   }
-  workbook.Sheets[sheetName] = XLSX.utils.aoa_to_sheet(data);
+  const indexByKey = new Map();
+  existing.forEach((row, index) => {
+    const key = String(row[keyColumn] ?? "").trim();
+    if (key) indexByKey.set(key, index);
+  });
+  for (const row of rowsToUpsert) {
+    const key = String(row[keyColumn] ?? "").trim();
+    if (!key) throw new Error(`Missing ${keyColumn} in ${sheetName} synchronization row`);
+    const existingIndex = indexByKey.get(key);
+    if (existingIndex === undefined) {
+      existing.push({ ...row });
+      indexByKey.set(key, existing.length - 1);
+    } else {
+      existing[existingIndex] = { ...existing[existingIndex], ...row };
+    }
+  }
+  workbook.Sheets[sheetName] = XLSX.utils.json_to_sheet(existing, { header: headers });
 };
 
 ensureSheet("EXPERIMENT_CATALOG", ["Experiment_ID","Domain","Experiment_Name","Category","Model_Type","Model_ID","Guided_Flow","Level","Status","Input_Refs","Measurement_Refs","Safety_Ref"]);
