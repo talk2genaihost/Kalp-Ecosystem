@@ -1,0 +1,2 @@
+Reaction_ID,Experiment_ID,Reaction_Name,Reactants,Products,Conditions,Status
+RXN-CHE-MIX-002-001,CHE-MIX-002,Hydrochloric Acid + Sodium Hydroxide Neutralization,"MAT-HCL:1,MAT-NAOH:1","MAT-NACL:1,MAT-H2O:1",,CANONICAL
