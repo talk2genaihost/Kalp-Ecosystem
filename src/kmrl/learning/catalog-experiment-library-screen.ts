@@ -32,7 +32,16 @@ export class CatalogExperimentLibraryScreen {
       const experiments = this.options.catalog.experiments.filter((item) => item.domain === domain);
       const cards = experiments.map((experiment) => {
         const model = this.options.registry.get(experiment.modelId);
-        const executable = model?.status === "EXECUTABLE";
+        const mappedInputs = new Set(
+          this.options.catalog.parameters
+            .filter((parameter) => parameter.experimentId === experiment.experimentId && parameter.modelInput.trim())
+            .map((parameter) => parameter.modelInput),
+        );
+        const declaredInputs = (model?.contract.requiredInputs ?? []).filter(
+          (input) => input.trim() && input.toLowerCase() !== "model inputs",
+        );
+        const semanticContractReady = declaredInputs.every((input) => mappedInputs.has(input));
+        const executable = model?.status === "EXECUTABLE" && semanticContractReady;
         return `
           <article class="kmrl-experiment-card" data-domain="${domain.toLowerCase()}">
             <div class="kmrl-experiment-card__domain">${escapeHtml(domain)}</div>
