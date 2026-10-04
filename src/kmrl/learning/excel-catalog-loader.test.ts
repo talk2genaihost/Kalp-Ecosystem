@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { utils, write } from "xlsx";
+import { read, utils, write } from "xlsx";
 import { loadStemLabCatalog } from "./excel-catalog-loader.js";
 
 function workbookBytes(): Uint8Array {
@@ -53,4 +53,12 @@ test("Excel loader rejects missing required columns", () => {
     () => loadStemLabCatalog(write(workbook, {type:"buffer",bookType:"xlsx"})),
     /Sheet EXPERIMENT_CATALOG is missing columns: Domain/
   );
+});
+
+test("Excel loader preserves executable mappings for the legacy catalog without Model_Input", () => {
+  const workbook = read(workbookBytes(), { type: "buffer" });
+  const rows = utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets.PARAMETERS], { defval: "" });
+  workbook.Sheets.PARAMETERS = utils.json_to_sheet(rows.map(({ Model_Input: _ignored, ...row }) => row));
+  const catalog = loadStemLabCatalog(write(workbook, { type: "buffer", bookType: "xlsx" }));
+  assert.equal(catalog.parameters[0].modelInput, "force");
 });
