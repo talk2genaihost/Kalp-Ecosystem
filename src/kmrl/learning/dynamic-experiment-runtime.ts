@@ -22,6 +22,7 @@ export type DynamicExperimentAction =
 export interface DynamicExperimentParameter {
   readonly parameterId: string;
   readonly parameterName: string;
+  readonly modelInput: string;
   readonly value: number | string;
   readonly min: number | string;
   readonly max: number | string;
@@ -67,27 +68,23 @@ interface DynamicModelSession {
   reset(): void;
 }
 
-function numericParameter(
+function mappedParameter(
   parameters: readonly DynamicExperimentParameter[],
-  name: string,
-  fallbackIndex: number,
-): number {
-  const exact = parameters.find((parameter) => parameter.parameterName.toLowerCase() === name.toLowerCase());
-  const fallback = parameters[fallbackIndex];
-  const value = exact?.value ?? fallback?.value;
-  const parsed = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(parsed)) throw new Error(`Parameter "${name}" must be numeric`);
-  return parsed;
+  modelInput: string,
+): DynamicExperimentParameter {
+  const parameter = parameters.find((item) => item.modelInput === modelInput);
+  if (!parameter) throw new Error(`Required model input "${modelInput}" is not mapped`);
+  return parameter;
 }
 
-function parameterByName(
+function numericMappedParameter(
   parameters: readonly DynamicExperimentParameter[],
-  name: string,
-  fallbackIndex: number,
-): DynamicExperimentParameter {
-  return parameters.find((parameter) => parameter.parameterName.toLowerCase() === name.toLowerCase())
-    ?? parameters[fallbackIndex]
-    ?? (() => { throw new Error(`Required parameter "${name}" is missing`); })();
+  modelInput: string,
+): number {
+  const parameter = mappedParameter(parameters, modelInput);
+  const value = typeof parameter.value === "number" ? parameter.value : Number(parameter.value);
+  if (!Number.isFinite(value)) throw new Error(`Model input "${modelInput}" must be numeric`);
+  return value;
 }
 
 function createModelSession(
@@ -97,14 +94,14 @@ function createModelSession(
   const modelId = definition.model.modelId;
 
   if (modelId === "constant_force") {
-    const mass = numericParameter(definition.parameters, "mass", 0);
+    const mass = numericMappedParameter(definition.parameters, "mass");
     const adapter = new ConstantForceExperimentAdapter({ massKg: quantity(mass, "kg") });
     return {
       setInput(name, value) {
         if (name === "force") adapter.applyConstantForce(quantity(Number(value), "N"));
       },
       step(dt) {
-        const force = parameterByName(definition.parameters, "force", 1);
+        const force = mappedParameter(definition.parameters, "force");
         adapter.applyConstantForce(quantity(Number(force.value), "N"));
         adapter.step(dt);
       },
@@ -129,7 +126,7 @@ function createModelSession(
         }
       },
       step(dt) {
-        const heat = parameterByName(definition.parameters, "energy", 1);
+        const heat = mappedParameter(definition.parameters, "energy");
         adapter.applyHeatEnergy(quantity(Number(heat.value), "J"));
         adapter.step(dt);
       },
@@ -192,6 +189,7 @@ export function buildDynamicExperimentDefinition(
     .map((item) => ({
       parameterId: item.parameterId,
       parameterName: item.parameterName,
+      modelInput: item.modelInput,
       value: item.defaultValue,
       min: item.min,
       max: item.max,
@@ -279,7 +277,7 @@ export class DynamicExperimentRuntime {
       }
       case "STEP": {
         this.require(this.status === "RUNNING", "STEP requires RUNNING state");
-        const timeStep = parameterByName(this.parameters, "time_step", 2);
+        const timeStep = mappedParameter(this.parameters, "dt");
         const dt = Number(timeStep.value);
         this.require(Number.isFinite(dt) && dt > 0, "time_step must be positive");
         this.model.step(quantity(dt, "s"));
