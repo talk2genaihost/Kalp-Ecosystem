@@ -55,3 +55,41 @@ test("KMRL MainSandbox browser validation", async ({ page }) => {
   await expect(page.locator(".kmrl-experiment-library")).toBeVisible();
   await expect(page.locator("text=Science Sandbox")).toBeVisible();
 });
+
+
+test("KMRL PHY-MEC-007 approved collision browser flow", async ({ page }) => {
+  const pageErrors = [];
+  const consoleErrors = [];
+  page.on("pageerror", (error) => pageErrors.push(String(error)));
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text());
+  });
+
+  await page.goto(KMRL_URL, { waitUntil: "networkidle" });
+  const collisionCard = page.locator('article[data-domain="physics"]').filter({ hasText: "Conservation of Momentum" }).first();
+  await expect(collisionCard).toBeVisible();
+  const launch = collisionCard.locator('[data-action="start-experiment"]');
+  await expect(launch).toBeEnabled();
+  await launch.click();
+
+  await expect(page.locator('[data-kmrl="dynamic-experiment"]')).toBeVisible();
+  await expect(page.locator("h1")).toHaveText("Conservation of Momentum");
+  await page.locator('[data-action="start"]').click();
+  await page.locator('[data-action="step"]').click();
+  await page.locator('[data-action="measure"]').click();
+
+  await expect(page.getByText("Final Velocity 1")).toBeVisible();
+  await expect(page.getByText("Final Velocity 2")).toBeVisible();
+  await expect(page.getByText("Momentum", { exact: true })).toBeVisible();
+  await expect(page.getByText("Kinetic Energy")).toBeVisible();
+  await expect(page.getByText("-1 m/s")).toBeVisible();
+  await expect(page.getByText("2 m/s", { exact: true })).toBeVisible();
+  await expect(page.getByText("1 kg*m/s")).toBeVisible();
+  await expect(page.getByText("2.5 J")).toBeVisible();
+
+  if (pageErrors.length || consoleErrors.length) {
+    throw new Error(
+      `Collision browser errors. pageerror=${JSON.stringify(pageErrors)} console=${JSON.stringify(consoleErrors)}`,
+    );
+  }
+});

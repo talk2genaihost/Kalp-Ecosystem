@@ -1,6 +1,6 @@
 export type QuantityType =
   | "DIMENSIONLESS" | "LENGTH" | "MASS" | "TIME" | "FORCE"
-  | "ENERGY" | "SPEED" | "ACCELERATION" | "AMOUNT" | "TEMPERATURE";
+  | "ENERGY" | "MOMENTUM" | "SPEED" | "ACCELERATION" | "AMOUNT" | "TEMPERATURE";
 
 export interface UnitDefinition {
   id: string;
@@ -21,6 +21,7 @@ const units: Record<string, UnitDefinition> = {
   "s": {id:"second", symbol:"s", quantity:"TIME", scaleToBase:1},
   "N": {id:"newton", symbol:"N", quantity:"FORCE", scaleToBase:1},
   "J": {id:"joule", symbol:"J", quantity:"ENERGY", scaleToBase:1},
+  "kg*m/s": {id:"kilogram-meter-per-second", symbol:"kg*m/s", quantity:"MOMENTUM", scaleToBase:1},
   "m/s": {id:"meter-per-second", symbol:"m/s", quantity:"SPEED", scaleToBase:1},
   "m/s2": {id:"meter-per-second-squared", symbol:"m/s2", quantity:"ACCELERATION", scaleToBase:1},
   "mol": {id:"mole", symbol:"mol", quantity:"AMOUNT", scaleToBase:1},

@@ -1,0 +1,11 @@
+PHY-MEC-007 approved catalog verification: PASS
+catalog: apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
+verification: post-synchronization workbook validation
+checks: 7
+result: all approved PHY-MEC-007 contract fields and Excel parameter mappings match the governed values
+approved mappings: P01->m1, P02->m2, P03->v1, P04->v2, P05->dt
+approved model inputs: m1, m2, v1, v2, dt
+procedure-step integrity: PHY-MEC-007 Step 1 is unique
+catalog blob sha: ca74e2f07fd0d456cafee1e81ff5421e7b167329
+catalog size bytes: 209689
+workflow evidence: KMRL Approved Catalog Synchronization run 19 (37237799731), post-synchronization verification step PASS

@@ -1,0 +1,127 @@
+// Governed one-time synchronization helper for the approved PHY-MEC-007 contract.
+import * as XLSX from "xlsx";
+import { readFileSync, writeFileSync } from "node:fs";
+
+const path = "apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
+const workbook = XLSX.read(readFileSync(path));
+
+const ensureSheet = (name, headers) => {
+  if (!workbook.SheetNames.includes(name)) {
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([headers]), name);
+  }
+  return workbook.Sheets[name];
+};
+
+const upsertRows = (sheetName, keyColumn, rowsToUpsert) => {
+  const sheet = workbook.Sheets[sheetName];
+  let existing = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const keyOf = (row) => Array.isArray(keyColumn)
+    ? keyColumn.map((column) => String(row[column] ?? "").trim()).join("::")
+    : String(row[keyColumn] ?? "").trim();
+  const existingHeaders = (XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })[0] ?? []).map(String);
+  const headers = [...existingHeaders];
+  for (const row of rowsToUpsert) {
+    for (const key of Object.keys(row)) {
+      if (!headers.includes(key)) headers.push(key);
+    }
+  }
+  const indexByKey = new Map();
+  existing.forEach((row, index) => {
+    const key = keyOf(row);
+    if (key) indexByKey.set(key, index);
+  });
+  for (const row of rowsToUpsert) {
+    const key = keyOf(row);
+    if (!key) throw new Error(`Missing ${Array.isArray(keyColumn) ? keyColumn.join(",") : keyColumn} in ${sheetName} synchronization row`);
+    const existingIndex = indexByKey.get(key);
+    if (existingIndex === undefined) {
+      existing.push({ ...row });
+      indexByKey.set(key, existing.length - 1);
+    } else {
+      existing[existingIndex] = { ...existing[existingIndex], ...row };
+    }
+  }
+  workbook.Sheets[sheetName] = XLSX.utils.json_to_sheet(existing, { header: headers });
+};
+
+ensureSheet("EXPERIMENT_CATALOG", ["Experiment_ID","Domain","Experiment_Name","Category","Model_Type","Model_ID","Guided_Flow","Level","Status","Input_Refs","Measurement_Refs","Safety_Ref"]);
+ensureSheet("MODEL_CONTRACTS", ["Model_ID","Domain","Required_Inputs","State_Outputs","Rule_or_Equation"]);
+ensureSheet("PARAMETERS", ["Experiment_ID","Parameter_ID","Parameter_Name","Default","Min","Max","Unit","Learner_Editable","Model_Input"]);
+ensureSheet("PROCEDURE_STEPS", ["Experiment_ID","Step_No","Step_Type","Instruction","Runtime_Action"]);
+ensureSheet("MEASUREMENTS", ["Measurement_ID","Experiment_ID","Measurement_Name","Unit","Source"]);
+ensureSheet("SAFETY", ["Safety_ID","Experiment_ID","Level","Hazards","Restrictions"]);
+ensureSheet("MATERIALS", ["Material_ID","Material_Name","Domain","Unit","State","Key_Properties"]);
+ensureSheet("OUTCOMES", ["Experiment_ID","Outcome_ID","Type","Condition","Expected_Result"]);
+ensureSheet("CURRICULUM_MAP", ["Curriculum_ID","Domain","Level","Topics","Seed_Count"]);
+ensureSheet("MEDIA_ASSETS", ["Media_ID","Experiment_ID","Asset_Type","Asset_Key","Required"]);
+
+upsertRows("EXPERIMENT_CATALOG", "Experiment_ID", [{
+  Experiment_ID:"PHY-MEC-007", Domain:"PHYSICS", Experiment_Name:"Conservation of Momentum",
+  Category:"Mechanics", Model_Type:"collision_momentum", Model_ID:"collision_momentum",
+  Guided_Flow:"OBSERVE → INTERACT → MEASURE → REFLECT", Level:"FOUNDATION", Status:"DEFINED",
+  Input_Refs:"Parameters sheet", Measurement_Refs:"Measurements sheet", Safety_Ref:"PHY-MEC-007-SAFE"
+}]);
+
+upsertRows("MODEL_CONTRACTS", "Model_ID", [{
+  Model_ID:"collision_momentum", Domain:"PHYSICS", Required_Inputs:"m1, m2, v1, v2, dt",
+  State_Outputs:"final velocity v1', final velocity v2', momentum, kinetic energy",
+  Rule_or_Equation:"ONE-DIMENSIONAL PERFECTLY ELASTIC COLLISION; v1'=((m1-m2)*v1+2*m2*v2)/(m1+m2); v2'=(2*m1*v1+(m2-m1)*v2)/(m1+m2); conserve momentum and kinetic energy"
+}]);
+
+upsertRows("PARAMETERS", "Parameter_ID", [
+  {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P01",Parameter_Name:"mass_1",Default:1,Min:0.001,Max:100,Unit:"kg",Learner_Editable:"YES",Model_Input:"m1"},
+  {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P02",Parameter_Name:"mass_2",Default:1,Min:0.001,Max:100,Unit:"kg",Learner_Editable:"YES",Model_Input:"m2"},
+  {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P03",Parameter_Name:"initial_velocity_1",Default:2,Min:-100,Max:100,Unit:"m/s",Learner_Editable:"YES",Model_Input:"v1"},
+  {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P04",Parameter_Name:"initial_velocity_2",Default:-1,Min:-100,Max:100,Unit:"m/s",Learner_Editable:"YES",Model_Input:"v2"},
+  {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P05",Parameter_Name:"time_step",Default:0.1,Min:0.001,Max:10,Unit:"s",Learner_Editable:"NO",Model_Input:"dt"}
+]);
+
+const procedureSheet = workbook.Sheets["PROCEDURE_STEPS"];
+const procedureRows = XLSX.utils.sheet_to_json(procedureSheet, { defval: "" });
+let seenPhyMec007Step1 = false;
+const dedupedProcedureRows = procedureRows.filter((row) => {
+  if (String(row.Experiment_ID ?? "").trim() !== "PHY-MEC-007" || Number(row.Step_No) !== 1) return true;
+  if (seenPhyMec007Step1) return false;
+  seenPhyMec007Step1 = true;
+  return true;
+});
+workbook.Sheets["PROCEDURE_STEPS"] = XLSX.utils.json_to_sheet(dedupedProcedureRows, {
+  header: (XLSX.utils.sheet_to_json(procedureSheet, { header: 1, defval: "" })[0] ?? []).map(String)
+});
+upsertRows("PROCEDURE_STEPS", ["Experiment_ID","Step_No"], [{
+  Experiment_ID:"PHY-MEC-007", Step_No:1, Step_Type:"INTERACT",
+  Instruction:"Set initial masses and velocities", Runtime_Action:"MODEL_DEFINED"
+}]);
+
+upsertRows("MEASUREMENTS", "Measurement_ID", [
+  {Measurement_ID:"PHY-MEC-007-M01",Experiment_ID:"PHY-MEC-007",Measurement_Name:"Final Velocity 1",Unit:"m/s",Source:"collision model"},
+  {Measurement_ID:"PHY-MEC-007-M02",Experiment_ID:"PHY-MEC-007",Measurement_Name:"Final Velocity 2",Unit:"m/s",Source:"collision model"},
+  {Measurement_ID:"PHY-MEC-007-M03",Experiment_ID:"PHY-MEC-007",Measurement_Name:"Momentum",Unit:"kg*m/s",Source:"collision model"},
+  {Measurement_ID:"PHY-MEC-007-M04",Experiment_ID:"PHY-MEC-007",Measurement_Name:"Kinetic Energy",Unit:"J",Source:"collision model"}
+]);
+
+upsertRows("SAFETY", "Safety_ID", [{
+  Safety_ID:"PHY-MEC-007-SAFE",Experiment_ID:"PHY-MEC-007",Level:"LOW",Hazards:"Physics simulation",Restrictions:"Simulation only"
+}]);
+
+upsertRows("MATERIALS", "Material_ID", [
+  {Material_ID:"MAT-CART-1",Material_Name:"Collision Cart 1",Domain:"PHYSICS",Unit:"kg",State:"solid",Key_Properties:"mass"},
+  {Material_ID:"MAT-CART-2",Material_Name:"Collision Cart 2",Domain:"PHYSICS",Unit:"kg",State:"solid",Key_Properties:"mass"}
+]);
+
+upsertRows("OUTCOMES", "Outcome_ID", [{
+  Experiment_ID:"PHY-MEC-007",Outcome_ID:"PHY-MEC-007-O01",Type:"OBSERVATION",
+  Condition:"measure",Expected_Result:"Momentum and kinetic energy are conserved"
+}]);
+
+upsertRows("CURRICULUM_MAP", "Curriculum_ID", [{
+  Curriculum_ID:"PHY-MEC",Domain:"PHYSICS",Level:"FOUNDATION",Topics:"Momentum and collisions",Seed_Count:1
+}]);
+
+upsertRows("MEDIA_ASSETS", "Media_ID", [{
+  Media_ID:"PHY-MEC-007-MEDIA-01",Experiment_ID:"PHY-MEC-007",Asset_Type:"IMAGE",
+  Asset_Key:"collision-momentum",Required:"NO"
+}]);
+
+XLSX.writeFile(workbook, path, { bookType: "xlsx" });
+console.log(`Synchronized approved PHY-MEC-007 catalog contract into ${path}`);
