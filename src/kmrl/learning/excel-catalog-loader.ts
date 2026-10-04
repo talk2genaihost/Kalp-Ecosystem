@@ -111,6 +111,7 @@ const LEGACY_MODEL_INPUTS: Readonly<Record<string, readonly string[]>> = {
   free_fall: ["gravity", "dt"],
   projectile_motion: ["speed", "angle", "gravity", "dt"],
   spring_mass: ["mass", "spring_constant", "dt"],
+  pendulum: ["length", "gravity"],
 };
 
 const SHEETS = {
