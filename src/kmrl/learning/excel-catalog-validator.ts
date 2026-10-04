@@ -148,6 +148,16 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     const model = catalog.modelContracts.find((candidate) => candidate.modelId === e.modelId);
     if (!model) return;
     const mapped = modelInputMappings.get(e.experimentId) ?? new Set<string>();
+    if (mapped.size === 0) {
+      warnings.push({
+        code: "EXPERIMENT_MODEL_INPUTS_UNMAPPED",
+        sheet: "PARAMETERS",
+        row: i + 2,
+        field: "Model_Input",
+        message: `Experiment "${e.experimentId}" has no semantic model-input mappings yet; it remains catalog-defined but not runtime-executable.`,
+      });
+      return;
+    }
     const declaredInputs = model.requiredInputs.filter((input) => input.trim() && input.toLowerCase() !== "model inputs");
     declaredInputs.forEach((input) => {
       if (!mapped.has(input)) issue(errors, "MODEL_INPUT_MAPPING_MISSING", "PARAMETERS", `Experiment "${e.experimentId}" does not map required model input "${input}"`, i + 2, "Model_Input");
