@@ -27,6 +27,7 @@ export interface ParameterRow {
   experimentId: string;
   parameterId: string;
   parameterName: string;
+  modelInput: string;
   defaultValue: string | number;
   min: string | number;
   max: string | number;
@@ -161,7 +162,7 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
     "Model_ID","Domain","Required_Inputs","State_Outputs","Rule_or_Equation"
   ]);
   requireColumns(SHEETS.parameters, workbook.Sheets[SHEETS.parameters], [
-    "Experiment_ID","Parameter_ID","Parameter_Name","Default","Min","Max","Unit","Learner_Editable"
+    "Experiment_ID","Parameter_ID","Parameter_Name","Model_Input","Default","Min","Max","Unit","Learner_Editable"
   ]);
   requireColumns(SHEETS.procedureSteps, workbook.Sheets[SHEETS.procedureSteps], [
     "Experiment_ID","Step_No","Step_Type","Instruction","Runtime_Action"
@@ -211,6 +212,7 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
       experimentId: text(r.Experiment_ID),
       parameterId: text(r.Parameter_ID),
       parameterName: text(r.Parameter_Name),
+      modelInput: text(r.Model_Input),
       defaultValue: r.Default as string | number,
       min: r.Min as string | number,
       max: r.Max as string | number,
