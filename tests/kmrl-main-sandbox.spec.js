@@ -83,7 +83,7 @@ test("KMRL PHY-MEC-007 approved collision browser flow", async ({ page }) => {
   await expect(page.getByText("Momentum", { exact: true })).toBeVisible();
   await expect(page.getByText("Kinetic Energy")).toBeVisible();
   await expect(page.getByText("-1 m/s")).toBeVisible();
-  await expect(page.getByText("2 m/s")).toBeVisible();
+  await expect(page.getByText("2 m/s", { exact: true })).toBeVisible();
   await expect(page.getByText("1 kg*m/s")).toBeVisible();
   await expect(page.getByText("2.5 J")).toBeVisible();
 
