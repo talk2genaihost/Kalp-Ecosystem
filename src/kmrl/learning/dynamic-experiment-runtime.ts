@@ -5,6 +5,7 @@ import { FreeFallExperimentAdapter } from "./free-fall-adapter.js";
 import { ProjectileMotionExperimentAdapter } from "./projectile-motion-adapter.js";
 import { SpringMassExperimentAdapter } from "./spring-mass-adapter.js";
 import { PendulumExperimentAdapter } from "./pendulum-adapter.js";
+import { InclineFrictionExperimentAdapter, WorkEnergyExperimentAdapter, PowerExperimentAdapter, CircularMotionExperimentAdapter, ThermalExpansionExperimentAdapter } from "./physics-calculation-adapters.js";
 import { MixMaterialsExperimentAdapter } from "./mix-materials-adapter.js";
 import type { ModelRegistryEntry, KMRLModelRegistry } from "./model-registry.js";
 import type { ExperimentCatalogRow, StemLabCatalog } from "./excel-catalog-loader.js";
@@ -207,6 +208,51 @@ function createModelSession(
       },
       reset() { adapter.reset(); },
     };
+  }
+
+  if (modelId === "incline_friction") {
+    const adapter = new InclineFrictionExperimentAdapter(
+      numericMappedParameter(definition.parameters, "mass"),
+      numericMappedParameter(definition.parameters, "angle"),
+      numericMappedParameter(definition.parameters, "coefficient"),
+      numericMappedParameter(definition.parameters, "gravity"),
+    );
+    return { setInput() {}, step(dt) { adapter.step(dt); }, measure() { return adapter.measure(); }, reset() { adapter.reset(); } };
+  }
+
+  if (modelId === "work_energy") {
+    const adapter = new WorkEnergyExperimentAdapter(
+      numericMappedParameter(definition.parameters, "force"),
+      numericMappedParameter(definition.parameters, "distance"),
+      numericMappedParameter(definition.parameters, "angle"),
+    );
+    return { setInput() {}, step(dt) { adapter.step(dt); }, measure() { return adapter.measure(); }, reset() { adapter.reset(); } };
+  }
+
+  if (modelId === "power") {
+    const adapter = new PowerExperimentAdapter(
+      numericMappedParameter(definition.parameters, "work"),
+      numericMappedParameter(definition.parameters, "time"),
+    );
+    return { setInput() {}, step(dt) { adapter.step(dt); }, measure() { return adapter.measure(); }, reset() { adapter.reset(); } };
+  }
+
+  if (modelId === "circular_motion") {
+    const adapter = new CircularMotionExperimentAdapter(
+      numericMappedParameter(definition.parameters, "mass"),
+      numericMappedParameter(definition.parameters, "radius"),
+      numericMappedParameter(definition.parameters, "speed"),
+    );
+    return { setInput() {}, step(dt) { adapter.step(dt); }, measure() { return adapter.measure(); }, reset() { adapter.reset(); } };
+  }
+
+  if (modelId === "thermal_expansion") {
+    const adapter = new ThermalExpansionExperimentAdapter(
+      numericMappedParameter(definition.parameters, "length"),
+      numericMappedParameter(definition.parameters, "coefficient"),
+      numericMappedParameter(definition.parameters, "dT"),
+    );
+    return { setInput() {}, step(dt) { adapter.step(dt); }, measure() { return adapter.measure(); }, reset() { adapter.reset(); } };
   }
 
   if (modelId === "heating_water") {
