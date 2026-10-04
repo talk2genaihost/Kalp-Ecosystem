@@ -23,6 +23,7 @@ const BUILTIN_IMPLEMENTATIONS: Readonly<Record<string, string>> = {
   free_fall: "FreeFallExperimentAdapter",
   projectile_motion: "ProjectileMotionExperimentAdapter",
   spring_mass: "SpringMassExperimentAdapter",
+  pendulum: "PendulumExperimentAdapter",
   registered_reaction: "MixMaterialsExperimentAdapter",
 };
 
