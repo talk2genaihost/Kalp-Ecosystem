@@ -1,0 +1,19 @@
+PHY-MEC-007 approved catalog verification: FAIL
+catalog: apps/kmrl-sandbox/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx
+checks: 7
+failures:
+MODEL_CONTRACTS:collision_momentum:Required_Inputs expected=m1, m2, v1, v2, dt actual=m1,m2,v1,v2
+MODEL_CONTRACTS:collision_momentum:Rule_or_Equation expected=ONE-DIMENSIONAL PERFECTLY ELASTIC COLLISION; v1'=((m1-m2)*v1+2*m2*v2)/(m1+m2); v2'=(2*m1*v1+(m2-m1)*v2)/(m1+m2); conserve momentum and kinetic energy actual=momentum conservation
+PARAMETERS:PHY-MEC-007-P01:Model_Input expected=m1 actual=
+PARAMETERS:PHY-MEC-007-P01:Min expected=0.001 actual=0
+PARAMETERS:PHY-MEC-007-P01:Unit expected=kg actual=DOMAIN
+PARAMETERS:PHY-MEC-007-P02:Model_Input expected=m2 actual=
+PARAMETERS:PHY-MEC-007-P02:Min expected=0.001 actual=0
+PARAMETERS:PHY-MEC-007-P02:Unit expected=kg actual=DOMAIN
+PARAMETERS:PHY-MEC-007-P03:Model_Input expected=v1 actual=
+PARAMETERS:PHY-MEC-007-P03:Default expected=2 actual=0.1
+PARAMETERS:PHY-MEC-007-P03:Min expected=-100 actual=0.001
+PARAMETERS:PHY-MEC-007-P03:Max expected=100 actual=10
+PARAMETERS:PHY-MEC-007-P03:Unit expected=m/s actual=s
+PARAMETERS:Parameter_ID=PHY-MEC-007-P04 missing
+PARAMETERS:Parameter_ID=PHY-MEC-007-P05 missing
