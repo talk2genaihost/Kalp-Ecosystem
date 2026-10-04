@@ -30,6 +30,7 @@ const BUILTIN_IMPLEMENTATIONS: Readonly<Record<string, string>> = {
   circular_motion: "CircularMotionExperimentAdapter",
   thermal_expansion: "ThermalExpansionExperimentAdapter",
   registered_reaction: "MixMaterialsExperimentAdapter",
+  collision_momentum: "CollisionMomentumExperimentAdapter",
 };
 
 export class KMRLModelRegistry {
