@@ -47,7 +47,8 @@ test("Excel loader rejects a missing required sheet", () => {
 
 test("Excel loader rejects missing required columns", () => {
   const workbook = utils.book_new();
-  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X",Domain:"PHYSICS",Experiment_Name:"X",Category:"Mechanics",Model_Type:"constant_force",Model_ID:"constant_force",Guided_Flow:"OBSERVE",Level:"FOUNDATION",Status:"DEFINED",Input_Refs:"",Measurement_Refs:"",Safety_Ref:"S"}]), "EXPERIMENT_CATALOG");
+  utils.book_append_sheet(workbook, utils.json_to_sheet([{Experiment_ID:"X",Experiment_Name:"X",Category:"Mechanics",Model_Type:"constant_force",Model_ID:"constant_force",Guided_Flow:"OBSERVE",Level:"FOUNDATION",Status:"DEFINED",Input_Refs:"",Measurement_Refs:"",Safety_Ref:"S"}]), "EXPERIMENT_CATALOG");
+  utils.book_append_sheet(workbook, utils.json_to_sheet([{Model_ID:"constant_force",Domain:"PHYSICS",Required_Inputs:"mass, force, dt",State_Outputs:"position, velocity, acceleration",Rule_or_Equation:"F=m*a"}]), "MODEL_CONTRACTS");
   assert.throws(
     () => loadStemLabCatalog(write(workbook, {type:"buffer",bookType:"xlsx"})),
     /Sheet EXPERIMENT_CATALOG is missing columns: Domain/
