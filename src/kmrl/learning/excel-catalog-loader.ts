@@ -112,6 +112,16 @@ const LEGACY_MODEL_INPUTS: Readonly<Record<string, readonly string[]>> = {
   projectile_motion: ["speed", "angle", "gravity", "dt"],
   spring_mass: ["mass", "spring_constant", "dt"],
   pendulum: ["length", "gravity"],
+  incline_friction: ["mass", "angle", "coefficient", "gravity"],
+  collision_momentum: ["m1", "m2", "v1", "v2"],
+  work_energy: ["force", "distance", "angle"],
+  power: ["work", "time"],
+  circular_motion: ["mass", "radius", "speed"],
+  heat_transfer: ["mass", "specific_heat", "energy"],
+  thermal_expansion: ["length", "coefficient", "dT"],
+  reflection: ["incident angle"],
+  refraction: ["n1", "n2", "incident angle"],
+  ohms_law: ["voltage", "resistance"],
 };
 
 const SHEETS = {
