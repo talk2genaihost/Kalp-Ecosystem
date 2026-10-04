@@ -105,6 +105,11 @@ export interface StemLabCatalog {
   mediaAssets: MediaAssetRow[];
 }
 
+const LEGACY_MODEL_INPUTS: Readonly<Record<string, readonly string[]>> = {
+  constant_force: ["mass", "force", "dt"],
+  heating_water: ["mass", "energy", "dt"],
+};
+
 const SHEETS = {
   experiments: "EXPERIMENT_CATALOG",
   modelContracts: "MODEL_CONTRACTS",
@@ -209,17 +214,23 @@ export function loadStemLabCatalog(source: ArrayBuffer | Uint8Array): StemLabCat
       stateOutputs: list(r.State_Outputs),
       ruleOrEquation: text(r.Rule_or_Equation),
     })),
-    parameters: rows(workbook, SHEETS.parameters).map((r) => ({
+    parameters: rows(workbook, SHEETS.parameters).map((r) => {
+      const experiment = rows(workbook, SHEETS.experiments).find((item) => text(item.Experiment_ID) === text(r.Experiment_ID));
+      const explicitModelInput = text(r.Model_Input);
+      const legacyInputs = experiment ? LEGACY_MODEL_INPUTS[text(experiment.Model_ID)] : undefined;
+      const parameterIndex = rows(workbook, SHEETS.parameters).filter((item) => text(item.Experiment_ID) === text(r.Experiment_ID)).findIndex((item) => text(item.Parameter_ID) === text(r.Parameter_ID));
+      return {
       experimentId: text(r.Experiment_ID),
       parameterId: text(r.Parameter_ID),
       parameterName: text(r.Parameter_Name),
-      modelInput: text(r.Model_Input),
+      modelInput: explicitModelInput || legacyInputs?.[parameterIndex] || "",
       defaultValue: r.Default as string | number,
       min: r.Min as string | number,
       max: r.Max as string | number,
       unit: text(r.Unit),
       learnerEditable: boolean(r.Learner_Editable),
-    })),
+      };
+    }),
     procedureSteps: rows(workbook, SHEETS.procedureSteps).map((r) => ({
       experimentId: text(r.Experiment_ID),
       stepNo: number(r.Step_No, "Step_No"),
