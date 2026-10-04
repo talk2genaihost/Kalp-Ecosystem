@@ -132,7 +132,6 @@ function initialMaterialsFromParameters(parameters: readonly DynamicExperimentPa
 
 function createModelSession(
   definition: DynamicExperimentDefinition,
-  _context: DynamicExperimentModelContext,
 ): DynamicModelSession {
   const modelId = definition.model.modelId;
 
@@ -319,12 +318,11 @@ function createModelSession(
   }
 
   if (modelId === "registered_reaction") {
-    if (!context.reaction || !context.initialMaterials) {
-      throw new Error("registered_reaction requires reaction and initialMaterials model context");
-    }
+    const reaction = parseReactionDefinition(definition, definition.experiment.experimentId);
+    const initialMaterials = initialMaterialsFromParameters(definition.parameters, reaction);
     const adapter = new MixMaterialsExperimentAdapter({
-      initialMaterials: context.initialMaterials,
-      reaction: context.reaction,
+      initialMaterials,
+      reaction,
     });
     return {
       setInput() {},
@@ -496,6 +494,5 @@ export function createDynamicExperimentRuntime(
 ): DynamicExperimentRuntime {
   return new DynamicExperimentRuntime(
     buildDynamicExperimentDefinition(catalog, registry, validation, experimentId),
-    context,
   );
 }
