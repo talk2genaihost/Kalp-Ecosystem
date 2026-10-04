@@ -15,7 +15,11 @@ function validCatalog(): StemLabCatalog {
       modelId:"constant_force", domain:"PHYSICS", requiredInputs:["mass","force","dt"],
       stateOutputs:["position","velocity","acceleration"], ruleOrEquation:"F=m*a"
     }],
-    parameters: [{experimentId:"PHY-MEC-001",parameterId:"P01",parameterName:"force",defaultValue:10,min:0,max:100,unit:"N",learnerEditable:true}],
+    parameters: [
+      {experimentId:"PHY-MEC-001",parameterId:"P01",parameterName:"mass",modelInput:"mass",defaultValue:1,min:0.1,max:100,unit:"kg",learnerEditable:true},
+      {experimentId:"PHY-MEC-001",parameterId:"P02",parameterName:"force",modelInput:"force",defaultValue:10,min:0,max:100,unit:"N",learnerEditable:true},
+      {experimentId:"PHY-MEC-001",parameterId:"P03",parameterName:"time_step",modelInput:"dt",defaultValue:0.1,min:0.001,max:10,unit:"s",learnerEditable:false}
+    ],
     procedureSteps: [{experimentId:"PHY-MEC-001",stepNo:1,stepType:"OBSERVE",instruction:"Observe motion",runtimeAction:"Model/UI defined"}],
     measurements: [{measurementId:"M01",experimentId:"PHY-MEC-001",measurementName:"Velocity",unit:"m/s",source:"runtime state"}],
     safety: [{safetyId:"S01",experimentId:"PHY-MEC-001",level:"LOW",hazards:"Simulation only",restrictions:"No physical procedure"}],
@@ -63,6 +67,20 @@ test("validator catches unknown experiment references and invalid procedure orde
   const result = validateStemLabCatalog(catalog);
   assert.ok(result.errors.some((e) => e.code === "DUPLICATE_STEP_NUMBER"));
   assert.ok(result.errors.some((e) => e.code === "EXPERIMENT_REFERENCE_MISSING"));
+});
+
+test("validator rejects missing semantic model-input mappings", () => {
+  const catalog = validCatalog();
+  catalog.parameters = catalog.parameters.filter((parameter) => parameter.modelInput !== "force");
+  const result = validateStemLabCatalog(catalog);
+  assert.ok(result.errors.some((e) => e.code === "MODEL_INPUT_MAPPING_MISSING"));
+});
+
+test("validator rejects duplicate semantic model-input mappings", () => {
+  const catalog = validCatalog();
+  catalog.parameters.push({...catalog.parameters[0], parameterId:"P99"});
+  const result = validateStemLabCatalog(catalog);
+  assert.ok(result.errors.some((e) => e.code === "DUPLICATE_MODEL_INPUT_MAPPING"));
 });
 
 test("validator keeps runtime executability separate from catalog validity", () => {
