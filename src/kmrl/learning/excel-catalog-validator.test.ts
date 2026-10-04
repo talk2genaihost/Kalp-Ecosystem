@@ -69,6 +69,14 @@ test("validator catches unknown experiment references and invalid procedure orde
   assert.ok(result.errors.some((e) => e.code === "EXPERIMENT_REFERENCE_MISSING"));
 });
 
+test("validator allows completely unmapped seed experiments", () => {
+  const catalog = validCatalog();
+  catalog.parameters = catalog.parameters.map((parameter) => ({...parameter, modelInput:""}));
+  const result = validateStemLabCatalog(catalog);
+  assert.equal(result.valid, true);
+  assert.ok(result.warnings.some((warning) => warning.code === "EXPERIMENT_MODEL_INPUTS_UNMAPPED"));
+});
+
 test("validator rejects missing semantic model-input mappings", () => {
   const catalog = validCatalog();
   catalog.parameters = catalog.parameters.filter((parameter) => parameter.modelInput !== "force");
