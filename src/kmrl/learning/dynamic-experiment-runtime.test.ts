@@ -43,6 +43,7 @@ function catalogFixture(): StemLabCatalog {
     outcomes: [{ experimentId, outcomeId: `${experimentId}-O01`, type: "OBSERVATION", condition: "step", expectedResult: "Motion changes" }],
     curriculumMap: [{ curriculumId: "PHY-MEC", domain: "PHYSICS", level: "FOUNDATION", topics: ["Mechanics"], seedCount: 1 }],
     mediaAssets: [],
+    reactionDefinitions: [],
   };
 }
 
@@ -307,4 +308,51 @@ test("pendulum catalog experiment executes the Excel-defined closed-form calcula
   const measured = runtime.dispatch({ type: "MEASURE" });
   assert.equal(measured.measurements[0].id, "period");
   assert.ok(Math.abs(measured.measurements[0].quantity.value - 2 * Math.PI * Math.sqrt(1 / 9.81)) < 1e-12);
+});
+
+
+test("CHE-MIX-002 launches from the canonical Excel reaction definition without runtime reaction injection", () => {
+  const experimentId = "CHE-MIX-002";
+  const catalog = catalogFixture();
+  catalog.experiments[0] = {
+    ...catalog.experiments[0], experimentId, domain:"CHEMISTRY", experimentName:"Mixing Materials: Observe a System Change",
+    modelType:"registered_reaction", modelId:"registered_reaction", safetyRef:"CHE-MIX-002-SAFE"
+  };
+  catalog.modelContracts[0] = {
+    modelId:"registered_reaction", domain:"CHEMISTRY",
+    requiredInputs:["material:MAT-HCL","material:MAT-NAOH","dt"],
+    stateOutputs:["material amounts","chemistry status","reaction events"],
+    ruleOrEquation:"HCl(aq) + NaOH(aq) → NaCl(aq) + H2O(l)"
+  };
+  catalog.parameters = [
+    {experimentId,parameterId:"CHE-MIX-002-P01",parameterName:"primary_parameter",modelInput:"material:MAT-HCL",defaultValue:1,min:0,max:100,unit:"mol",learnerEditable:true},
+    {experimentId,parameterId:"CHE-MIX-002-P02",parameterName:"secondary_parameter",modelInput:"material:MAT-NAOH",defaultValue:1,min:0,max:100,unit:"mol",learnerEditable:true},
+    {experimentId,parameterId:"CHE-MIX-002-P03",parameterName:"time_step",modelInput:"dt",defaultValue:0.1,min:0.001,max:10,unit:"s",learnerEditable:false},
+  ];
+  catalog.materials = [
+    {materialId:"MAT-HCL",materialName:"Hydrochloric Acid",domain:"CHEMISTRY",unit:"mol",state:"aqueous",keyProperties:["concentration"]},
+    {materialId:"MAT-NAOH",materialName:"Sodium Hydroxide",domain:"CHEMISTRY",unit:"mol",state:"aqueous",keyProperties:["concentration"]},
+    {materialId:"MAT-NACL",materialName:"Sodium Chloride",domain:"CHEMISTRY",unit:"mol",state:"aqueous",keyProperties:["salt","electrolyte"]},
+    {materialId:"MAT-H2O",materialName:"Water",domain:"CHEMISTRY",unit:"mol",state:"liquid",keyProperties:["specific_heat","density"]},
+  ];
+  catalog.procedureSteps = [{experimentId,stepNo:1,stepType:"INTERACT",instruction:"Mix acid and base",runtimeAction:"MODEL_DEFINED"}];
+  catalog.measurements = [{measurementId:"CHE-MIX-002-M01",experimentId,measurementName:"Material Amounts",unit:"mol",source:"material amounts"}];
+  catalog.safety = [{safetyId:"CHE-MIX-002-SAFE",experimentId,level:"LOW",hazards:"Chemical simulation",restrictions:"Simulation only"}];
+  catalog.outcomes = [{experimentId,outcomeId:"CHE-MIX-002-O01",type:"OBSERVATION",condition:"step",expectedResult:"Neutralization produces salt and water"}];
+  catalog.reactionDefinitions = [{
+    reactionId:"RXN-CHE-MIX-002-001",experimentId,reactionName:"Hydrochloric Acid + Sodium Hydroxide Neutralization",
+    reactants:["MAT-HCL:1","MAT-NAOH:1"],products:["MAT-NACL:1","MAT-H2O:1"],conditions:[],status:"CANONICAL"
+  }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+
+  runtime.dispatch({type:"START"});
+  const measured = runtime.dispatch({type:"MEASURE"});
+  assert.ok(measured.measurements.length >= 1);
+  runtime.dispatch({type:"STEP"});
+  const after = runtime.dispatch({type:"MEASURE"});
+  assert.equal(after.tick, 1);
 });
