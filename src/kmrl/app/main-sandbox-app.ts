@@ -9,7 +9,7 @@ const rootElement = document.getElementById("kmrl-app");
 if (!(rootElement instanceof HTMLElement)) throw new Error("KMRL app root not found");
 const root: HTMLElement = rootElement;
 
-const CATALOG_URL = "./catalog/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
+const CATALOG_URL = "./KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
 
 let catalogPromise: ReturnType<typeof loadCatalog> | undefined;
 
