@@ -112,15 +112,23 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     }
   });
 
+  const modelInputMappings = new Map<string, Set<string>>();
   const parameterKeys = new Set<string>();
   catalog.parameters.forEach((p, i) => {
     const row = i + 2;
     nonEmpty(p.experimentId, errors, "EXPERIMENT_REFERENCE_REQUIRED", "PARAMETERS", row, "Experiment_ID");
     nonEmpty(p.parameterId, errors, "PARAMETER_ID_REQUIRED", "PARAMETERS", row, "Parameter_ID");
     nonEmpty(p.parameterName, errors, "PARAMETER_NAME_REQUIRED", "PARAMETERS", row, "Parameter_Name");
+    nonEmpty(p.modelInput, errors, "MODEL_INPUT_REQUIRED", "PARAMETERS", row, "Model_Input");
     nonEmpty(p.unit, errors, "UNIT_REQUIRED", "PARAMETERS", row, "Unit");
     if (p.experimentId && !experimentIds.has(p.experimentId)) issue(errors, "EXPERIMENT_REFERENCE_MISSING", "PARAMETERS", `Unknown experiment "${p.experimentId}"`, row, "Experiment_ID");
     const key = `${p.experimentId}::${p.parameterId}`;
+    if (p.experimentId && p.modelInput) {
+      const mapped = modelInputMappings.get(p.experimentId) ?? new Set<string>();
+      if (mapped.has(p.modelInput)) issue(errors, "DUPLICATE_MODEL_INPUT_MAPPING", "PARAMETERS", `Model input "${p.modelInput}" is mapped more than once for experiment "${p.experimentId}"`, row, "Model_Input");
+      mapped.add(p.modelInput);
+      modelInputMappings.set(p.experimentId, mapped);
+    }
     if (parameterKeys.has(key)) issue(errors, "DUPLICATE_PARAMETER_ID", "PARAMETERS", `Duplicate parameter "${p.parameterId}" for experiment "${p.experimentId}"`, row, "Parameter_ID");
     parameterKeys.add(key);
     const numeric = [p.defaultValue, p.min, p.max].every((v) => typeof v === "number");
@@ -132,6 +140,19 @@ export function validateStemLabCatalog(catalog: StemLabCatalog): CatalogValidati
     } else {
       warnings.push({ code: "PARAMETER_NON_NUMERIC", sheet: "PARAMETERS", row, message: "Parameter bounds are non-numeric; runtime semantics must be supplied by the model contract." });
     }
+  });
+
+  catalog.experiments.forEach((e, i) => {
+    const model = catalog.modelContracts.find((candidate) => candidate.modelId === e.modelId);
+    if (!model) return;
+    const mapped = modelInputMappings.get(e.experimentId) ?? new Set<string>();
+    const declaredInputs = model.requiredInputs.filter((input) => input.trim() && input.toLowerCase() !== "model inputs");
+    declaredInputs.forEach((input) => {
+      if (!mapped.has(input)) issue(errors, "MODEL_INPUT_MAPPING_MISSING", "PARAMETERS", `Experiment "${e.experimentId}" does not map required model input "${input}"`, i + 2, "Model_Input");
+    });
+    mapped.forEach((input) => {
+      if (!model.requiredInputs.some((declared) => declared.toLowerCase() === input.toLowerCase())) issue(errors, "MODEL_INPUT_MAPPING_UNKNOWN", "PARAMETERS", `Parameter maps to "${input}", which is not declared by model "${model.modelId}"`, i + 2, "Model_Input");
+    });
   });
 
   const stepKeys = new Set<string>();
