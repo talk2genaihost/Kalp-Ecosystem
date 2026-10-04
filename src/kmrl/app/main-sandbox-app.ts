@@ -1,30 +1,51 @@
-import { LocalExperimentRepository } from "../data/local-experiment-repository.js";
-import { LocalMutationQueue } from "../offline/local-mutation-queue.js";
-import { UnifiedScienceKernel } from "../contracts/science.js";
-import { scienceTick } from "../simulation/v1-d/science/index.js";
-import { ExperimentRuntime } from "../runtime/experiment-runtime.js";
-import { MainSandboxScreen } from "../ui/main-sandbox-screen.js";
-import { createMainSandboxSyncPort } from "./remote-sync.js";
-import { ExperimentLibraryScreen } from "../learning/experiment-library-screen.js";
-import { getExperiment, GuidedExperimentSession, type ExperimentDefinition } from "../learning/experiment-library.js";
-import { createScienceSandboxApp } from "./science-sandbox-app.js";
+import { createKMRLModelRegistry } from "../learning/model-registry.js";
+import { loadStemLabCatalog } from "../learning/excel-catalog-loader.js";
+import { validateStemLabCatalog } from "../learning/excel-catalog-validator.js";
+import { createDynamicExperimentRuntime } from "../learning/dynamic-experiment-runtime.js";
+import { DynamicExperimentScreen } from "../learning/dynamic-experiment-screen.js";
+import { CatalogExperimentLibraryScreen } from "../learning/catalog-experiment-library-screen.js";
 
-const repository = new LocalExperimentRepository();
-const offline = new LocalMutationQueue();
 const rootElement = document.getElementById("kmrl-app");
 if (!(rootElement instanceof HTMLElement)) throw new Error("KMRL app root not found");
 const root: HTMLElement = rootElement;
-const syncPort = createMainSandboxSyncPort(repository, offline);
 
-const launch = (experiment: ExperimentDefinition): void => {
-  const runtime = new ExperimentRuntime({ experimentId: experiment.id, initialScience: experiment.initialState, science: new UnifiedScienceKernel(scienceTick), repository, offline });
-  const sandbox = createScienceSandboxApp(runtime);
-  const guided = new GuidedExperimentSession(experiment, experiment.id);
-  new MainSandboxScreen(sandbox.application.domain, offline, syncPort, { onOpenLibrary: showLibrary }, guided).mount(root);
-};
+const CATALOG_URL = "./catalog/KALP_STEM_LAB_MASTER_CATALOG_v1_0.xlsx";
 
-function showLibrary(): void {
-  new ExperimentLibraryScreen({ onStartExperiment: launch }).mount(root);
+let catalogPromise: ReturnType<typeof loadCatalog> | undefined;
+
+async function loadCatalog() {
+  const response = await fetch(CATALOG_URL);
+  if (!response.ok) throw new Error(`Science Lab catalog could not be loaded: HTTP ${response.status}`);
+  const workbook = await response.arrayBuffer();
+  const catalog = loadStemLabCatalog(workbook);
+  const validation = validateStemLabCatalog(catalog);
+  if (!validation.valid) {
+    throw new Error(`Science Lab catalog is invalid: ${validation.errors.map((error) => error.message).join("; ")}`);
+  }
+  const registry = createKMRLModelRegistry(catalog);
+  return { catalog, registry, validation };
 }
 
-launch(getExperiment("physics-constant-force"));
+function getCatalog() {
+  catalogPromise ??= loadCatalog();
+  return catalogPromise;
+}
+
+async function launch(experimentId: string): Promise<void> {
+  const { catalog, registry, validation } = await getCatalog();
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+  new DynamicExperimentScreen(runtime, { onBackToLibrary: showLibrary }).mount(root);
+}
+
+async function showLibrary(): Promise<void> {
+  const { catalog, registry } = await getCatalog();
+  new CatalogExperimentLibraryScreen({
+    catalog,
+    registry,
+    onStartExperiment: launch,
+  }).mount(root);
+}
+
+void showLibrary().catch((error) => {
+  root.innerHTML = `<section class="kmrl-shell"><div class="kmrl-sync-alert" role="alert"><strong>Science Sandbox startup failed</strong><span>${String(error instanceof Error ? error.message : error)}</span></div></section>`;
+});
