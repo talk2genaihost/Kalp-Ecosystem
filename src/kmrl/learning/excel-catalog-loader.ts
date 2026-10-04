@@ -144,7 +144,8 @@ function rows(workbook: WorkBook, sheetName: string): Record<string, Cell>[] {
   return utils.sheet_to_json<Record<string, Cell>>(sheet, { defval: "" });
 }
 
-function requireColumns(sheetName: string, sheet: WorkSheet, required: string[]): void {
+function requireColumns(sheetName: string, sheet: WorkSheet | undefined, required: string[]): void {
+  if (!sheet) throw new Error(`Missing required sheet: ${sheetName}`);
   const headerRows = utils.sheet_to_json(sheet, { header: 1, defval: "" }) as unknown as Cell[][];
   const headers = new Set((headerRows[0] ?? []).map((value) => text(value)));
   const missing = required.filter((column) => !headers.has(column));
