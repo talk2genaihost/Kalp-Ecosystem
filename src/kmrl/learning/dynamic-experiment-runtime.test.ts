@@ -173,3 +173,44 @@ test("heating-water catalog experiment launches through the same generic runtime
   const measured = runtime.dispatch({ type: "MEASURE" });
   assert.equal(measured.measurements[0].id, "temperature");
 });
+
+test("free-fall catalog experiment launches through the same generic runtime", () => {
+  const experimentId = "PHY-MEC-002";
+  const catalog = catalogFixture();
+  catalog.experiments[0] = {
+    ...catalog.experiments[0],
+    experimentId,
+    experimentName: "Free Fall",
+    modelType: "free_fall",
+    modelId: "free_fall",
+    safetyRef: "PHY-MEC-002-SAFE",
+  };
+  catalog.modelContracts[0] = {
+    modelId: "free_fall",
+    domain: "PHYSICS",
+    requiredInputs: ["gravity", "dt"],
+    stateOutputs: ["height", "velocity", "acceleration"],
+    ruleOrEquation: "a=-g",
+  };
+  catalog.parameters = [
+    { experimentId, parameterId: "PHY-MEC-002-P01", parameterName: "gravity", modelInput: "gravity", defaultValue: 9.81, min: 0.1, max: 30, unit: "m/s2", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-002-P02", parameterName: "time_step", modelInput: "dt", defaultValue: 0.1, min: 0.001, max: 10, unit: "s", learnerEditable: false },
+  ];
+  catalog.procedureSteps = [{ experimentId, stepNo: 1, stepType: "INTERACT", instruction: "Release object", runtimeAction: "MODEL_DEFINED" }];
+  catalog.measurements = [{ measurementId: "PHY-MEC-002-M01", experimentId, measurementName: "Height", unit: "m", source: "height" }];
+  catalog.safety = [{ safetyId: "PHY-MEC-002-SAFE", experimentId, level: "LOW", hazards: "Falling object", restrictions: "Use safe test area" }];
+  catalog.outcomes = [{ experimentId, outcomeId: "PHY-MEC-002-O01", type: "OBSERVATION", condition: "step", expectedResult: "Velocity changes under gravity" }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+
+  runtime.dispatch({ type: "START" });
+  runtime.dispatch({ type: "STEP" });
+  const measured = runtime.dispatch({ type: "MEASURE" });
+
+  assert.equal(measured.tick, 1);
+  assert.equal(measured.measurements[0].id, "height");
+  assert.ok(measured.measurements[0].quantity.value < 0);
+});
