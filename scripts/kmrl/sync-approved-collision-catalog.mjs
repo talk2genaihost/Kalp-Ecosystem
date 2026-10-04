@@ -14,7 +14,10 @@ const ensureSheet = (name, headers) => {
 
 const upsertRows = (sheetName, keyColumn, rowsToUpsert) => {
   const sheet = workbook.Sheets[sheetName];
-  const existing = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  let existing = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const keyOf = (row) => Array.isArray(keyColumn)
+    ? keyColumn.map((column) => String(row[column] ?? "").trim()).join("::")
+    : String(row[keyColumn] ?? "").trim();
   const existingHeaders = (XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" })[0] ?? []).map(String);
   const headers = [...existingHeaders];
   for (const row of rowsToUpsert) {
@@ -24,12 +27,12 @@ const upsertRows = (sheetName, keyColumn, rowsToUpsert) => {
   }
   const indexByKey = new Map();
   existing.forEach((row, index) => {
-    const key = String(row[keyColumn] ?? "").trim();
+    const key = keyOf(row);
     if (key) indexByKey.set(key, index);
   });
   for (const row of rowsToUpsert) {
-    const key = String(row[keyColumn] ?? "").trim();
-    if (!key) throw new Error(`Missing ${keyColumn} in ${sheetName} synchronization row`);
+    const key = keyOf(row);
+    if (!key) throw new Error(`Missing ${Array.isArray(keyColumn) ? keyColumn.join(",") : keyColumn} in ${sheetName} synchronization row`);
     const existingIndex = indexByKey.get(key);
     if (existingIndex === undefined) {
       existing.push({ ...row });
@@ -73,7 +76,19 @@ upsertRows("PARAMETERS", "Parameter_ID", [
   {Experiment_ID:"PHY-MEC-007",Parameter_ID:"PHY-MEC-007-P05",Parameter_Name:"time_step",Default:0.1,Min:0.001,Max:10,Unit:"s",Learner_Editable:"NO",Model_Input:"dt"}
 ]);
 
-upsertRows("PROCEDURE_STEPS", "Experiment_ID", [{
+const procedureSheet = workbook.Sheets["PROCEDURE_STEPS"];
+const procedureRows = XLSX.utils.sheet_to_json(procedureSheet, { defval: "" });
+let seenPhyMec007Step1 = false;
+const dedupedProcedureRows = procedureRows.filter((row) => {
+  if (String(row.Experiment_ID ?? "").trim() !== "PHY-MEC-007" || Number(row.Step_No) !== 1) return true;
+  if (seenPhyMec007Step1) return false;
+  seenPhyMec007Step1 = true;
+  return true;
+});
+workbook.Sheets["PROCEDURE_STEPS"] = XLSX.utils.json_to_sheet(dedupedProcedureRows, {
+  header: (XLSX.utils.sheet_to_json(procedureSheet, { header: 1, defval: "" })[0] ?? []).map(String)
+});
+upsertRows("PROCEDURE_STEPS", ["Experiment_ID","Step_No"], [{
   Experiment_ID:"PHY-MEC-007", Step_No:1, Step_Type:"INTERACT",
   Instruction:"Set initial masses and velocities", Runtime_Action:"MODEL_DEFINED"
 }]);
