@@ -12,18 +12,25 @@ export class CollisionMomentumExperimentAdapter {
   private mass2Kg = 0;
   private velocity1Mps = 0;
   private velocity2Mps = 0;
+  private readonly initialInputs: CollisionMomentumInputs;
 
   constructor(inputs: CollisionMomentumInputs) {
+    this.validateInputs(inputs);
+    this.initialInputs = { ...inputs };
     this.setInputs(inputs);
   }
 
-  setInputs(inputs: CollisionMomentumInputs): void {
+  private validateInputs(inputs: CollisionMomentumInputs): void {
     if (![inputs.mass1Kg, inputs.mass2Kg].every((value) => Number.isFinite(value) && value > 0)) {
       throw new Error("Collision masses must be finite and positive");
     }
     if (![inputs.velocity1Mps, inputs.velocity2Mps].every((value) => Number.isFinite(value))) {
       throw new Error("Collision velocities must be finite");
     }
+  }
+
+  setInputs(inputs: CollisionMomentumInputs): void {
+    this.validateInputs(inputs);
     this.mass1Kg = inputs.mass1Kg;
     this.mass2Kg = inputs.mass2Kg;
     this.velocity1Mps = inputs.velocity1Mps;
@@ -43,13 +50,8 @@ export class CollisionMomentumExperimentAdapter {
         (this.mass2Kg - this.mass1Kg) * this.velocity2Mps) /
       denominator;
 
-    const initialMomentum =
-      this.mass1Kg * this.velocity1Mps + this.mass2Kg * this.velocity2Mps;
     const finalMomentum =
       this.mass1Kg * finalVelocity1 + this.mass2Kg * finalVelocity2;
-    const initialKineticEnergy =
-      0.5 * this.mass1Kg * this.velocity1Mps ** 2 +
-      0.5 * this.mass2Kg * this.velocity2Mps ** 2;
     const finalKineticEnergy =
       0.5 * this.mass1Kg * finalVelocity1 ** 2 +
       0.5 * this.mass2Kg * finalVelocity2 ** 2;
@@ -62,5 +64,7 @@ export class CollisionMomentumExperimentAdapter {
     ];
   }
 
-  reset(): void {}
+  reset(): void {
+    this.setInputs(this.initialInputs);
+  }
 }
