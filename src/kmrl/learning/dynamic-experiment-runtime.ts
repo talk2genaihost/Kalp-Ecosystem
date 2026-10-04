@@ -205,7 +205,7 @@ export function buildDynamicExperimentDefinition(
     parameters,
     procedureSteps: catalog.procedureSteps.filter((item) => item.experimentId === experimentId),
     measurements: catalog.measurements.filter((item) => item.experimentId === experimentId),
-    safety: catalog.safety.filter((item) => item.experimentId === experimentId || item.experimentId === experiment.safetyRef),
+    safety: catalog.safety.filter((item) => item.experimentId === experimentId),
     materials: catalog.materials,
     outcomes: catalog.outcomes.filter((item) => item.experimentId === experimentId),
   };
