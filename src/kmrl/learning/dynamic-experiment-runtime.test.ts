@@ -214,3 +214,44 @@ test("free-fall catalog experiment launches through the same generic runtime", (
   assert.equal(measured.measurements[0].id, "height");
   assert.ok(measured.measurements[0].quantity.value < 0);
 });
+
+test("projectile-motion catalog experiment launches through the same generic runtime", () => {
+  const experimentId = "PHY-MEC-003";
+  const catalog = catalogFixture();
+  catalog.experiments[0] = {
+    ...catalog.experiments[0],
+    experimentId,
+    experimentName: "Projectile Motion",
+    modelType: "projectile_motion",
+    modelId: "projectile_motion",
+    safetyRef: "PHY-MEC-003-SAFE",
+  };
+  catalog.modelContracts[0] = {
+    modelId: "projectile_motion",
+    domain: "PHYSICS",
+    requiredInputs: ["speed", "angle", "gravity", "dt"],
+    stateOutputs: ["x", "y", "speed"],
+    ruleOrEquation: "projectile trajectory",
+  };
+  catalog.parameters = [
+    { experimentId, parameterId: "PHY-MEC-003-P01", parameterName: "speed", modelInput: "speed", defaultValue: 20, min: 1, max: 100, unit: "m/s", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-003-P02", parameterName: "angle", modelInput: "angle", defaultValue: 45, min: 0, max: 90, unit: "deg", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-003-P03", parameterName: "gravity", modelInput: "gravity", defaultValue: 9.81, min: 0.1, max: 30, unit: "m/s2", learnerEditable: true },
+    { experimentId, parameterId: "PHY-MEC-003-P04", parameterName: "time_step", modelInput: "dt", defaultValue: 0.1, min: 0.001, max: 1, unit: "s", learnerEditable: false },
+  ];
+  catalog.procedureSteps = [{ experimentId, stepNo: 1, stepType: "INTERACT", instruction: "Launch projectile", runtimeAction: "MODEL_DEFINED" }];
+  catalog.measurements = [{ measurementId: "PHY-MEC-003-M01", experimentId, measurementName: "Horizontal Position", unit: "m", source: "x" }];
+  catalog.safety = [{ safetyId: "PHY-MEC-003-SAFE", experimentId, level: "LOW", hazards: "Projectile motion", restrictions: "Use controlled environment" }];
+  catalog.outcomes = [{ experimentId, outcomeId: "PHY-MEC-003-O01", type: "OBSERVATION", condition: "step", expectedResult: "Projectile follows a trajectory" }];
+
+  const validation = validateStemLabCatalog(catalog);
+  assert.equal(validation.valid, true, JSON.stringify(validation.errors));
+  const registry = createKMRLModelRegistry(catalog);
+  const runtime = createDynamicExperimentRuntime(catalog, registry, validation, experimentId);
+
+  runtime.dispatch({ type: "START" });
+  const measured = runtime.dispatch({ type: "MEASURE" });
+  assert.equal(measured.measurements[0].id, "x");
+  const stepped = runtime.dispatch({ type: "STEP" });
+  assert.equal(stepped.tick, 1);
+});
