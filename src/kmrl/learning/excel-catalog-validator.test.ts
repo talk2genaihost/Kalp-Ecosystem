@@ -118,4 +118,9 @@ test("validator validates reaction definition source references and status", () 
   catalog.reactionDefinitions[0].status = "INVALID";
   result = validateStemLabCatalog(catalog);
   assert.ok(result.errors.some((e) => e.code === "INVALID_REACTION_STATUS"));
+
+  catalog.reactionDefinitions[0].status = "CANONICAL";
+  catalog.reactionDefinitions[0].reactants = ["UNKNOWN-MATERIAL:1"];
+  result = validateStemLabCatalog(catalog);
+  assert.ok(result.errors.some((e) => e.code === "REACTION_MATERIAL_REFERENCE_MISSING"));
 });
