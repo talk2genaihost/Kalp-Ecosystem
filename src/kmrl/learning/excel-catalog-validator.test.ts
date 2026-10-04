@@ -27,6 +27,7 @@ function validCatalog(): StemLabCatalog {
     outcomes: [{experimentId:"PHY-MEC-001",outcomeId:"O01",type:"EXPECTED",condition:"valid parameter range",expectedResult:"Model-defined result"}],
     curriculumMap: [{curriculumId:"PHYSICS-FOUNDATION",domain:"PHYSICS",level:"FOUNDATION",topics:["Mechanics"],seedCount:1}],
     mediaAssets: [{mediaId:"MEDIA-01",experimentId:"PHY-MEC-001",assetType:"diagram",assetKey:"PHY-MEC-001_diagram",required:false}]
+    ,reactionDefinitions: []
   };
 }
 
@@ -97,4 +98,24 @@ test("validator keeps runtime executability separate from catalog validity", () 
   catalog.modelContracts[0].modelId = "catalog_only_model";
   const result = validateStemLabCatalog(catalog);
   assert.equal(result.valid, true);
+});
+
+
+test("validator validates reaction definition source references and status", () => {
+  const catalog = validCatalog();
+  catalog.reactionDefinitions.push({
+    reactionId:"RXN-001", experimentId:"PHY-MEC-001", reactionName:"Test Reaction",
+    reactants:["MAT-A:1"], products:["MAT-B:1"], conditions:["MIN_TEMPERATURE:25"], status:"PROPOSED"
+  });
+  let result = validateStemLabCatalog(catalog);
+  assert.equal(result.valid, true);
+
+  catalog.reactionDefinitions[0].experimentId = "UNKNOWN";
+  result = validateStemLabCatalog(catalog);
+  assert.ok(result.errors.some((e) => e.code === "EXPERIMENT_REFERENCE_MISSING" && e.sheet === "REACTION_DEFINITIONS"));
+
+  catalog.reactionDefinitions[0].experimentId = "PHY-MEC-001";
+  catalog.reactionDefinitions[0].status = "INVALID";
+  result = validateStemLabCatalog(catalog);
+  assert.ok(result.errors.some((e) => e.code === "INVALID_REACTION_STATUS"));
 });
