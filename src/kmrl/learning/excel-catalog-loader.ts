@@ -110,6 +110,7 @@ const LEGACY_MODEL_INPUTS: Readonly<Record<string, readonly string[]>> = {
   heating_water: ["mass", "energy", "dt"],
   free_fall: ["gravity", "dt"],
   projectile_motion: ["speed", "angle", "gravity", "dt"],
+  spring_mass: ["mass", "spring_constant", "dt"],
 };
 
 const SHEETS = {
