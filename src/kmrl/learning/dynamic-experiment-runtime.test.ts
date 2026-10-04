@@ -113,7 +113,7 @@ test("a second Excel-defined experiment using the same registered model needs no
     .concat(clone.outcomes.filter((outcome) => outcome.experimentId !== "PHY-MEC-001"));
 
   const clonedValidation = validateStemLabCatalog(clone);
-  assert.equal(clonedValidation.valid, true);
+  assert.equal(clonedValidation.valid, true, JSON.stringify(clonedValidation.errors));
 
   const registry = createKMRLModelRegistry(clone);
   const runtime = createDynamicExperimentRuntime(
