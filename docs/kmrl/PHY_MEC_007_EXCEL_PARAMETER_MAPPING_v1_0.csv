@@ -1,0 +1,6 @@
+Experiment_ID,Parameter_ID,Parameter_Name,Default,Min,Max,Unit,Learner_Editable,Model_Input
+PHY-MEC-007,PHY-MEC-007-P01,mass_1,1,0.001,100,kg,YES,m1
+PHY-MEC-007,PHY-MEC-007-P02,mass_2,1,0.001,100,kg,YES,m2
+PHY-MEC-007,PHY-MEC-007-P03,initial_velocity_1,2,-100,100,m/s,YES,v1
+PHY-MEC-007,PHY-MEC-007-P04,initial_velocity_2,-1,-100,100,m/s,YES,v2
+PHY-MEC-007,PHY-MEC-007-P05,time_step,0.1,0.001,10,s,NO,dt
