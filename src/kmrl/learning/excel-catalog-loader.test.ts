@@ -15,7 +15,7 @@ function workbookBytes(): Uint8Array {
     Input_Refs:"Parameters sheet",Measurement_Refs:"Measurements sheet",Safety_Ref:"PHY-MEC-001-SAFE"
   }]);
   add("MODEL_CONTRACTS", [{Model_ID:"constant_force",Domain:"PHYSICS",Required_Inputs:"mass, force, dt",State_Outputs:"position, velocity, acceleration",Rule_or_Equation:"F=m*a"}]);
-  add("PARAMETERS", [{Experiment_ID:"PHY-MEC-001",Parameter_ID:"P01",Parameter_Name:"Force",Model_Input:"force",Default:10,Min:0,Max:100,Unit:"N",Learner_Editable:"YES"}]);
+  add("PARAMETERS", [{Experiment_ID:"PHY-MEC-001",Parameter_ID:"P02",Parameter_Name:"Force",Model_Input:"force",Default:10,Min:0,Max:100,Unit:"N",Learner_Editable:"YES"}]);
   add("PROCEDURE_STEPS", [{Experiment_ID:"PHY-MEC-001",Step_No:1,Step_Type:"OBSERVE",Instruction:"Observe motion",Runtime_Action:"Model/UI defined"}]);
   add("MEASUREMENTS", [{Measurement_ID:"M01",Experiment_ID:"PHY-MEC-001",Measurement_Name:"Velocity",Unit:"m/s",Source:"runtime state"}]);
   add("SAFETY", [{Safety_ID:"S01",Experiment_ID:"PHY-MEC-001",Level:"LOW",Hazards:"Simulation only",Restrictions:"No physical procedure"}]);
