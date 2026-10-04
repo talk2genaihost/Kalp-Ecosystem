@@ -44,6 +44,7 @@ export interface DynamicExperimentDefinition {
   readonly safety: StemLabCatalog["safety"];
   readonly materials: StemLabCatalog["materials"];
   readonly outcomes: StemLabCatalog["outcomes"];
+  readonly reactionDefinitions: StemLabCatalog["reactionDefinitions"];
 }
 
 export interface DynamicMeasurement {
@@ -61,10 +62,7 @@ export interface DynamicExperimentSnapshot {
   readonly measurements: DynamicMeasurement[];
 }
 
-export interface DynamicExperimentModelContext {
-  readonly reaction?: ReactionDefinition;
-  readonly initialMaterials?: readonly MaterialAmount[];
-}
+export interface DynamicExperimentModelContext {}
 
 interface DynamicModelSession {
   setInput(name: string, value: number | string): void;
@@ -92,9 +90,46 @@ function numericMappedParameter(
   return value;
 }
 
+function parseReactionParticipant(value: string): { materialId: string; coefficient: number } {
+  const [materialId, coefficientText] = value.split(":").map((item) => item.trim());
+  const coefficient = Number(coefficientText);
+  if (!materialId || !Number.isFinite(coefficient) || coefficient <= 0) {
+    throw new Error(`Invalid reaction participant: ${value}`);
+  }
+  return { materialId, coefficient };
+}
+
+function parseReactionDefinition(definition: DynamicExperimentDefinition, experimentId: string): ReactionDefinition {
+  const source = definition.reactionDefinitions.find((item) => item.experimentId === experimentId && item.status.toUpperCase() === "CANONICAL");
+  if (!source) throw new Error(`No canonical reaction definition is registered for experiment "${experimentId}"`);
+  return {
+    id: source.reactionId,
+    name: source.reactionName,
+    reactants: source.reactants.map(parseReactionParticipant),
+    products: source.products.map(parseReactionParticipant),
+    conditions: source.conditions.map((value) => {
+      const [type, temperatureText] = value.split(":").map((item) => item.trim());
+      const temperature = Number(temperatureText);
+      if (type !== "MIN_TEMPERATURE" && type !== "MAX_TEMPERATURE") throw new Error(`Unsupported reaction condition: ${value}`);
+      if (!Number.isFinite(temperature)) throw new Error(`Invalid reaction condition temperature: ${value}`);
+      return { type, temperature: quantity(temperature, "degC") } as ReactionDefinition["conditions"] extends readonly (infer T)[] ? T : never;
+    }),
+  };
+}
+
+function initialMaterialsFromParameters(parameters: readonly DynamicExperimentParameter[], reaction: ReactionDefinition): readonly MaterialAmount[] {
+  return reaction.reactants.map((participant) => {
+    const parameter = parameters.find((item) => item.modelInput === `material:${participant.materialId}`);
+    if (!parameter) throw new Error(`No semantic parameter mapping exists for reaction material "${participant.materialId}"`);
+    const amount = typeof parameter.value === "number" ? parameter.value : Number(parameter.value);
+    if (!Number.isFinite(amount) || amount < 0) throw new Error(`Invalid initial amount for reaction material "${participant.materialId}"`);
+    return { materialId: participant.materialId, amount: quantity(amount, "mol") };
+  });
+}
+
 function createModelSession(
   definition: DynamicExperimentDefinition,
-  context: DynamicExperimentModelContext,
+  _context: DynamicExperimentModelContext,
 ): DynamicModelSession {
   const modelId = definition.model.modelId;
 
@@ -345,6 +380,7 @@ export function buildDynamicExperimentDefinition(
     safety: catalog.safety.filter((item) => item.experimentId === experimentId),
     materials: catalog.materials,
     outcomes: catalog.outcomes.filter((item) => item.experimentId === experimentId),
+    reactionDefinitions: catalog.reactionDefinitions.filter((item) => item.experimentId === experimentId),
   };
 }
 
@@ -371,6 +407,7 @@ export class DynamicExperimentRuntime {
       safety: this.definition.safety.map((item) => ({ ...item })),
       materials: this.definition.materials.map((item) => ({ ...item, keyProperties: [...item.keyProperties] })),
       outcomes: this.definition.outcomes.map((item) => ({ ...item })),
+      reactionDefinitions: this.definition.reactionDefinitions.map((item) => ({ ...item, reactants: [...item.reactants], products: [...item.products], conditions: [...item.conditions] })),
     };
   }
 
