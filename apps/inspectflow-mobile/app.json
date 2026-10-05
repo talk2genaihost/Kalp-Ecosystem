@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "KALP InspectFlow",
+    "slug": "kalp-inspectflow",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.kalp.inspectflow",
+      "versionCode": 1
+    }
+  }
+}
