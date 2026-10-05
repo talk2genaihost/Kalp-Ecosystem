@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { InspectionStore, type Inspection } from './inspectflow/inspectionStore';
+import { hasSession, signIn, signOut, syncInspection } from './inspectflow/kmrlSync';
 
 type Screen = 'lab' | 'inspectflow';
 
@@ -20,18 +21,39 @@ export default function App() {
   const [title, setTitle] = useState('Site Inspection 001');
   const [observation, setObservation] = useState('');
   const [pending, setPending] = useState(0);
+  const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const refresh = async () => {
     const saved = await store.get('inspection-001');
     setInspection(saved);
     setPending(await store.pendingCount());
+    setAuthenticated(await hasSession());
     setLoading(false);
   };
 
   useEffect(() => {
     void refresh();
   }, []);
+
+  const login = async () => {
+    try {
+      await signIn(email.trim(), password);
+      setAuthenticated(true);
+      setPassword('');
+      Alert.alert('KMRL Backend', 'Supabase authentication successful.');
+    } catch (error) {
+      Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Unknown error');
+    }
+  };
+
+  const logout = async () => {
+    await signOut();
+    setAuthenticated(false);
+  };
 
   const startInspection = async () => {
     const now = new Date().toISOString();
@@ -62,24 +84,84 @@ export default function App() {
     setPending(await store.pendingCount());
   };
 
-  const processOfflineQueue = async () => {
-    const item = await store.nextPending();
-    if (!item) {
-      Alert.alert('Offline Queue', 'Nothing is pending.');
+  const syncPending = async () => {
+    if (!authenticated) {
+      Alert.alert('Backend Sync', 'Sign in to the KMRL Sandbox first.');
       return;
     }
-    await store.acknowledge(item.id);
-    setPending(await store.pendingCount());
-    Alert.alert(
-      'Offline Queue',
-      'Local queue item acknowledged. Backend sync remains the next integration boundary.',
-    );
+
+    const item = await store.nextPending();
+    if (!item) {
+      Alert.alert('Backend Sync', 'Nothing is pending.');
+      return;
+    }
+
+    setSyncing(true);
+    try {
+      const result = await syncInspection(item.payload);
+      if (!result.ok) {
+        Alert.alert(
+          result.status === 409 ? 'Backend Conflict' : 'Backend Sync Failed',
+          result.error,
+        );
+        return;
+      }
+
+      await store.acknowledge(item.id);
+      setPending(await store.pendingCount());
+      Alert.alert('Backend Sync', 'Inspection synced to KMRL Sandbox.');
+    } catch (error) {
+      Alert.alert(
+        'Backend Sync',
+        error instanceof Error ? error.message : 'Network sync failed',
+      );
+    } finally {
+      setSyncing(false);
+    }
   };
 
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
         <Text style={styles.loading}>Loading KMRAL Lab...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!authenticated) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.labTitle}>KMRL LAB</Text>
+          <Text style={styles.subtitle}>KALP Mobile Test & Integration Lab</Text>
+          <View style={styles.labCard}>
+            <Text style={styles.labCardTitle}>KMRL Sandbox Sign-in</Text>
+            <Text style={styles.helper}>
+              Authenticate before sending InspectFlow data to the Supabase backend.
+            </Text>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Test user email"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+            />
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Password"
+              secureTextEntry
+              style={styles.input}
+            />
+            <TouchableOpacity style={styles.primary} onPress={() => void login()}>
+              <Text style={styles.primaryText}>Sign in to KMRL Sandbox</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.footer}>
+            KMRL backend: kmrl-sync • authenticated Edge Function
+          </Text>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -93,12 +175,13 @@ export default function App() {
           </TouchableOpacity>
 
           <Text style={styles.title}>KALP InspectFlow</Text>
-          <Text style={styles.subtitle}>KMRAL Mobile Sandbox v0.3</Text>
+          <Text style={styles.subtitle}>KMRAL Mobile Sandbox v0.4</Text>
 
           <View style={styles.statusCard}>
             <Text style={styles.statusTitle}>Android shell: READY</Text>
             <Text>Persistent storage: READY</Text>
             <Text>Offline queue: {pending} pending</Text>
+            <Text>Supabase session: AUTHENTICATED</Text>
           </View>
 
           <Text style={styles.section}>Inspection Test</Text>
@@ -143,16 +226,23 @@ export default function App() {
               ))}
 
               <TouchableOpacity
-                style={styles.secondary}
-                onPress={() => void processOfflineQueue()}
+                style={styles.primary}
+                onPress={() => void syncPending()}
+                disabled={syncing}
               >
-                <Text style={styles.secondaryText}>Process Offline Queue</Text>
+                <Text style={styles.primaryText}>
+                  {syncing ? 'Syncing…' : 'Sync Pending to Backend'}
+                </Text>
               </TouchableOpacity>
             </>
           )}
 
+          <TouchableOpacity style={styles.secondary} onPress={() => void logout()}>
+            <Text style={styles.secondaryText}>Sign out</Text>
+          </TouchableOpacity>
+
           <Text style={styles.footer}>
-            KMRAL vertical slice: UI to persistence to offline queue. Backend sync follows.
+            KMRAL vertical slice: UI → persistence → offline queue → authenticated kmrl-sync.
           </Text>
         </ScrollView>
       </SafeAreaView>
@@ -172,7 +262,8 @@ export default function App() {
           <StatusRow label="Persistent Storage" value="PASS" tone="pass" />
           <StatusRow label="Offline Queue" value={pending === 0 ? 'PASS' : pending + ' PENDING'} tone={pending === 0 ? 'pass' : 'warn'} />
           <StatusRow label="InspectFlow" value="RUNNING" tone="pass" />
-          <StatusRow label="Backend Sync" value="NEXT" tone="warn" />
+          <StatusRow label="Supabase Session" value="AUTHENTICATED" tone="pass" />
+          <StatusRow label="Backend Sync" value={pending === 0 ? 'READY' : 'PENDING'} tone={pending === 0 ? 'pass' : 'warn'} />
         </View>
 
         <Text style={styles.section}>Lab Modules</Text>
@@ -181,7 +272,7 @@ export default function App() {
           <View style={styles.moduleIcon}><Text style={styles.iconText}>IF</Text></View>
           <View style={styles.moduleBody}>
             <Text style={styles.moduleTitle}>InspectFlow</Text>
-            <Text style={styles.moduleText}>Inspection → persistence → offline queue</Text>
+            <Text style={styles.moduleText}>Inspection → persistence → offline queue → backend</Text>
           </View>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
@@ -198,7 +289,7 @@ export default function App() {
           <View style={styles.moduleIcon}><Text style={styles.iconText}>SD</Text></View>
           <View style={styles.moduleBody}>
             <Text style={styles.moduleTitle}>Sandbox Data</Text>
-            <Text style={styles.moduleText}>Local inspection and queue state</Text>
+            <Text style={styles.moduleText}>Local inspection and KMRL remote snapshot state</Text>
           </View>
         </View>
 
@@ -206,7 +297,7 @@ export default function App() {
           <View style={styles.moduleIcon}><Text style={styles.iconText}>IT</Text></View>
           <View style={styles.moduleBody}>
             <Text style={styles.moduleTitle}>Integration Tests</Text>
-            <Text style={styles.moduleText}>Current scope: mobile persistence and offline queue</Text>
+            <Text style={styles.moduleText}>Mobile persistence + authenticated backend sync</Text>
           </View>
         </View>
 
@@ -214,14 +305,14 @@ export default function App() {
           <View style={styles.moduleIcon}><Text style={styles.iconText}>APK</Text></View>
           <View style={styles.moduleBody}>
             <Text style={styles.moduleTitle}>Build / APK</Text>
-            <Text style={styles.moduleText}>KMRAL InspectFlow v0.3 • Android preview build</Text>
+            <Text style={styles.moduleText}>KMRAL InspectFlow v0.4 • Android preview build</Text>
           </View>
         </View>
 
         <View style={styles.nextCard}>
-          <Text style={styles.nextTitle}>NEXT INTEGRATION</Text>
+          <Text style={styles.nextTitle}>BACKEND INTEGRATION</Text>
           <Text style={styles.nextText}>
-            Backend Sync: Offline Queue → inspectflow-sync → backend → sync result
+            Supabase KMRL Sandbox → authenticated kmrl-sync → revisioned inspection snapshot.
           </Text>
         </View>
       </ScrollView>
@@ -254,6 +345,7 @@ const styles = StyleSheet.create({
   labTitle: { fontSize: 34, fontWeight: '800' },
   title: { fontSize: 30, fontWeight: '700' },
   subtitle: { marginTop: 6, fontSize: 16, color: '#555' },
+  helper: { marginBottom: 14, color: '#555', lineHeight: 20 },
   backButton: { marginBottom: 20 },
   backText: { fontSize: 17, fontWeight: '700' },
   labCard: { marginTop: 22, padding: 18, borderRadius: 14, backgroundColor: '#fff' },
@@ -280,7 +372,7 @@ const styles = StyleSheet.create({
   statusTitle: { fontSize: 17, fontWeight: '700' },
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 14, marginBottom: 12 },
   multiline: { minHeight: 90, textAlignVertical: 'top' },
-  primary: { backgroundColor: '#111', borderRadius: 10, padding: 15, alignItems: 'center' },
+  primary: { backgroundColor: '#111', borderRadius: 10, padding: 15, alignItems: 'center', marginTop: 4 },
   primaryText: { color: '#fff', fontWeight: '700' },
   secondary: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#bbb', borderRadius: 10, padding: 14, alignItems: 'center', marginTop: 12 },
   secondaryText: { fontWeight: '700' },
