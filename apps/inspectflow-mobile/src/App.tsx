@@ -9,35 +9,28 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { InspectionStore, type Inspection } from './inspectflow/inspectionStore';
-import { hasSession, signIn, signOut, syncInspection } from './inspectflow/kmrlSync';
-import { STEM_CATALOG_SOURCE, STEM_EXPERIMENTS, COLLISION_MOMENTUM_MAPPING } from './inspectflow/stemCatalog';
+import { hasSession, signIn, signOut } from './inspectflow/kmrlSync';
+import { STEM_EXPERIMENTS, STEM_CATALOG_SOURCE } from './inspectflow/stemCatalog';
 
-type Screen = 'lab' | 'inspectflow' | 'catalog';
+type Screen = 'home' | 'catalog' | 'profile';
+
+const SUBJECTS = ['All', 'Physics', 'Chemistry', 'Mathematics'] as const;
+type Subject = (typeof SUBJECTS)[number];
 
 export default function App() {
-  const store = useMemo(() => new InspectionStore(), []);
-  const [screen, setScreen] = useState<Screen>('lab');
-  const [inspection, setInspection] = useState<Inspection | null>(null);
-  const [title, setTitle] = useState('Site Inspection 001');
-  const [observation, setObservation] = useState('');
-  const [pending, setPending] = useState(0);
+  const [screen, setScreen] = useState<Screen>('home');
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const refresh = async () => {
-    const saved = await store.get('inspection-001');
-    setInspection(saved);
-    setPending(await store.pendingCount());
-    setAuthenticated(await hasSession());
-    setLoading(false);
-  };
+  const [query, setQuery] = useState('');
+  const [subject, setSubject] = useState<Subject>('All');
 
   useEffect(() => {
-    void refresh();
+    void (async () => {
+      setAuthenticated(await hasSession());
+      setLoading(false);
+    })();
   }, []);
 
   const login = async () => {
@@ -45,9 +38,8 @@ export default function App() {
       await signIn(email.trim(), password);
       setAuthenticated(true);
       setPassword('');
-      Alert.alert('KMRL Backend', 'Supabase authentication successful.');
     } catch (error) {
-      Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Unknown error');
+      Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Unable to sign in');
     }
   };
 
@@ -56,379 +48,350 @@ export default function App() {
     setAuthenticated(false);
   };
 
-  const startInspection = async () => {
-    const now = new Date().toISOString();
-    const next: Inspection = {
-      id: 'inspection-001',
-      title: title.trim() || 'Untitled inspection',
-      status: 'in_progress',
-      observations: inspection?.observations ?? [],
-      evidenceMediaIds: inspection?.evidenceMediaIds ?? [],
-      createdAt: inspection?.createdAt ?? now,
-      updatedAt: now,
-    };
-    await store.save(next);
-    setInspection(next);
-    setPending(await store.pendingCount());
-  };
-
-  const addObservation = async () => {
-    if (!inspection || !observation.trim()) return;
-    const next: Inspection = {
-      ...inspection,
-      observations: [...inspection.observations, observation.trim()],
-      updatedAt: new Date().toISOString(),
-    };
-    await store.save(next);
-    setInspection(next);
-    setObservation('');
-    setPending(await store.pendingCount());
-  };
-
-  const syncPending = async () => {
-    if (!authenticated) {
-      Alert.alert('Backend Sync', 'Sign in to the KMRL Sandbox first.');
-      return;
-    }
-
-    const item = await store.nextPending();
-    if (!item) {
-      Alert.alert('Backend Sync', 'Nothing is pending.');
-      return;
-    }
-
-    setSyncing(true);
-    try {
-      const result = await syncInspection(item.payload);
-      if (!result.ok) {
-        Alert.alert(
-          result.status === 409 ? 'Backend Conflict' : 'Backend Sync Failed',
-          result.error,
-        );
-        return;
-      }
-
-      await store.acknowledge(item.id);
-      setPending(await store.pendingCount());
-      Alert.alert('Backend Sync', 'Inspection synced to KMRL Sandbox.');
-    } catch (error) {
-      Alert.alert(
-        'Backend Sync',
-        error instanceof Error ? error.message : 'Network sync failed',
-      );
-    } finally {
-      setSyncing(false);
-    }
-  };
+  const filteredExperiments = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return STEM_EXPERIMENTS.filter((item) => {
+      const matchesSubject = subject === 'All' || item.Domain === subject;
+      const matchesQuery =
+        !q ||
+        item.Experiment_ID.toLowerCase().includes(q) ||
+        item.Experiment_Name.toLowerCase().includes(q) ||
+        item.Model_ID.toLowerCase().includes(q);
+      return matchesSubject && matchesQuery;
+    });
+  }, [query, subject]);
 
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <Text style={styles.loading}>Loading KMRAL Lab...</Text>
+        <View style={styles.loadingWrap}>
+          <Text style={styles.brand}>⚗ KMRL</Text>
+          <Text style={styles.loading}>Loading Sandbox…</Text>
+        </View>
       </SafeAreaView>
     );
   }
 
   if (!authenticated) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.labTitle}>KMRL LAB</Text>
-          <Text style={styles.subtitle}>KALP Mobile Test & Integration Lab</Text>
-          <View style={styles.labCard}>
-            <Text style={styles.labCardTitle}>KMRL Sandbox Sign-in</Text>
-            <Text style={styles.helper}>
-              Authenticate before sending InspectFlow data to the Supabase backend.
-            </Text>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Test user email"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              style={styles.input}
-            />
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password"
-              secureTextEntry
-              style={styles.input}
-            />
-            <TouchableOpacity style={styles.primary} onPress={() => void login()}>
-              <Text style={styles.primaryText}>Sign in to KMRL Sandbox</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.footer}>
-            KMRL backend: kmrl-sync • authenticated Edge Function
-          </Text>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  if (screen === 'catalog') {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <TouchableOpacity onPress={() => setScreen('lab')} style={styles.backButton}>
-            <Text style={styles.backText}>‹ KMRL LAB</Text>
-          </TouchableOpacity>
-          <Text style={styles.title}>STEM Catalog</Text>
-          <Text style={styles.subtitle}>Excel-governed runtime data • 45 seed experiments</Text>
-          <View style={styles.statusCard}>
-            <Text style={styles.statusTitle}>Catalog Source: LOADED</Text>
-            <Text>Approved workbook: {STEM_CATALOG_SOURCE.approvedWorkbook}</Text>
-            <Text>Physics: 15 • Chemistry: 15 • Mathematics: 15</Text>
-            <Text>Collision model: PHY-MEC-007</Text>
-          </View>
-          <Text style={styles.section}>Experiments</Text>
-          {STEM_EXPERIMENTS.map((item) => (
-            <View key={item.Experiment_ID} style={styles.catalogRow}>
-              <View style={styles.moduleBody}>
-                <Text style={styles.moduleTitle}>{item.Experiment_ID} • {item.Experiment_Name}</Text>
-                <Text style={styles.moduleText}>{item.Domain} • model: {item.Model_ID}</Text>
-              </View>
-            </View>
-          ))}
-          <View style={styles.nextCard}>
-            <Text style={styles.nextTitle}>PHY-MEC-007 MAPPING</Text>
-            <Text style={styles.nextText}>
-              m1={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P01'].default} kg •
-              m2={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P02'].default} kg •
-              v1={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P03'].default} m/s •
-              v2={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P04'].default} m/s •
-              dt={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P05'].default} s
-            </Text>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  if (screen === 'inspectflow') {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <TouchableOpacity onPress={() => setScreen('lab')} style={styles.backButton}>
-            <Text style={styles.backText}>‹ KMRL LAB</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.title}>KALP InspectFlow</Text>
-          <Text style={styles.subtitle}>KMRAL Mobile Sandbox v0.4</Text>
-
-          <View style={styles.statusCard}>
-            <Text style={styles.statusTitle}>Android shell: READY</Text>
-            <Text>Persistent storage: READY</Text>
-            <Text>Offline queue: {pending} pending</Text>
-            <Text>Supabase session: AUTHENTICATED</Text>
-          </View>
-
-          <Text style={styles.section}>Inspection Test</Text>
-
-          <TextInput
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Inspection title"
-            style={styles.input}
-          />
-
-          <TouchableOpacity style={styles.primary} onPress={() => void startInspection()}>
-            <Text style={styles.primaryText}>
-              {inspection ? 'Save Inspection' : 'Start Inspection'}
-            </Text>
-          </TouchableOpacity>
-
-          {inspection && (
-            <>
-              <View style={styles.inspectionCard}>
-                <Text style={styles.inspectionTitle}>{inspection.title}</Text>
-                <Text>Status: {inspection.status}</Text>
-                <Text>Observations: {inspection.observations.length}</Text>
-              </View>
-
-              <TextInput
-                value={observation}
-                onChangeText={setObservation}
-                placeholder="Add observation"
-                multiline
-                style={[styles.input, styles.multiline]}
-              />
-
-              <TouchableOpacity style={styles.secondary} onPress={() => void addObservation()}>
-                <Text style={styles.secondaryText}>Add Observation</Text>
-              </TouchableOpacity>
-
-              {inspection.observations.map((item, index) => (
-                <Text key={index + '-' + item} style={styles.observation}>
-                  {index + 1}. {item}
-                </Text>
-              ))}
-
-              <TouchableOpacity
-                style={styles.primary}
-                onPress={() => void syncPending()}
-                disabled={syncing}
-              >
-                <Text style={styles.primaryText}>
-                  {syncing ? 'Syncing…' : 'Sync Pending to Backend'}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
-
-          <TouchableOpacity style={styles.secondary} onPress={() => void logout()}>
-            <Text style={styles.secondaryText}>Sign out</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.footer}>
-            KMRAL vertical slice: UI → persistence → offline queue → authenticated kmrl-sync.
-          </Text>
-        </ScrollView>
-      </SafeAreaView>
-    );
+    return <LoginScreen email={email} password={password} setEmail={setEmail} setPassword={setPassword} onLogin={() => void login()} />;
   }
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.labTitle}>KMRL LAB</Text>
-        <Text style={styles.subtitle}>KALP Mobile Test & Integration Lab</Text>
+      {screen === 'home' && <Home onCatalog={() => setScreen('catalog')} onProfile={() => setScreen('profile')} />}
+      {screen === 'catalog' && (
+        <Catalog
+          query={query}
+          setQuery={setQuery}
+          subject={subject}
+          setSubject={setSubject}
+          experiments={filteredExperiments}
+          onBack={() => setScreen('home')}
+        />
+      )}
+      {screen === 'profile' && <Profile onBack={() => setScreen('home')} onSignOut={() => void logout()} />}
+      <BottomNav screen={screen} onHome={() => setScreen('home')} onCatalog={() => setScreen('catalog')} onProfile={() => setScreen('profile')} />
+    </SafeAreaView>
+  );
+}
 
-        <View style={styles.labCard}>
-          <Text style={styles.labCardTitle}>Runtime Status</Text>
-          <StatusRow label="Android Runtime" value="READY" tone="pass" />
-          <StatusRow label="KMRAL Core" value="READY" tone="pass" />
-          <StatusRow label="Persistent Storage" value="PASS" tone="pass" />
-          <StatusRow label="Offline Queue" value={pending === 0 ? 'PASS' : pending + ' PENDING'} tone={pending === 0 ? 'pass' : 'warn'} />
-          <StatusRow label="InspectFlow" value="RUNNING" tone="pass" />
-          <StatusRow label="Supabase Session" value="AUTHENTICATED" tone="pass" />
-          <StatusRow label="Backend Sync" value={pending === 0 ? 'READY' : 'PENDING'} tone={pending === 0 ? 'pass' : 'warn'} />
-          <StatusRow label="STEM Catalog" value="45 LOADED" tone="pass" />
-        </View>
-
-        <Text style={styles.section}>Lab Modules</Text>
-
-        <TouchableOpacity style={styles.moduleCard} onPress={() => setScreen('catalog')}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>STEM</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>STEM Catalog</Text>
-            <Text style={styles.moduleText}>Excel source → governed runtime catalog • 45 experiments</Text>
-          </View>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.moduleCard} onPress={() => setScreen('inspectflow')}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>IF</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>InspectFlow</Text>
-            <Text style={styles.moduleText}>Inspection → persistence → offline queue → backend</Text>
-          </View>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
-
-        <View style={styles.moduleCard}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>TR</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>Test Runs</Text>
-            <Text style={styles.moduleText}>Device validation checkpoints and results</Text>
-          </View>
-        </View>
-
-        <View style={styles.moduleCard}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>SD</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>Sandbox Data</Text>
-            <Text style={styles.moduleText}>Local inspection and KMRL remote snapshot state</Text>
-          </View>
-        </View>
-
-        <View style={styles.moduleCard}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>IT</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>Integration Tests</Text>
-            <Text style={styles.moduleText}>Mobile persistence + authenticated backend sync</Text>
-          </View>
-        </View>
-
-        <View style={styles.moduleCard}>
-          <View style={styles.moduleIcon}><Text style={styles.iconText}>APK</Text></View>
-          <View style={styles.moduleBody}>
-            <Text style={styles.moduleTitle}>Build / APK</Text>
-            <Text style={styles.moduleText}>KMRAL InspectFlow v0.4 • Android preview build</Text>
-          </View>
-        </View>
-
-        <View style={styles.nextCard}>
-          <Text style={styles.nextTitle}>BACKEND INTEGRATION</Text>
-          <Text style={styles.nextText}>
-            Supabase KMRL Sandbox → authenticated kmrl-sync → revisioned inspection snapshot.
-          </Text>
+function LoginScreen({
+  email,
+  password,
+  setEmail,
+  setPassword,
+  onLogin,
+}: {
+  email: string;
+  password: string;
+  setEmail: (value: string) => void;
+  setPassword: (value: string) => void;
+  onLogin: () => void;
+}) {
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.loginContainer}>
+        <Text style={styles.loginBrand}>⚗ KMRL</Text>
+        <Text style={styles.loginTitle}>KMRL Sandbox</Text>
+        <Text style={styles.loginSubtitle}>Explore · Experiment · Measure · Learn</Text>
+        <View style={styles.loginCard}>
+          <Text style={styles.cardTitle}>Welcome back</Text>
+          <Text style={styles.helper}>Sign in to save experiments and sync your work with KMRL Sandbox.</Text>
+          <TextInput value={email} onChangeText={setEmail} placeholder="Email" autoCapitalize="none" keyboardType="email-address" style={styles.input} />
+          <TextInput value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry style={styles.input} />
+          <TouchableOpacity style={styles.primary} onPress={onLogin}>
+            <Text style={styles.primaryText}>Sign in</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function StatusRow({
-  label,
-  value,
-  tone,
+function Home({ onCatalog, onProfile }: { onCatalog: () => void; onProfile: () => void }) {
+  return (
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.brand}>⚗ KMRL</Text>
+            <Text style={styles.heroTitle}>KMRL SANDBOX</Text>
+            <Text style={styles.subtitle}>Explore · Experiment · Measure · Learn</Text>
+          </View>
+          <TouchableOpacity style={styles.avatar} onPress={onProfile}><Text>👤</Text></TouchableOpacity>
+        </View>
+
+        <View style={styles.heroCard}>
+          <View style={styles.heroArt}><Text style={styles.heroEmoji}>🔬</Text></View>
+          <View style={styles.heroCopy}>
+            <Text style={styles.heroCardTitle}>Learn by doing</Text>
+            <Text style={styles.heroCardText}>Run interactive STEM experiments, record observations and keep your results.</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.startCard} onPress={onCatalog}>
+          <View style={styles.startIcon}><Text style={styles.startIconText}>▶</Text></View>
+          <View style={styles.startBody}>
+            <Text style={styles.startTitle}>Start New Experiment</Text>
+            <Text style={styles.startText}>Choose from the STEM catalog</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+
+        <View style={styles.grid}>
+          <ActionCard icon="📚" title="STEM Catalog" subtitle="45 experiments" onPress={onCatalog} />
+          <ActionCard icon="🧪" title="Continue" subtitle="No active experiment" disabled />
+          <ActionCard icon="📊" title="My Results" subtitle="No results yet" disabled />
+          <ActionCard icon="🕘" title="Recent" subtitle="No experiments yet" disabled />
+        </View>
+
+        <View style={styles.syncCard}>
+          <View style={styles.syncDot} />
+          <View style={styles.syncBody}>
+            <Text style={styles.syncTitle}>Sync Status</Text>
+            <Text style={styles.syncText}>Online · Ready to sync</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Choose a subject</Text>
+        <View style={styles.subjectPreview}>
+          <SubjectCard label="Physics" emoji="⚛" detail="Motion · Energy · Forces" />
+          <SubjectCard label="Chemistry" emoji="⚗" detail="Matter · Reactions · Solutions" />
+          <SubjectCard label="Mathematics" emoji="π" detail="Algebra · Geometry · Statistics" />
+        </View>
+      </ScrollView>
+    </>
+  );
+}
+
+function Catalog({
+  query,
+  setQuery,
+  subject,
+  setSubject,
+  experiments,
+  onBack,
 }: {
-  label: string;
-  value: string;
-  tone: 'pass' | 'warn';
+  query: string;
+  setQuery: (value: string) => void;
+  subject: Subject;
+  setSubject: (value: Subject) => void;
+  experiments: typeof STEM_EXPERIMENTS;
+  onBack: () => void;
 }) {
   return (
-    <View style={styles.statusRow}>
-      <View style={[styles.dot, tone === 'pass' ? styles.dotPass : styles.dotWarn]} />
-      <Text style={styles.statusLabel}>{label}</Text>
-      <Text style={tone === 'pass' ? styles.statusPass : styles.statusWarn}>{value}</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={onBack}><Text style={styles.back}>‹ Home</Text></TouchableOpacity>
+        <Text style={styles.catalogCount}>{experiments.length} shown</Text>
+      </View>
+      <Text style={styles.pageTitle}>STEM Catalog</Text>
+      <Text style={styles.subtitle}>45 governed seed experiments</Text>
+
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search experiments…"
+        style={styles.search}
+      />
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+        {SUBJECTS.map((item) => (
+          <TouchableOpacity key={item} onPress={() => setSubject(item)} style={[styles.chip, subject === item && styles.chipActive]}>
+            <Text style={[styles.chipText, subject === item && styles.chipTextActive]}>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <View style={styles.sourceCard}>
+        <Text style={styles.sourceTitle}>CATALOG SOURCE · READY</Text>
+        <Text style={styles.sourceText}>{STEM_CATALOG_SOURCE.approvedWorkbook}</Text>
+        <Text style={styles.sourceText}>Physics 15 · Chemistry 15 · Mathematics 15</Text>
+      </View>
+
+      <Text style={styles.sectionTitle}>Experiments</Text>
+      {experiments.map((item) => (
+        <TouchableOpacity key={item.Experiment_ID} style={styles.experimentCard} onPress={() => Alert.alert('Experiment Workspace', item.Experiment_Name + '\n\nWorkspace is the next KMRL build stage.')}>
+          <View style={[styles.experimentIcon, item.Domain === 'Physics' ? styles.physics : item.Domain === 'Chemistry' ? styles.chemistry : styles.math]}>
+            <Text style={styles.experimentEmoji}>{item.Domain === 'Physics' ? '⚛' : item.Domain === 'Chemistry' ? '⚗' : 'π'}</Text>
+          </View>
+          <View style={styles.experimentBody}>
+            <Text style={styles.experimentId}>{item.Experiment_ID}</Text>
+            <Text style={styles.experimentName}>{item.Experiment_Name}</Text>
+            <Text style={styles.experimentMeta}>{item.Domain} · {item.Model_ID}</Text>
+          </View>
+          <Text style={styles.arrow}>›</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+}
+
+function Profile({ onBack, onSignOut }: { onBack: () => void; onSignOut: () => void }) {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity onPress={onBack}><Text style={styles.back}>‹ Home</Text></TouchableOpacity>
+      <Text style={styles.pageTitle}>Profile</Text>
+      <View style={styles.profileCard}>
+        <View style={styles.profileAvatar}><Text style={{ fontSize: 28 }}>👤</Text></View>
+        <View><Text style={styles.profileName}>KMRL Student</Text><Text style={styles.profileMeta}>KMRL Sandbox account</Text></View>
+      </View>
+      <View style={styles.settingCard}>
+        <Text style={styles.settingRow}>☁  Sync & Offline Storage</Text>
+        <Text style={styles.settingRow}>🔔  Notifications</Text>
+        <Text style={styles.settingRow}>⚙  Settings</Text>
+        <Text style={styles.settingRow}>ℹ  About KMRL Sandbox</Text>
+      </View>
+      <TouchableOpacity style={styles.secondary} onPress={onSignOut}><Text style={styles.secondaryText}>Sign out</Text></TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+function ActionCard({ icon, title, subtitle, onPress, disabled }: { icon: string; title: string; subtitle: string; onPress?: () => void; disabled?: boolean }) {
+  return (
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.actionCard, disabled && styles.actionDisabled]}>
+      <Text style={styles.actionIcon}>{icon}</Text>
+      <Text style={styles.actionTitle}>{title}</Text>
+      <Text style={styles.actionSubtitle}>{subtitle}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function SubjectCard({ label, emoji, detail }: { label: string; emoji: string; detail: string }) {
+  return (
+    <View style={styles.subjectCard}>
+      <Text style={styles.subjectEmoji}>{emoji}</Text>
+      <Text style={styles.subjectLabel}>{label}</Text>
+      <Text style={styles.subjectDetail}>{detail}</Text>
     </View>
   );
 }
 
+function BottomNav({ screen, onHome, onCatalog, onProfile }: { screen: Screen; onHome: () => void; onCatalog: () => void; onProfile: () => void }) {
+  return (
+    <View style={styles.nav}>
+      <NavItem label="Home" icon="⌂" active={screen === 'home'} onPress={onHome} />
+      <NavItem label="Catalog" icon="▣" active={screen === 'catalog'} onPress={onCatalog} />
+      <NavItem label="Experiments" icon="⚗" active={false} onPress={() => Alert.alert('Experiments', 'Experiment Workspace is the next build stage.')} />
+      <NavItem label="Results" icon="▥" active={false} onPress={() => Alert.alert('Results', 'Results history is the next build stage.')} />
+      <NavItem label="Profile" icon="●" active={screen === 'profile'} onPress={onProfile} />
+    </View>
+  );
+}
+
+function NavItem({ label, icon, active, onPress }: { label: string; icon: string; active: boolean; onPress: () => void }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.navItem}>
+      <Text style={[styles.navIcon, active && styles.navActive]}>{icon}</Text>
+      <Text style={[styles.navLabel, active && styles.navActive]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f7f7f7' },
-  container: { padding: 24, paddingBottom: 48 },
-  loading: { marginTop: 48, textAlign: 'center', fontSize: 18 },
-  labTitle: { fontSize: 34, fontWeight: '800' },
-  title: { fontSize: 30, fontWeight: '700' },
-  subtitle: { marginTop: 6, fontSize: 16, color: '#555' },
-  helper: { marginBottom: 14, color: '#555', lineHeight: 20 },
-  backButton: { marginBottom: 20 },
-  backText: { fontSize: 17, fontWeight: '700' },
-  labCard: { marginTop: 22, padding: 18, borderRadius: 14, backgroundColor: '#fff' },
-  labCardTitle: { fontSize: 19, fontWeight: '700', marginBottom: 10 },
-  statusRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-  dot: { width: 10, height: 10, borderRadius: 5, marginRight: 10 },
-  dotPass: { backgroundColor: '#2e9b55' },
-  dotWarn: { backgroundColor: '#d69b1c' },
-  statusLabel: { flex: 1, fontSize: 15 },
-  statusPass: { fontWeight: '700', color: '#247a42' },
-  statusWarn: { fontWeight: '700', color: '#9a6a08' },
-  section: { marginTop: 28, marginBottom: 12, fontSize: 22, fontWeight: '700' },
-  moduleCard: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderRadius: 14, marginBottom: 12 },
-  moduleIcon: { width: 44, height: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: '#111' },
-  iconText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-  moduleBody: { flex: 1, marginLeft: 14 },
-  moduleTitle: { fontSize: 17, fontWeight: '700' },
-  moduleText: { marginTop: 3, color: '#666', fontSize: 13 },
-  chevron: { fontSize: 30, color: '#777', marginLeft: 8 },
-  nextCard: { marginTop: 16, padding: 18, borderRadius: 14, backgroundColor: '#fff4d6' },
-  nextTitle: { fontSize: 13, fontWeight: '800', color: '#8a650d' },
-  nextText: { marginTop: 6, fontSize: 14, lineHeight: 20 },
-  statusCard: { marginTop: 20, padding: 16, borderRadius: 12, backgroundColor: '#fff', gap: 6 },
-  statusTitle: { fontSize: 17, fontWeight: '700' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 14, marginBottom: 12 },
-  multiline: { minHeight: 90, textAlignVertical: 'top' },
-  primary: { backgroundColor: '#111', borderRadius: 10, padding: 15, alignItems: 'center', marginTop: 4 },
-  primaryText: { color: '#fff', fontWeight: '700' },
-  secondary: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#bbb', borderRadius: 10, padding: 14, alignItems: 'center', marginTop: 12 },
-  secondaryText: { fontWeight: '700' },
-  inspectionCard: { marginTop: 16, padding: 16, backgroundColor: '#fff', borderRadius: 12, gap: 5 },
-  inspectionTitle: { fontSize: 18, fontWeight: '700' },
-  observation: { marginTop: 8, padding: 10, backgroundColor: '#fff', borderRadius: 8 },
-  catalogRow: { padding: 14, backgroundColor: '#fff', borderRadius: 10, marginBottom: 8 },
-  footer: { marginTop: 28, textAlign: 'center', fontSize: 13 },
+  safe: { flex: 1, backgroundColor: '#f4f8fb' },
+  container: { padding: 18, paddingBottom: 96 },
+  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  brand: { fontSize: 16, fontWeight: '800', color: '#0c5a91' },
+  loading: { marginTop: 12, fontSize: 16, color: '#4a6170' },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  heroTitle: { marginTop: 8, fontSize: 30, fontWeight: '900', color: '#0b2740' },
+  subtitle: { marginTop: 4, fontSize: 14, color: '#5f7380' },
+  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#d7e4ec' },
+  heroCard: { flexDirection: 'row', backgroundColor: '#dff1ff', borderRadius: 20, padding: 16, alignItems: 'center', marginBottom: 14 },
+  heroArt: { width: 82, height: 82, borderRadius: 18, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  heroEmoji: { fontSize: 44 },
+  heroCopy: { flex: 1, marginLeft: 14 },
+  heroCardTitle: { fontSize: 20, fontWeight: '800', color: '#0b3553' },
+  heroCardText: { marginTop: 6, fontSize: 13, lineHeight: 18, color: '#355a70' },
+  startCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0b83f6', borderRadius: 18, padding: 16, marginBottom: 14 },
+  startIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  startIconText: { color: '#0b83f6', fontSize: 20 },
+  startBody: { flex: 1, marginLeft: 12 },
+  startTitle: { color: '#fff', fontSize: 18, fontWeight: '800' },
+  startText: { color: '#dff1ff', marginTop: 3, fontSize: 12 },
+  arrow: { fontSize: 28, color: '#78909c' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  actionCard: { width: '48.5%', backgroundColor: '#fff', borderRadius: 16, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e0eaf0' },
+  actionDisabled: { opacity: 0.62 },
+  actionIcon: { fontSize: 26 },
+  actionTitle: { marginTop: 8, fontSize: 16, fontWeight: '800', color: '#17384f' },
+  actionSubtitle: { marginTop: 4, fontSize: 12, color: '#738692' },
+  syncCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 15, borderWidth: 1, borderColor: '#dce8ee', marginTop: 2 },
+  syncDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#20a464' },
+  syncBody: { flex: 1, marginLeft: 12 },
+  syncTitle: { fontSize: 16, fontWeight: '800', color: '#17384f' },
+  syncText: { marginTop: 3, color: '#64808f', fontSize: 12 },
+  sectionTitle: { marginTop: 22, marginBottom: 10, fontSize: 20, fontWeight: '800', color: '#17384f' },
+  subjectPreview: { gap: 10 },
+  subjectCard: { backgroundColor: '#fff', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#e0eaf0' },
+  subjectEmoji: { fontSize: 28 },
+  subjectLabel: { marginTop: 6, fontSize: 17, fontWeight: '800', color: '#17384f' },
+  subjectDetail: { marginTop: 3, fontSize: 12, color: '#708692' },
+  back: { color: '#0b83f6', fontSize: 16, fontWeight: '700' },
+  pageTitle: { marginTop: 12, fontSize: 30, fontWeight: '900', color: '#0b2740' },
+  catalogCount: { color: '#6b808c', fontSize: 12 },
+  search: { backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#d8e5ec', marginTop: 18 },
+  chips: { paddingVertical: 12, gap: 8 },
+  chip: { paddingVertical: 9, paddingHorizontal: 15, borderRadius: 20, backgroundColor: '#fff', borderWidth: 1, borderColor: '#d8e5ec' },
+  chipActive: { backgroundColor: '#0b83f6', borderColor: '#0b83f6' },
+  chipText: { color: '#45616f', fontWeight: '700' },
+  chipTextActive: { color: '#fff' },
+  sourceCard: { backgroundColor: '#e8f7ef', borderRadius: 14, padding: 14, marginTop: 2 },
+  sourceTitle: { color: '#167545', fontSize: 12, fontWeight: '900' },
+  sourceText: { marginTop: 4, color: '#355e49', fontSize: 12 },
+  experimentCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 12, marginBottom: 10, borderWidth: 1, borderColor: '#e0eaf0' },
+  experimentIcon: { width: 54, height: 54, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  physics: { backgroundColor: '#dff1ff' },
+  chemistry: { backgroundColor: '#e8f7ef' },
+  math: { backgroundColor: '#fff0e6' },
+  experimentEmoji: { fontSize: 28 },
+  experimentBody: { flex: 1, marginLeft: 12 },
+  experimentId: { color: '#6d7f89', fontSize: 11, fontWeight: '800' },
+  experimentName: { marginTop: 2, fontSize: 15, fontWeight: '800', color: '#17384f' },
+  experimentMeta: { marginTop: 4, fontSize: 11, color: '#708692' },
+  loginContainer: { padding: 22, paddingTop: 80 },
+  loginBrand: { fontSize: 18, fontWeight: '900', color: '#0b83f6' },
+  loginTitle: { marginTop: 12, fontSize: 34, fontWeight: '900', color: '#0b2740' },
+  loginSubtitle: { marginTop: 5, color: '#607985' },
+  loginCard: { marginTop: 30, backgroundColor: '#fff', borderRadius: 20, padding: 20, borderWidth: 1, borderColor: '#dce8ee' },
+  cardTitle: { fontSize: 20, fontWeight: '800', color: '#17384f' },
+  helper: { marginTop: 7, marginBottom: 16, color: '#657b87', lineHeight: 19 },
+  input: { backgroundColor: '#f8fbfd', borderWidth: 1, borderColor: '#d8e5ec', borderRadius: 12, padding: 14, marginBottom: 12 },
+  primary: { backgroundColor: '#0b83f6', borderRadius: 13, padding: 15, alignItems: 'center' },
+  primaryText: { color: '#fff', fontWeight: '800' },
+  profileCard: { marginTop: 20, flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 18, padding: 18 },
+  profileAvatar: { width: 58, height: 58, borderRadius: 29, backgroundColor: '#dff1ff', alignItems: 'center', justifyContent: 'center' },
+  profileName: { marginLeft: 14, fontSize: 18, fontWeight: '800', color: '#17384f' },
+  profileMeta: { marginLeft: 14, marginTop: 3, color: '#71848e', fontSize: 12 },
+  settingCard: { marginTop: 14, backgroundColor: '#fff', borderRadius: 16, padding: 4 },
+  settingRow: { padding: 16, fontSize: 15, color: '#29495b', borderBottomWidth: 1, borderBottomColor: '#edf2f5' },
+  secondary: { marginTop: 18, borderWidth: 1, borderColor: '#b8cbd5', borderRadius: 13, padding: 14, alignItems: 'center', backgroundColor: '#fff' },
+  secondaryText: { color: '#29495b', fontWeight: '800' },
+  nav: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 72, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#dce8ee', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
+  navItem: { alignItems: 'center', width: '20%' },
+  navIcon: { fontSize: 19, color: '#78909c' },
+  navLabel: { marginTop: 3, fontSize: 10, color: '#78909c' },
+  navActive: { color: '#0b83f6', fontWeight: '900' },
 });
