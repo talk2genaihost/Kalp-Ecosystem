@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'catalog.dart';
-import 'kmrl_sync.dart';
+import 'package:kmrl_sandbox/catalog.dart';
+import 'package:kmrl_sandbox/kmrl_sync.dart';
 
 void main() => runApp(const KmrlApp());
 
@@ -101,9 +101,9 @@ class _HomeState extends State<Home>{
   Expanded(child:ListView.builder(itemCount:filtered.length,itemBuilder:(c,i){
    final e=filtered[i];
    return Card(margin:const EdgeInsets.symmetric(horizontal:12,vertical:4),child:ListTile(
-    leading:CircleAvatar(child:Text(e.domain[0])),title:Text(e.name),subtitle:Text(e.id+' · '+e.modelId),trailing:const Icon(Icons.chevron_right),
+    leading:CircleAvatar(child:Text(e.domain[0])),title:Text(e.name),subtitle:Text('${e.id} · ${e.modelId}'),trailing:const Icon(Icons.chevron_right),
     onTap:()=>showDialog(context:context,builder:(_)=>AlertDialog(
-     title:Text(e.name),content:Text(e.id+'\n'+e.domain+'\nModel: '+e.modelId+'\n\nWorkspace is the next Flutter build stage.'),
+     title:Text(e.name),content:Text('${e.id}\n${e.domain}\nModel: ${e.modelId}\n\nWorkspace is the next Flutter build stage.'),
      actions:[TextButton(onPressed:()=>Navigator.pop(context),child:const Text('OK'))]))));
   }))
  ]);
