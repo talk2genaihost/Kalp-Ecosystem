@@ -1,14 +1,14 @@
-name: InspectFlow Android APK
+name: KMRL Sandbox Android APK
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - feature/kmral-inspectflow-android-apk
+      - feature/kmral-sandbox-enduser-ui-v0.1
 
 jobs:
   build_android:
-    name: Build InspectFlow APK
+    name: Build KMRL Sandbox APK
     type: build
     params:
       platform: android
