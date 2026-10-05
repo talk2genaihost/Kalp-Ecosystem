@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import { InspectionStore, type Inspection } from './inspectflow/inspectionStore';
 import { hasSession, signIn, signOut, syncInspection } from './inspectflow/kmrlSync';
+import { STEM_CATALOG_SOURCE, STEM_EXPERIMENTS, COLLISION_MOMENTUM_MAPPING } from './inspectflow/stemCatalog';
 
-type Screen = 'lab' | 'inspectflow';
+type Screen = 'lab' | 'inspectflow' | 'catalog';
 
 export default function App() {
   const store = useMemo(() => new InspectionStore(), []);
@@ -166,6 +167,45 @@ export default function App() {
     );
   }
 
+  if (screen === 'catalog') {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <TouchableOpacity onPress={() => setScreen('lab')} style={styles.backButton}>
+            <Text style={styles.backText}>‹ KMRL LAB</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>STEM Catalog</Text>
+          <Text style={styles.subtitle}>Excel-governed runtime data • 45 seed experiments</Text>
+          <View style={styles.statusCard}>
+            <Text style={styles.statusTitle}>Catalog Source: LOADED</Text>
+            <Text>Approved workbook: {STEM_CATALOG_SOURCE.approvedWorkbook}</Text>
+            <Text>Physics: 15 • Chemistry: 15 • Mathematics: 15</Text>
+            <Text>Collision model: PHY-MEC-007</Text>
+          </View>
+          <Text style={styles.section}>Experiments</Text>
+          {STEM_EXPERIMENTS.map((item) => (
+            <View key={item.Experiment_ID} style={styles.catalogRow}>
+              <View style={styles.moduleBody}>
+                <Text style={styles.moduleTitle}>{item.Experiment_ID} • {item.Experiment_Name}</Text>
+                <Text style={styles.moduleText}>{item.Domain} • model: {item.Model_ID}</Text>
+              </View>
+            </View>
+          ))}
+          <View style={styles.nextCard}>
+            <Text style={styles.nextTitle}>PHY-MEC-007 MAPPING</Text>
+            <Text style={styles.nextText}>
+              m1={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P01'].default} kg •
+              m2={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P02'].default} kg •
+              v1={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P03'].default} m/s •
+              v2={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P04'].default} m/s •
+              dt={COLLISION_MOMENTUM_MAPPING['PHY-MEC-007-P05'].default} s
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   if (screen === 'inspectflow') {
     return (
       <SafeAreaView style={styles.safe}>
@@ -264,9 +304,19 @@ export default function App() {
           <StatusRow label="InspectFlow" value="RUNNING" tone="pass" />
           <StatusRow label="Supabase Session" value="AUTHENTICATED" tone="pass" />
           <StatusRow label="Backend Sync" value={pending === 0 ? 'READY' : 'PENDING'} tone={pending === 0 ? 'pass' : 'warn'} />
+          <StatusRow label="STEM Catalog" value="45 LOADED" tone="pass" />
         </View>
 
         <Text style={styles.section}>Lab Modules</Text>
+
+        <TouchableOpacity style={styles.moduleCard} onPress={() => setScreen('catalog')}>
+          <View style={styles.moduleIcon}><Text style={styles.iconText}>STEM</Text></View>
+          <View style={styles.moduleBody}>
+            <Text style={styles.moduleTitle}>STEM Catalog</Text>
+            <Text style={styles.moduleText}>Excel source → governed runtime catalog • 45 experiments</Text>
+          </View>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.moduleCard} onPress={() => setScreen('inspectflow')}>
           <View style={styles.moduleIcon}><Text style={styles.iconText}>IF</Text></View>
@@ -379,5 +429,6 @@ const styles = StyleSheet.create({
   inspectionCard: { marginTop: 16, padding: 16, backgroundColor: '#fff', borderRadius: 12, gap: 5 },
   inspectionTitle: { fontSize: 18, fontWeight: '700' },
   observation: { marginTop: 8, padding: 10, backgroundColor: '#fff', borderRadius: 8 },
+  catalogRow: { padding: 14, backgroundColor: '#fff', borderRadius: 10, marginBottom: 8 },
   footer: { marginTop: 28, textAlign: 'center', fontSize: 13 },
 });
