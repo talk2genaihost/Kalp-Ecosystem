@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "KMRL Sandbox",
+    "slug": "kalp-inspectflow",
+    "version": "0.5.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.kalp.inspectflow",
+      "versionCode": 3
+    },
+    "extra": {
+      "eas": {
+        "projectId": "eb26876b-7b38-4919-8e2a-f51f296b64ff"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+name: KMRL Sandbox Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/kmral-sandbox-enduser-ui-v0.1
+      - feature/kmral-inspectflow-android-apk
+
+jobs:
+  build_android:
+    name: Build KMRL Sandbox APK
+    type: build
+    params:
+      platform: android
+      profile: preview

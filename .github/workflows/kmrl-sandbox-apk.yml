@@ -1,0 +1,32 @@
+name: KMRL Sandbox APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/kmral-sandbox-enduser-ui-v0.1
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/inspectflow-mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/inspectflow-mobile/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build preview APK with EAS
+        run: npx eas-cli build --platform android --profile preview --non-interactive --wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
