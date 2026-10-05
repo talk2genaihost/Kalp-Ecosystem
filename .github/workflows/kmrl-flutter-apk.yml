@@ -20,6 +20,8 @@ jobs:
           cache: true
       - name: Generate Android platform scaffold
         run: flutter create --platforms=android .
+      - name: Remove generated placeholder test
+        run: rm -f test/widget_test.dart
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
