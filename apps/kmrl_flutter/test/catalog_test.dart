@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/catalog.dart';
+import 'package:kmrl_sandbox/catalog.dart';
 
 void main() {
   test('KMRL catalog contains 45 governed experiments', () {
