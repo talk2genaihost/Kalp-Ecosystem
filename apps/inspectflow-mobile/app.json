@@ -8,6 +8,11 @@
     "android": {
       "package": "com.kalp.inspectflow",
       "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "eb26876b-7b38-4919-8e2a-f51f296b64ff"
+      }
     }
   }
 }
