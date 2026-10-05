@@ -55,7 +55,6 @@ class _LoginState extends State<Login>{
    FilledButton(onPressed:busy?null:go,child:Text(busy?'Signing in…':'Sign in'))
   ]))))));
 }
-}
 
 class Home extends StatefulWidget {
  final VoidCallback onSignOut;
