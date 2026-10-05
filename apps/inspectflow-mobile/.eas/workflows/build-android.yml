@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feature/kmral-sandbox-enduser-ui-v0.1
+      - feature/kmral-inspectflow-android-apk
 
 jobs:
   build_android:
