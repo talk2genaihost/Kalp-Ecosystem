@@ -101,11 +101,21 @@ export function validateRetroMissionReels(episode:Record<string,any>):RetroMissi
         Array.isArray(shot.characters)&&shot.characters.length>0 &&
         Boolean(shot.world_state)&&Boolean(shot.character_state)&&
         Boolean(shot.capability_state)&&Boolean(shot.threat_state)&&
-        Boolean(shot.objective_state)&&Boolean(shot.continuity_from)&&Boolean(shot.continuity_to)
+        Boolean(shot.objective_state)&&Boolean(shot.continuity_from)&&Boolean(shot.continuity_to) &&
+        typeof shot.previous_state==="string"&&typeof shot.state_change==="string"&&
+        typeof shot.current_state==="string"&&typeof shot.next_hook==="string"&&
+        typeof shot.continuity_lock==="string"&&typeof shot.storyboard_prompt==="string"&&
+        Number.isInteger(shot.prompt_character_count)&&shot.prompt_character_count===shot.storyboard_prompt.length&&
+        shot.prompt_character_count<=900
       );
       completeShots
-        ? pass("reel_"+number+"_shot_contract","Reel "+number+" contains complete production and continuity state.")
-        : fail("reel_"+number+"_shot_contract","Reel "+number+" contains incomplete production or continuity state.");
+        ? pass("reel_"+number+"_shot_contract","Reel "+number+" contains complete production, continuity and storyboard prompt state.")
+        : fail("reel_"+number+"_shot_contract","Reel "+number+" contains incomplete production, continuity or storyboard prompt state.");
+      const promptLengths=Array.isArray(reel.shots)?reel.shots.map((shot:any)=>Number(shot.prompt_character_count||0)):[];
+      const promptsOk=promptLengths.length===RETRO_SHOTS_PER_REEL&&promptLengths.every(n=>n>0&&n<=900);
+      promptsOk
+        ? pass("reel_"+number+"_prompt_900","Every Reel "+number+" storyboard prompt is <= 900 characters.")
+        : fail("reel_"+number+"_prompt_900","Reel "+number+" contains a storyboard prompt above the 900-character production limit.");
 
       if(index>0){
         const previous=reels[index-1];
