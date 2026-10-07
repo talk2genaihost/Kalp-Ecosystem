@@ -247,24 +247,24 @@ test("mission episode gate: generated production JSON contains actual 8-frame re
   assert.ok(episode.reels.every((reel:any)=>reel.starting_state.world_state==="Desert environment"));
 });
 
-test("mission reel production gate: every reel generates 12 shots and Resume carries mission state",()=>{
+test("mission reel production gate: every reel generates 8 frames and Resume carries mission state",()=>{
   const plan=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",3);
   const initial=buildRetroInitialMissionState(plan,"Jungle fortress","CONTRA_001","Baseline capability","Enemy perimeter active");
   const reel1=buildRetroReelProduction(plan,1,initial,["CONTRA_001"],"Jungle fortress","Baseline capability",contra.frames);
-  assert.equal(reel1.shots.length,12);
+  assert.equal(reel1.shots.length,8);
   assert.equal(reel1.ending_state.status,"IN_PROGRESS");
   assert.equal(reel1.ending_state.reel,1);
   assert.equal(reel1.shots[7].is_resolution_shot,false);
   assert.equal(reel1.shots[7].continuity_to,reel1.ending_state.continuity_anchor);
 
   const reel2=buildRetroReelProduction(plan,2,reel1.ending_state,["CONTRA_001"],reel1.ending_state.world_state,reel1.ending_state.capability_state,contra.frames);
-  assert.equal(reel2.shots.length,12);
+  assert.equal(reel2.shots.length,8);
   assert.equal(reel2.starting_state.continuity_anchor,reel1.ending_state.continuity_anchor);
   assert.equal(reel2.shots[0].continuity_from,reel1.ending_state.continuity_anchor);
   assert.equal(reel2.ending_state.status,"IN_PROGRESS");
 
   const reel3=buildRetroReelProduction(plan,3,reel2.ending_state,["CONTRA_001"],reel2.ending_state.world_state,reel2.ending_state.capability_state,contra.frames);
-  assert.equal(reel3.shots.length,12);
+  assert.equal(reel3.shots.length,8);
   assert.equal(reel3.shots[7].is_resolution_shot,true);
   assert.equal(reel3.ending_state.status,"COMPLETE");
   assert.match(reel3.ending_state.objective_state,/COMPLETE/i);
