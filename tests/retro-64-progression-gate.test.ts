@@ -200,15 +200,15 @@ test("RETRO-64 semantic world gate: generated underwater episode uses underwater
 test("mission arc planner supports user-selected reel counts and final conclusion",()=>{
   const plan2=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",2);
   expect(plan2.reel_count).toBe(2);
-  expect(plan2.total_shots).toBe(24);
+  expect(plan2.total_shots).toBe(16);
   expect(plan2.reels).toHaveLength(2);
-  expect(plan2.reels.every(r=>r.shots===12)).toBe(true);
+  expect(plan2.reels.every(r=>r.shots===8)).toBe(true);
   expect(plan2.reels[1].role).toBe("MISSION_RESOLUTION");
   expect(plan2.reels[1].concludes_mission).toBe(true);
   expect(plan2.reels[0].concludes_mission).toBe(false);
 
   const plan5=buildRetroMissionArcPlan("Contra should rescue the U.S. President.",5);
-  expect(plan5.total_shots).toBe(60);
+  expect(plan5.total_shots).toBe(40);
   expect(plan5.final_reel).toBe(5);
   expect(plan5.reels).toHaveLength(5);
   expect(plan5.reels[0].role).toBe("MISSION_SETUP");
@@ -222,7 +222,7 @@ test("mission arc planner rejects fewer than two reels",()=>{
   expect(()=>buildRetroMissionArcPlan("Contra should rescue the U.S. President.",0)).toThrow();
 });
 
-test("mission episode gate: generated production JSON contains actual 12-shot reels with Resume continuity",()=>{
+test("mission episode gate: generated production JSON contains actual 8-frame reels with Resume continuity",()=>{
   const episode=buildIntentDrivenRetroEpisode({
     game:contra,
     mode:"EXPANSION",
@@ -233,15 +233,15 @@ test("mission episode gate: generated production JSON contains actual 12-shot re
   assert.equal(episode.validation.status,"PASS");
   assert.equal(episode.mission_arc_plan.reel_count,3);
   assert.equal(episode.reels.length,3);
-  assert.equal(episode.production_shot_count,36);
-  assert.ok(episode.reels.every((reel:any)=>reel.shots.length===12));
+  assert.equal(episode.production_shot_count,24);
+  assert.ok(episode.reels.every((reel:any)=>reel.shots.length===8));
   assert.equal(episode.reels[0].ending_state.status,"IN_PROGRESS");
   assert.equal(episode.reels[1].starting_state.continuity_anchor,episode.reels[0].ending_state.continuity_anchor);
   assert.equal(episode.reels[1].starting_state.world_state,episode.reels[0].ending_state.world_state);
   assert.equal(episode.reels[1].starting_state.character_state,episode.reels[0].ending_state.character_state);
   assert.equal(episode.reels[1].starting_state.objective,episode.reels[0].ending_state.objective);
   assert.equal(episode.reels[1].shots[0].continuity_from,episode.reels[0].ending_state.continuity_anchor);
-  assert.equal(episode.reels[2].shots[11].is_resolution_shot,true);
+  assert.equal(episode.reels[2].shots[7].is_resolution_shot,true);
   assert.equal(episode.reels[2].ending_state.status,"COMPLETE");
   assert.match(episode.reels[2].ending_state.objective_state,/COMPLETE/i);
   assert.ok(episode.reels.every((reel:any)=>reel.starting_state.world_state==="Desert environment"));
@@ -254,8 +254,8 @@ test("mission reel production gate: every reel generates 12 shots and Resume car
   assert.equal(reel1.shots.length,12);
   assert.equal(reel1.ending_state.status,"IN_PROGRESS");
   assert.equal(reel1.ending_state.reel,1);
-  assert.equal(reel1.shots[11].is_resolution_shot,false);
-  assert.equal(reel1.shots[11].continuity_to,reel1.ending_state.continuity_anchor);
+  assert.equal(reel1.shots[7].is_resolution_shot,false);
+  assert.equal(reel1.shots[7].continuity_to,reel1.ending_state.continuity_anchor);
 
   const reel2=buildRetroReelProduction(plan,2,reel1.ending_state,["CONTRA_001"],reel1.ending_state.world_state,reel1.ending_state.capability_state,contra.frames);
   assert.equal(reel2.shots.length,12);
@@ -265,7 +265,7 @@ test("mission reel production gate: every reel generates 12 shots and Resume car
 
   const reel3=buildRetroReelProduction(plan,3,reel2.ending_state,["CONTRA_001"],reel2.ending_state.world_state,reel2.ending_state.capability_state,contra.frames);
   assert.equal(reel3.shots.length,12);
-  assert.equal(reel3.shots[11].is_resolution_shot,true);
+  assert.equal(reel3.shots[7].is_resolution_shot,true);
   assert.equal(reel3.ending_state.status,"COMPLETE");
   assert.match(reel3.ending_state.objective_state,/COMPLETE/i);
 });
@@ -276,12 +276,12 @@ test("Resume Reel is blocked when the previous reel state is missing",()=>{
   assert.throws(()=>buildRetroReelProduction(plan,2,initial,["CONTRA_001"],"Jungle fortress","Baseline capability",contra.frames));
 });
 
-test("dashboard gate: exposes 12-shot Reel generation and Resume controls",()=>{
+test("dashboard gate: exposes 8-frame Reel generation and Resume controls",()=>{
   const dashboardPath = path.resolve(process.cwd(), "apps/cinematic-studio/index.html");
   const html = fs.readFileSync(dashboardPath, "utf8");
   assert.match(html,/id="retroGenerateReel"/);
   assert.match(html,/id="retroResumeReel"/);
-  assert.match(html,/12 Shots/);
+  assert.match(html,/8 Frames/);
   assert.match(html,/Resume blocked: generate the previous reel first/);
   assert.match(html,/mission_state/);
   assert.match(html,/ending_state/);
@@ -304,4 +304,24 @@ test("RETRO-64 semantic world gate: desert intent overrides jungle reference wor
   assert.doesNotMatch(text,/dense tropical jungle|rainforest|muddy shoulders/i);
   assert.doesNotMatch(text,/helicopter rotor|heavy rain|jungle/i);
   assert.ok(episode.storyboard.every((s:any)=>s.semantic_world_id==="DESERT"));
+});
+
+
+test("RETRO-64 canonical gate: 3 reels produce 24 continuous frames with <=900-char prompts",()=>{
+  const episode=buildIntentDrivenRetroEpisode({
+    game:contra, mode:"EXPANSION",
+    intent:"Contra should rescue the U.S. President.",
+    episodeId:"CONTRA_24_FRAME_CANONICAL_001", missionReelCount:3
+  });
+  assert.equal(episode.mission_arc_plan.reel_count,3);
+  assert.equal(episode.mission_arc_plan.shots_per_reel,8);
+  assert.equal(episode.mission_arc_plan.total_shots,24);
+  assert.equal(episode.reels.length,3);
+  assert.ok(episode.reels.every((r:any)=>r.shots.length===8));
+  assert.ok(episode.reels.flatMap((r:any)=>r.shots).every((s:any)=>s.prompt_character_count<=900));
+  assert.equal(episode.reels[1].starting_state.continuity_anchor,episode.reels[0].ending_state.continuity_anchor);
+  assert.equal(episode.reels[2].starting_state.continuity_anchor,episode.reels[1].ending_state.continuity_anchor);
+  assert.equal(episode.reels[2].ending_state.status,"COMPLETE");
+  assert.equal(episode.reels[2].shots[7].is_resolution_shot,true);
+  assert.equal(episode.validation.status,"PASS");
 });
