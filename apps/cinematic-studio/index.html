@@ -56,9 +56,9 @@
 <section class="view" data-view="library"><div class="appview">
 <div class="viewhead"><div class="ey">ASSET LIBRARY</div><div class="title">Cinematic Assets & Jobs</div><div class="muted">Canonical scene assets, visual jobs and production references.</div></div>
 <div class="viewgrid" id="libraryGrid"></div></div></section><section class="view" data-view="retro"><div class="retro-shell">
-<div class="viewhead"><div class="ey">RETRO 64 · DEDICATED WORKFLOW</div><div class="title">Retro 64 Mission Production Studio <span style="font:10px system-ui;color:#66cce2;vertical-align:middle">● ACTIVE WORKFLOW</span></div><div class="muted">Game progression DNA → intent → mission arc → 12-shot reels → Resume continuity → mission completion. The 8-stage Excel reference is source DNA, not the final reel.</div></div>
-<div class="retro-grid"><aside class="retro-panel"><div class="field"><label>GAME REFERENCE</label><select class="retro-select" id="retroGame"></select></div><div class="field"><label>INTENT MODE</label><select class="retro-select" id="retroMode"><option value="REFERENCE">REFERENCE · Exact reference episode</option><option value="VARIATION" selected>VARIATION · Same game progression, new episode</option><option value="EXPANSION">EXPANSION · Intent-driven new episode</option></select></div><div class="field"><label>USER INTENT</label><textarea id="retroIntent" placeholder="Example: Contra should rescue the U.S. President."></textarea></div><div class="field"><label>MISSION LENGTH</label><select class="retro-select" id="retroReelCount"><option value="2">2 REELS · 24 SHOTS</option><option value="3" selected>3 REELS · 36 SHOTS</option><option value="4">4 REELS · 48 SHOTS</option><option value="5">5 REELS · 60 SHOTS</option><option value="6">6 REELS · 72 SHOTS</option></select></div><div id="retroMissionPlan" class="muted" style="margin-top:8px"></div><button class="primary" id="retroGenerate">Generate Progression Episode</button><button class="primary" id="retroGenerateReel" disabled>▶ Generate Reel 1 · 12 Shots</button><button class="secondary" id="retroResumeReel" disabled>↻ Resume Next Reel · 12 Shots</button><button class="primary" id="retroVisualStoryboard" disabled>▣ Generate Visual Storyboard</button><button class="primary" id="retroSendProduction" disabled>⇢ Approve & Send to Production</button><button class="secondary" id="retroStoryboard" disabled>▣ Open Storyboard Review</button><button class="secondary" id="retroLoad">Load Reference</button><button class="secondary" id="retroExport">Export Production JSON</button><div id="retroStatus" class="muted" style="margin-top:10px">Ready.</div><div id="retroValidationDetails" class="retro-validation" style="display:none"></div></aside>
-<section class="retro-panel"><div class="ey">PROGRESSION DNA</div><div id="retroMeta" class="muted">Select a game.</div><div id="retroProgression" class="retro-frames" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">MISSION PRODUCTION · LIVE STATE</div><div id="retroMissionProduction" class="retro-mission-production"><div class="muted">Generate a mission to initialize the production state.</div></div><div class="ey" style="margin-top:14px">REFERENCE DNA · SOURCE</div><div id="retroCards" class="retro-cards" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">8-STAGE PROGRESSION SOURCE MAP</div><div class="muted" style="margin:5px 0 8px">These 8 frames define progression rhythm. They are not the generated 12-shot reel output.</div><div id="retroFrames" class="retro-frames"></div><div class="ey" style="margin-top:14px">PRODUCTION JSON</div><pre id="retroJson" class="retro-json">Generate an episode to create the production contract.</pre></section></div></div></section><div class="toast" id="toast"></div>
+<div class="viewhead"><div class="ey">RETRO 64 · DEDICATED WORKFLOW</div><div class="title">Retro 64 Mission Production Studio <span style="font:10px system-ui;color:#66cce2;vertical-align:middle">● ACTIVE WORKFLOW</span></div><div class="muted">Game progression DNA → intent → mission arc → 8-frame reels → Resume continuity → mission completion. The 8-stage Excel reference is source DNA, not the final reel.</div></div>
+<div class="retro-grid"><aside class="retro-panel"><div class="field"><label>GAME REFERENCE</label><select class="retro-select" id="retroGame"></select></div><div class="field"><label>INTENT MODE</label><select class="retro-select" id="retroMode"><option value="REFERENCE">REFERENCE · Exact reference episode</option><option value="VARIATION" selected>VARIATION · Same game progression, new episode</option><option value="EXPANSION">EXPANSION · Intent-driven new episode</option></select></div><div class="field"><label>USER INTENT</label><textarea id="retroIntent" placeholder="Example: Contra should rescue the U.S. President."></textarea></div><div class="field"><label>MISSION LENGTH</label><select class="retro-select" id="retroReelCount"><option value="2">2 REELS · 16 FRAMES</option><option value="3" selected>3 REELS · 24 FRAMES</option><option value="4">4 REELS · 32 FRAMES</option><option value="5">5 REELS · 40 FRAMES</option><option value="6">6 REELS · 48 FRAMES</option></select></div><div id="retroMissionPlan" class="muted" style="margin-top:8px"></div><button class="primary" id="retroGenerate">Generate Progression Episode</button><button class="primary" id="retroGenerateReel" disabled>▶ Generate Reel 1 · 8 Frames</button><button class="secondary" id="retroResumeReel" disabled>↻ Resume Next Reel · 8 Frames</button><button class="primary" id="retroVisualStoryboard" disabled>▣ Generate Visual Storyboard</button><button class="primary" id="retroSendProduction" disabled>⇢ Approve & Send to Production</button><button class="secondary" id="retroStoryboard" disabled>▣ Open Storyboard Review</button><button class="secondary" id="retroLoad">Load Reference</button><button class="secondary" id="retroExport">Export Production JSON</button><div id="retroStatus" class="muted" style="margin-top:10px">Ready.</div><div id="retroValidationDetails" class="retro-validation" style="display:none"></div></aside>
+<section class="retro-panel"><div class="ey">PROGRESSION DNA</div><div id="retroMeta" class="muted">Select a game.</div><div id="retroProgression" class="retro-frames" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">MISSION PRODUCTION · LIVE STATE</div><div id="retroMissionProduction" class="retro-mission-production"><div class="muted">Generate a mission to initialize the production state.</div></div><div class="ey" style="margin-top:14px">REFERENCE DNA · SOURCE</div><div id="retroCards" class="retro-cards" style="margin-top:10px"></div><div class="ey" style="margin-top:14px">8-STAGE PROGRESSION SOURCE MAP</div><div class="muted" style="margin:5px 0 8px">These 8 frames define progression rhythm. They are not the generated 8-frame reel output.</div><div id="retroFrames" class="retro-frames"></div><div class="ey" style="margin-top:14px">PRODUCTION JSON</div><pre id="retroJson" class="retro-json">Generate an episode to create the production contract.</pre></section></div></div></section><div class="toast" id="toast"></div>
 <script>
 const KALP_BACKEND = { endpoint: "https://cfwrgalgscieddkcrtde.supabase.co/functions/v1/kalp-intelligence-gateway", authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmd3JnYWxnc2NpZWRka2NydGRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDQyNzYsImV4cCI6MjEwNDE4MDI3Nn0.TwAdY3JdepMp5IFmmogcXJI4VyhN9Yx5iLxqQG7wqrw" };
 const KALP_INTELLIGENCE_ALIGNMENT = {
@@ -556,7 +556,7 @@ function updateRetroMissionPlanUI(){
   if(!el)return;
   const intent=document.getElementById("retroIntent")?.value.trim()||"";
   const count=document.getElementById("retroReelCount")?.value||"3";
-  el.innerHTML=intent?buildRetroMissionPlanUI(intent,count):"Choose the mission length first. KALP will distribute progression across 12-shot reels and reserve conclusion for the final reel.";
+  el.innerHTML=intent?buildRetroMissionPlanUI(intent,count):"Choose the mission length first. KALP will distribute progression across 8-frame reels and reserve conclusion for the final reel.";
 }
 function retroGenerate(){
   if(!retroGame)return;
@@ -661,7 +661,7 @@ function retroGenerate(){
   document.getElementById("retroFrames").innerHTML=retroEpisode.storyboard.map(f=>"<div class=\"retro-frame\"><strong>FRAME 0"+f.frame+" · "+f.stage+"</strong><h4>"+f.title+"</h4><p>"+f.description+"</p><p style=\"color:#66cce2\">VISUAL · "+f.visual+"</p><p>ACTION · "+f.action+"</p><p style=\"color:#4ed6a0\">CAMERA · "+f.camera+"</p><p style=\"color:#e9bb68\">AUDIO · "+(f.audio_dna?.music||"")+" · "+(f.audio_dna?.intensity||"")+" · "+(f.audio_dna?.transition||"")+"</p></div>").join("");
   const sceneValidation=retroValidate(retroEpisode);const contractValidation=retroValidateProductionJson(retroEpisode);const characterContinuity=retroValidateCharacterContinuity(retroEpisode);const rendererReadiness=retroValidateRendererReadiness(retroEpisode);const validation={validator_version:"1.0",status:sceneValidation.status==="PASS"&&contractValidation.status==="PASS"&&characterContinuity.status==="PASS"&&rendererReadiness.status==="PASS"?"PASS":"FAIL",errors:[...sceneValidation.errors,...contractValidation.errors,...characterContinuity.errors,...rendererReadiness.errors],warnings:[...sceneValidation.warnings,...contractValidation.warnings,...characterContinuity.warnings,...rendererReadiness.warnings],checks:[...sceneValidation.checks,...contractValidation.checks,...characterContinuity.checks,...rendererReadiness.checks]};retroEpisode.validation=validation;retroEpisode.renderer_readiness=rendererReadiness;document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);renderRetroValidationDetails(validation);
   renderRetroMissionProduction();
-  document.getElementById("retroStatus").textContent="GENERATED · "+mode+" · "+(validation.status==="PASS"?"VALIDATED":"VALIDATION FAILED")+" · mission arc ready · 12-shot reel engine armed.";
+  document.getElementById("retroStatus").textContent="GENERATED · "+mode+" · "+(validation.status==="PASS"?"VALIDATED":"VALIDATION FAILED")+" · mission arc ready · 8-frame reel engine armed.";
   document.getElementById("retroStoryboard").disabled=validation.status!=="PASS";
   document.getElementById("retroVisualStoryboard").disabled=validation.status!=="PASS";
   document.getElementById("retroGenerateReel").disabled=validation.status!=="PASS";
@@ -721,42 +721,78 @@ function renderRetroMissionProduction(){
     const done=reels[r.reel-1];
     const current=state.reel===r.reel;
     const status=done?(done.ending_state?.status==="COMPLETE"?"COMPLETE":"GENERATED"):(current?"CURRENT":"PENDING");
-    return "<div class=\"retro-mission-reel "+(done?"done ":"")+(current?"current":"")+"\"><div><strong>REEL "+r.reel+"</strong><span>"+r.role+"</span></div><b>12 SHOTS</b><small>"+retroEsc(r.title)+" · "+retroEsc(r.objective)+"</small><em>"+status+"</em></div>";
+    return "<div class=\"retro-mission-reel "+(done?"done ":"")+(current?"current":"")+"\"><div><strong>REEL "+r.reel+"</strong><span>"+r.role+"</span></div><b>8 FRAMES</b><small>"+retroEsc(r.title)+" · "+retroEsc(r.objective)+"</small><em>"+status+"</em></div>";
   }).join("");
   const shotRows=reels.map(reel=>{
     const shots=reel.shots.map(s=>"<div class=\"retro-shot\"><strong>"+String(s.shot).padStart(2,"0")+"</strong><span>"+retroEsc(s.title)+"</span><small>"+retroEsc(s.stage)+(s.is_resolution_shot?" · RESOLUTION":"")+"</small></div>").join("");
     return "<div class=\"retro-reel-detail\"><div class=\"retro-reel-head\"><b>REEL "+reel.reel+" · "+(reel.ending_state?.status==="COMPLETE"?"MISSION COMPLETE":"IN PROGRESS")+"</b><span>"+retroEsc(reel.starting_state?.world_state||"World state")+"</span></div><div class=\"retro-shot-grid\">"+shots+"</div><div class=\"retro-continuity\">RESUME ANCHOR · "+retroEsc(reel.ending_state?.continuity_anchor||"—")+"</div></div>";
   }).join("");
-  box.innerHTML="<div class=\"retro-mission-summary\"><div><b>MISSION ARC</b><strong>"+plan.reel_count+" REELS · "+plan.total_shots+" SHOTS</strong></div><div><b>STATE</b><strong>"+retroEsc(state.status)+"</strong></div><div><b>OBJECTIVE</b><strong>"+retroEsc(state.objective_state)+"</strong></div></div><div class=\"retro-reel-plan-grid\">"+rows+"</div>"+(shotRows||"<div class=\"muted\" style=\"margin-top:8px\">No reel generated yet. Generate Reel 1 to create the first 12-shot production packet.</div>");
+  box.innerHTML="<div class=\"retro-mission-summary\"><div><b>MISSION ARC</b><strong>"+plan.reel_count+" REELS · "+plan.total_shots+" SHOTS</strong></div><div><b>STATE</b><strong>"+retroEsc(state.status)+"</strong></div><div><b>OBJECTIVE</b><strong>"+retroEsc(state.objective_state)+"</strong></div></div><div class=\"retro-reel-plan-grid\">"+rows+"</div>"+(shotRows||"<div class=\"muted\" style=\"margin-top:8px\">No reel generated yet. Generate Reel 1 to create the first 8-frame production packet.</div>");
 }
 function retroGenerateReel(reelNumber){
   if(!retroEpisode)return;
-  const count=Number(retroEpisode.mission_arc_plan?.reel_count||document.getElementById("retroReelCount")?.value||3);
+  const count=Number(retroEpisode.mission_arc_plan?.reel_count||3);
+  if(reelNumber<1||reelNumber>count){toast("Requested reel is outside the mission plan.");return;}
   const previous=retroEpisode.mission_state||{reel:0,status:"IN_PROGRESS",world_state:retroEpisode.semantic_resolution?.world_label||"Established game world",character_state:(retroEpisode.storyboard?.[0]?.characters||[]).join(", "),capability_state:"Baseline game capability",threat_state:"Initial opposition",objective_state:"Mission accepted; objective not yet complete.",continuity_anchor:"Mission initialized from approved intent and progression plan.",mission_id:retroEpisode.episode_id,objective:retroEpisode.intent};
   if(reelNumber>1 && (!retroEpisode.reels||!retroEpisode.reels[reelNumber-2])){toast("Resume blocked: generate the previous reel first.");return;}
   const prev=reelNumber===1?previous:retroEpisode.reels[reelNumber-2].ending_state;
   if(reelNumber>1 && prev.reel!==reelNumber-1){toast("Resume blocked: previous reel state is missing.");return;}
   const plan=retroEpisode.mission_arc_plan.reels[reelNumber-1];
   const source=retroEpisode.storyboard||[];
-  const shots=Array.from({length:12},(_,idx)=>{
+  const beats=reelNumber===1
+    ? ["Establish entry state","Trigger first threat","First engagement","Gain capability","Major escalation","Breakthrough","Reach threshold","Reveal next threat"]
+    : reelNumber===count
+      ? ["Resume crisis state","Close distance","Final threat","Final engagement","Climax build","Climax","Complete objective","Resolve and close"]
+      : ["Resume exact state","Consequence unfolds","New threat emerges","Adapt response","Setback","Counter-move","New objective threshold","Cliffhanger"];
+  const shots=Array.from({length:8},(_,idx)=>{
     const src=source[idx%source.length]||{};
-    const final=plan.concludes_mission&&idx===11;
-    const nextState={...prev,reel:reelNumber,status:final?"COMPLETE":"IN_PROGRESS",world_state:prev.world_state,character_state:prev.character_state,capability_state:prev.capability_state,threat_state:final?"Threat resolved; mission closes.":"Escalating opposition carried forward.",objective_state:final?"Objective completed; mission marked COMPLETE.":idx===10?"Objective threshold reached; prepare for the next state.":prev.objective_state,continuity_anchor:"Reel "+reelNumber+" Shot "+(idx+1)+" continuity anchor."};
-    return {shot:idx+1,reel:reelNumber,stage:plan.role,title:final?"Mission Complete":(src.title||"Mission Beat")+" — Shot "+(idx+1),description:final?"Final confrontation resolves the mission objective and establishes a clear cinematic ending.":(src.description||src.visual||"Continue the mission.")+" Continue from the previous shot without resetting character, world or objective state.",action:final?"Complete the objective, secure the outcome, and close the mission.":(src.action||"Advance the mission."),characters:src.characters||[],world_state:prev.world_state,character_state:prev.character_state,capability_state:prev.capability_state,threat_state:nextState.threat_state,objective_state:nextState.objective_state,continuity_from:prev.continuity_anchor,continuity_to:nextState.continuity_anchor,is_resolution_shot:final};
+    const final=plan.concludes_mission&&idx===7;
+    const beat=beats[idx];
+    const stateBefore=prev.continuity_anchor;
+    const stateChange=final?"Objective completed; mission closes.":beat+"; advance without resetting established state.";
+    const threat=final?"Threat neutralized or escaped; mission closes.":reelNumber===1&&idx<3?"Initial opposition is forming.":reelNumber>1&&idx===2?"A new threat emerges from the previous reel's consequence.":"Escalating opposition carried forward.";
+    const objective=final?"Objective completed; mission marked COMPLETE.":idx===6?"Objective threshold reached; prepare for the next state.":prev.objective_state;
+    const currentState=prev.world_state+" | "+prev.character_state+" | "+prev.capability_state+" | "+threat+" | "+objective;
+    const nextHook=final?"Cinematic resolution and clean ending.":idx===7?"Carry this exact end-state into the next reel.":"Continue directly from this changed state.";
+    const continuityLock="Identity, costume, equipment, world, props and mission state locked; only justified story-state changes allowed.";
+    const prompt=[
+      "RETRO64 "+reelNumber+"-"+(idx+1)+". "+(src.title||"Mission beat")+". "+(src.action||"Advance the mission."),
+      "STATE BEFORE: "+stateBefore+". CHANGE: "+stateChange,
+      "WORLD: "+prev.world_state+". HERO: "+prev.character_state+". THREAT: "+threat,
+      "CAMERA: cinematic progression; preserve identity and environment. HOOK: "+nextHook,
+      "LOCK: "+continuityLock
+    ].join(" ");
+    const nextState={...prev,reel:reelNumber,status:final?"COMPLETE":"IN_PROGRESS",world_state:prev.world_state,character_state:prev.character_state,capability_state:prev.capability_state,threat_state:threat,objective_state:objective,continuity_anchor:"Reel "+reelNumber+" Frame "+(idx+1)+" end-state anchor."};
+    return {
+      shot:idx+1,reel:reelNumber,stage:plan.role,title:final?"Mission Complete":(src.title||"Mission Beat")+" · "+beat,
+      description:final?"Final confrontation resolves the mission objective and establishes a clear cinematic ending.":(src.description||"Continue the mission.")+" "+beat+" from the inherited state.",
+      action:final?"Complete the objective, secure the outcome, and close the mission.":(src.action||"Advance the mission.")+" State changes; do not repeat the previous frame.",
+      characters:src.characters||[],world_state:nextState.world_state,character_state:nextState.character_state,capability_state:nextState.capability_state,
+      threat_state:nextState.threat_state,objective_state:nextState.objective_state,continuity_from:stateBefore,continuity_to:nextState.continuity_anchor,
+      is_resolution_shot:final,previous_state:stateBefore,state_change:stateChange,current_state:currentState,next_hook:nextHook,
+      continuity_lock:continuityLock,storyboard_prompt:prompt,prompt_character_count:prompt.length
+    };
   });
-  const endingState={...prev,reel:reelNumber,status:plan.concludes_mission?"COMPLETE":"IN_PROGRESS",objective_state:plan.concludes_mission?"Objective completed; mission marked COMPLETE.":"Objective remains unresolved; continue to next reel.",continuity_anchor:"Reel "+reelNumber+" Shot 12 continuity anchor."};
+  const endingState=shots[7];
   retroEpisode.reels=retroEpisode.reels||[];
-  retroEpisode.reels[reelNumber-1]={reel:reelNumber,shots,starting_state:prev,ending_state:endingState,continuation_token:"RETRO-MISSION|"+retroEpisode.intent+"|"+reelNumber+"|"+endingState.status};
-  retroEpisode.mission_state=endingState;
+  retroEpisode.reels[reelNumber-1]={reel:reelNumber,shots,starting_state:prev,ending_state:{
+    ...prev,reel:reelNumber,status:plan.concludes_mission?"COMPLETE":"IN_PROGRESS",
+    objective_state:plan.concludes_mission?"Objective completed; mission marked COMPLETE.":"Objective remains unresolved; continue to next reel.",
+    continuity_anchor:shots[7].continuity_to
+  },continuation_token:"RETRO-MISSION|"+retroEpisode.intent+"|"+reelNumber+"|"+(plan.concludes_mission?"COMPLETE":"IN_PROGRESS")};
+  retroEpisode.mission_state=retroEpisode.reels[reelNumber-1].ending_state;
+  const promptGate=retroEpisode.reels.every(r=>r.shots?.length===8&&r.shots.every(s=>s.prompt_character_count<=900&&s.prompt_character_count===s.storyboard_prompt.length));
+  retroEpisode.retro24_gate={contract:"RETRO64-24-FRAME-CONTINUITY-1.0",expected_frames:count*8,generated_frames:retroEpisode.reels.reduce((n,r)=>n+(r.shots?.length||0),0),prompt_limit:900,prompt_gate:promptGate,continuity_gate:retroEpisode.reels.every((r,i)=>i===0||r.starting_state?.continuity_anchor===retroEpisode.reels[i-1]?.ending_state?.continuity_anchor)};
   renderRetroMissionProduction();
   document.getElementById("retroReelCount").disabled=false;
   document.getElementById("retroJson").textContent=JSON.stringify(retroEpisode,null,2);
-  document.getElementById("retroStatus").textContent="REEL "+reelNumber+" GENERATED · 12 SHOTS · "+(plan.concludes_mission?"MISSION COMPLETE":"STATE SAVED");
+  document.getElementById("retroStatus").textContent="REEL "+reelNumber+" GENERATED · 8 FRAMES · "+(plan.concludes_mission?"MISSION COMPLETE":"STATE SAVED")+" · PROMPTS "+(promptGate?"≤900":"OVER LIMIT");
   const send=document.getElementById("retroSendProduction");
-  if(send) send.disabled=!(retroEpisode.validation?.status==="PASS" && retroEpisode.reels.length===count && retroEpisode.mission_state.status==="COMPLETE");
+  const gate=retroEpisode.retro24_gate;
+  if(send) send.disabled=!(retroEpisode.validation?.status==="PASS"&&gate.generated_frames===gate.expected_frames&&gate.prompt_gate&&gate.continuity_gate&&retroEpisode.mission_state.status==="COMPLETE");
   document.getElementById("retroResumeReel").disabled=plan.concludes_mission;
-  document.getElementById("retroResumeReel").textContent=plan.concludes_mission?"✓ Mission Complete":"↻ Resume Reel "+(reelNumber+1)+" · 12 Shots";
-  toast(plan.concludes_mission?"Mission completed in Reel "+reelNumber+".":"Reel "+reelNumber+" generated. Story state saved for Resume.");
+  document.getElementById("retroResumeReel").textContent=plan.concludes_mission?"✓ Mission Complete":"↻ Resume Reel "+(reelNumber+1)+" · 8 Frames";
+  toast(plan.concludes_mission?"Mission completed in Reel "+reelNumber+".":"Reel "+reelNumber+" generated; state handed forward.");
 }
 function wireRetroReelControls(){
   const gen=document.getElementById("retroGenerateReel"),resume=document.getElementById("retroResumeReel");
@@ -772,7 +808,8 @@ function retroBuildProductionPackage(){
   const validation=retroEpisode.validation||{};
   const expectedReels=Number(retroEpisode.mission_arc_plan?.reel_count||0);
   if(validation.status!=="PASS"){toast("Retro validation must PASS before production handoff.");return null;}
-  if(!expectedReels || retroEpisode.reels?.length!==expectedReels || retroEpisode.mission_state?.status!=="COMPLETE"){toast("Complete the final mission reel before production handoff.");return null;}
+  const gate=retroEpisode.retro24_gate;
+  if(!expectedReels || !gate || gate.expected_frames!==24 || gate.generated_frames!==24 || !gate.prompt_gate || !gate.continuity_gate || retroEpisode.mission_state?.status!=="COMPLETE"){toast("Production gate blocked: all 24 frames, continuity and <=900-character prompts must pass.");return null;}
   const reels=retroEpisode.reels||[];
   const shots=reels.flatMap(reel=>(reel.shots||[]).map(s=>({
     frame_id:"R"+String(reel.reel).padStart(2,"0")+"-S"+String(s.shot).padStart(2,"0"),
