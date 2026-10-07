@@ -3,11 +3,11 @@
  *
  * A mission is no longer fixed to 8 frames or 3 reels.
  * The 8-frame reference remains the progression-DNA source.
- * A user chooses the number of reels; every reel owns exactly 12 shots.
+ * A user chooses the number of reels; every reel owns exactly 8 production frames.
  * The final reel is always the resolution/conclusion reel.
  */
 
-export const RETRO_SHOTS_PER_REEL = 12;
+export const RETRO_SHOTS_PER_REEL = 8;
 export const RETRO_MIN_MISSION_REELS = 2;
 
 export type RetroMissionReelRole =
@@ -173,6 +173,13 @@ export interface RetroMissionShot {
   continuity_from:string;
   continuity_to:string;
   is_resolution_shot:boolean;
+  previous_state:string;
+  state_change:string;
+  current_state:string;
+  next_hook:string;
+  continuity_lock:string;
+  storyboard_prompt:string;
+  prompt_character_count:number;
 }
 
 export interface RetroGeneratedReel {
@@ -234,11 +241,22 @@ export function buildRetroReelProduction(
     const shot=index+1;
     const sourceFrame=source[index%source.length];
     const resolution=reelPlan.concludes_mission && shot===RETRO_SHOTS_PER_REEL;
-    const nextObjective=resolution?"Objective completed; mission marked COMPLETE.":shot===11?"Objective threshold reached; prepare for the next state.":state.objective_state;
+    const nextObjective=resolution?"Objective completed; mission marked COMPLETE.":shot===7?"Objective threshold reached; prepare for the next state.":state.objective_state;
     const nextThreat=resolution?"Threat neutralized or escaped; mission closes.":reelPlan.role==="MISSION_SETUP"&&shot<4?"Initial opposition is forming.":"Escalating opposition carried forward.";
+    const currentState=`${worldState} | ${characterIds.join(", ")} | ${capabilityState} | ${nextThreat} | ${nextObjective}`;
+    const stateChange=resolution?"Objective completed; mission closes.":`${SHOT_BEATS[index]}; advance the mission without resetting established state.`;
+    const nextHook=resolution?"Cinematic resolution and clean ending.":shot===8?"Carry this exact end-state into the next reel.":"Continue directly from the changed state in the next frame.";
+    const continuityLock="Identity, costume, equipment, world, props and established mission state remain locked; only justified story-state changes may occur.";
+    const storyboardPrompt=[
+      `RETRO64 frame ${reel}-${shot}. ${sourceFrame.title}. ${sourceFrame.action}` ,
+      `STATE: ${state.objective_state}. CHANGE: ${stateChange}` ,
+      `WORLD: ${worldState}. HERO: ${characterIds.join(", ")}. THREAT: ${nextThreat}` ,
+      `CAMERA: cinematic progression shot; preserve continuity. HOOK: ${nextHook}` ,
+      `LOCK: ${continuityLock}`
+    ].join(" ");
     const description=resolution
       ? "Final confrontation resolves the mission objective and establishes a clear cinematic ending."
-      : `${sourceFrame.description} Continue from the previous shot without resetting character, world or objective state. Beat: ${SHOT_BEATS[index]}.`;
+      : `${sourceFrame.description} Continue from the previous frame without resetting character, world or objective state. Beat: ${SHOT_BEATS[index]}.`;
     const nextState:RetroMissionState={
       ...state,
       reel,
@@ -261,7 +279,14 @@ export function buildRetroReelProduction(
       objective_state:nextObjective,
       continuity_from:state.continuity_anchor,
       continuity_to:nextState.continuity_anchor,
-      is_resolution_shot:resolution
+      is_resolution_shot:resolution,
+      previous_state:state.continuity_anchor,
+      state_change:stateChange,
+      current_state:currentState,
+      next_hook:nextHook,
+      continuity_lock:continuityLock,
+      storyboard_prompt:storyboardPrompt,
+      prompt_character_count:storyboardPrompt.length
     });
     state=nextState;
   }
