@@ -33,7 +33,7 @@ jobs:
           from pathlib import Path
           import re
           html = Path("apps/cinematic-studio/index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\\b[^>]*>([\\s\\S]*?)</script\\s*>", html, re.IGNORECASE)
+          scripts = re.findall(r"<script\b[^>]*>([\s\S]*?)</script\s*>", html, re.IGNORECASE)
           scripts = [s for s in scripts if s.strip()]
           if not scripts:
               raise SystemExit("FAIL: No inline script blocks found.")
