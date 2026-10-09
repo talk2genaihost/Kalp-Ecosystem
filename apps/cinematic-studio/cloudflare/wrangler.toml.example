@@ -1,0 +1,15 @@
+# Copy to wrangler.toml only after creating a dedicated Cloudflare D1 database.
+# Never commit account secrets or KALP_API_TOKEN.
+name = "kalp-cinematic-studio-api"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Replace with the exact deployed Studio origin before enabling browser requests.
+ALLOWED_ORIGIN = "https://REPLACE-WITH-CINEMATIC-STUDIO-ORIGIN"
+
+[[d1_databases]]
+binding = "KALP_CINEMATIC_DB"
+database_name = "kalp-cinematic-studio"
+database_id = "REPLACE-WITH-DEDICATED-D1-DATABASE-ID"
+migrations_dir = "migrations"
