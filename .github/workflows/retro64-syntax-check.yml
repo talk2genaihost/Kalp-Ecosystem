@@ -1,0 +1,49 @@
+name: Retro64 JavaScript Syntax Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/cinematic-studio/index.html"
+      - ".github/workflows/retro64-syntax-check.yml"
+  push:
+    branches:
+      - "fix/retro64-reference-dna-lock"
+    paths:
+      - "apps/cinematic-studio/index.html"
+      - ".github/workflows/retro64-syntax-check.yml"
+
+jobs:
+  syntax-check:
+    name: Check inline JavaScript syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Extract inline scripts and validate syntax
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("apps/cinematic-studio/index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script\\b[^>]*>([\\s\\S]*?)</script\\s*>", html, re.IGNORECASE)
+          scripts = [s for s in scripts if s.strip()]
+          if not scripts:
+              raise SystemExit("FAIL: No inline script blocks found.")
+          out = Path("/tmp/retro64-inline-scripts")
+          out.mkdir(parents=True, exist_ok=True)
+          for i, script in enumerate(scripts, 1):
+              (out / f"script-{i}.js").write_text(script, encoding="utf-8")
+          print(f"Extracted {len(scripts)} inline script block(s).")
+          PY
+          for file in /tmp/retro64-inline-scripts/*.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
