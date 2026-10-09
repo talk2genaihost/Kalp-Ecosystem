@@ -33,10 +33,18 @@ jobs:
           from pathlib import Path
           import re
           html = Path("apps/cinematic-studio/index.html").read_text(encoding="utf-8")
-          scripts = re.findall(r"<script\b[^>]*>([\s\S]*?)</script\s*>", html, re.IGNORECASE)
-          scripts = [s for s in scripts if s.strip()]
+          tags = re.findall(r"<script\b([^>]*)>([\s\S]*?)</script\s*>", html, re.IGNORECASE)
+          scripts = []
+          for attrs, body in tags:
+              if re.search(r"\bsrc\s*=", attrs, re.IGNORECASE):
+                  continue
+              script_type = re.search(r"""\btype\s*=\s*["']?([^\s"'>]+)""", attrs, re.IGNORECASE)
+              if script_type and ("json" in script_type.group(1).lower()):
+                  continue
+              if body.strip():
+                  scripts.append(body)
           if not scripts:
-              raise SystemExit("FAIL: No inline script blocks found.")
+              raise SystemExit("FAIL: No inline JavaScript blocks found.")
           out = Path("/tmp/retro64-inline-scripts")
           out.mkdir(parents=True, exist_ok=True)
           for i, script in enumerate(scripts, 1):
