@@ -78,7 +78,9 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
       movement[String(x.input_movement).toLowerCase()] = String(x.normalized_movement);
     }
 
-    const va = vfxAudioRows.find(x => String(x.world_id).toUpperCase() === id);\n    const vfx = va ? list(va.vfx) : vfxRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.vfx ?? x.effect ?? x.value));\n    const audio = va ? list(va.audio) : audioRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.audio ?? x.sound ?? x.value));
+    const va = vfxAudioRows.find(x => String(x.world_id).toUpperCase() === id);
+    const vfx = va ? list(va.vfx) : vfxRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.vfx ?? x.effect ?? x.value));
+    const audio = va ? list(va.audio) : audioRows.filter(x => String(x.world_id).toUpperCase() === id).flatMap(x => list(x.audio ?? x.sound ?? x.value));
 
     return {
       id,
@@ -100,7 +102,8 @@ export function loadUnifiedKnowledgeSource(filePath = workbookPath()): UnifiedKn
 
   const progressionStages = progressionRows
     .sort((a, b) => Number(a.stage_order) - Number(b.stage_order))
-    .map(r => String(r.stage_id ?? r.stage ?? ""))\n    .filter(Boolean);
+    .map(r => String(r.stage_id ?? r.stage ?? ""))
+    .filter(Boolean);
 
   const missionArchetypes: Record<string, string> = {};
   for (const r of missionRows) {
