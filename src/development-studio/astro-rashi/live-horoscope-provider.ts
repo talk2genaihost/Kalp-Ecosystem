@@ -77,7 +77,7 @@ export function createLiveHoroscopeProvider(): HoroscopeContentProvider & {
 
 export async function fetchLiveHoroscopes(
   locale: Locale
-): Promise<{ values: Map<string, string>; attribution?: string }> {
+): Promise<{ values: Map<string, string>; attributions: Map<string, string> }> {
   // Sigastra does not list Hindi as a supported language, so request English and label the source language honestly.
   void locale;
 
@@ -95,18 +95,27 @@ export async function fetchLiveHoroscopes(
       const items = normalize(payload);
       const item = items.find((candidate) => {
         const reportedSign = extractSign(candidate);
-        return !reportedSign || reportedSign === sign || reportedSign === sign.toLowerCase();
+        return !reportedSign || reportedSign === sign;
       }) ?? items[0];
       const value = item ? extractText(item) : null;
-      return { sign, value };
+      const attribution = payload.attribution && typeof payload.attribution === "object"
+        ? (payload.attribution as ProviderObject).localizedHref
+        : undefined;
+      return {
+        sign,
+        value,
+        attribution: typeof attribution === "string" ? attribution : `https://sigastra.com/daily-horoscope/${sign}`
+      };
     })
   );
 
   const values = new Map<string, string>();
+  const attributions = new Map<string, string>();
   const failures: string[] = [];
   for (const result of responses) {
     if (result.status === "fulfilled") {
       if (result.value.value) values.set(result.value.sign, result.value.value);
+      attributions.set(result.value.sign, result.value.attribution);
     } else {
       failures.push(result.reason instanceof Error ? result.reason.message : String(result.reason));
     }
@@ -116,6 +125,5 @@ export async function fetchLiveHoroscopes(
     throw new Error(failures[0] ?? "Live horoscope provider returned no usable daily summaries.");
   }
 
-  // A generic attribution link avoids crediting one selected sign's localized page for all signs.
-  return { values, attribution: "https://sigastra.com/partners/api" };
+  return { values, attributions };
 }
