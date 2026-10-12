@@ -14,6 +14,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | und
 const locale: Locale = "hi-IN";
 void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
+let liveAttributionUrl = "https://sigastra.com/partners/api";
 let accessToken: string | null = null;
 function isHindiText(value: string): boolean {
   const devanagari = (value.match(/[\u0900-\u097F]/g) ?? []).length;
@@ -98,11 +99,29 @@ function renderDaily(): void {
       ? "● लाइव संदेश · मूल भाषा"
       : "दैनिक संदेश · स्रोत से उपलब्ध नहीं";
   renderDailyGuidance();
+  const summaryNode = $("dailyHeroText");
+  const host = summaryNode.parentElement;
+  if (host) {
+    let credit = document.getElementById("dailyProviderCredit") as HTMLAnchorElement | null;
+    if (!credit) {
+      credit = document.createElement("a");
+      credit.id = "dailyProviderCredit";
+      credit.target = "_blank";
+      credit.rel = "noopener noreferrer";
+      credit.textContent = "Horoscope content powered by Sigastra";
+      credit.style.display = "inline-block";
+      credit.style.marginTop = "0.5rem";
+      credit.style.fontSize = "0.85rem";
+      host.appendChild(credit);
+    }
+    credit.href = liveAttributionUrl;
+  }
 }
 
 async function loadLive(): Promise<void> {
   try {
     const result = await fetchLiveHoroscopes(locale);
+    liveAttributionUrl = result.attribution ?? "https://sigastra.com/partners/api";
     for (const rashi of rashis) {
       const value = result.values.get(SIGN_MAP[rashi.id]);
       if (value?.trim()) liveProvider.setSummary(rashi.id, value.trim());
