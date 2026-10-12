@@ -1,6 +1,6 @@
 import { createAstroRashiRuntime } from "./runtime.js";
 import { unavailableCalculationProvider } from "./demo-provider.js";
-import { createLiveHoroscopeProvider, fetchLiveHoroscopes, SIGN_MAP } from "./live-horoscope-provider.js";
+import { createLiveHoroscopeProvider, fetchLiveHoroscopes, getDailyHoroscope, SIGN_MAP } from "./live-horoscope-provider.js";
 import { rashis } from "./localization.js";
 import { renderGeminiForPayload } from "./kalp-gemini-entry.js";
 import { deriveCanonicalEvidence } from "./kalp-derived-evidence.js";
@@ -71,18 +71,17 @@ function renderRashis(): void {
 }
 
 function renderDailyGuidance(): void {
-  // The current provider contract supplies a horoscope summary only. Do not
-  // invent lucky colours, numbers, times, or advice when the source omits them.
   const unavailable = "स्रोत से उपलब्ध नहीं";
-  $("luckyColor").textContent = unavailable;
-  $("luckyNumber").textContent = unavailable;
-  $("luckyTime").textContent = unavailable;
-  $("dailyFocus").textContent = unavailable;
-  $("workGuidance").textContent = unavailable;
-  $("moneyGuidance").textContent = unavailable;
-  $("relationshipGuidance").textContent = unavailable;
-  $("dailyCaution").textContent = unavailable;
-  $("dailyMantra").textContent = unavailable;
+  const data = getDailyHoroscope(selectedRashi.id);
+  $("luckyColor").textContent = data?.luckyColor ?? unavailable;
+  $("luckyNumber").textContent = data?.luckyNumber ?? unavailable;
+  $("luckyTime").textContent = data?.luckyTime ?? unavailable;
+  $("dailyFocus").textContent = data?.focus ?? unavailable;
+  $("workGuidance").textContent = data?.career ?? unavailable;
+  $("moneyGuidance").textContent = data?.finance ?? unavailable;
+  $("relationshipGuidance").textContent = data?.relationships ?? unavailable;
+  $("dailyCaution").textContent = data?.caution ?? unavailable;
+  $("dailyMantra").textContent = data?.mantra ?? unavailable;
 }
 
 function renderDaily(): void {
