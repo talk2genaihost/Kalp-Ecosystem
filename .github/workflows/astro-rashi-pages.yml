@@ -16,14 +16,12 @@ jobs:
     steps:
       - name: Set up job
         run: true
-      - name: Checkout repository without external action
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -eu
-          git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" repo
-          cd repo
-          git checkout "${GITHUB_SHA}"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: repo
+          persist-credentials: false
       - name: Restore Weather application from source branch
         working-directory: repo
         run: |
