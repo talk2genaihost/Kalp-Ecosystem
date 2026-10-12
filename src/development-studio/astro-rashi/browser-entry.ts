@@ -128,7 +128,13 @@ function renderDaily(): void {
   $("selectedRashiHint").textContent = "हिंदी में दैनिक संदेश";
   $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
   $("dailyHeroText").textContent = summary;
-  $("dailyHeroStatus").textContent = liveStatus.includes("लाइव") ? "● लाइव हिंदी" : "हिंदी संदेश";
+  const currentSummary = runtime.weekly(selectedRashi.id, locale).summary?.trim() ?? "";
+  const hasHindiLiveSummary = isHindiText(currentSummary) && !currentSummary.startsWith("आज ");
+  $("dailyHeroStatus").textContent = hasHindiLiveSummary
+    ? "● लाइव हिंदी"
+    : liveStatus.includes("उपलब्ध नहीं") || liveStatus.includes("लोड हो रहा")
+      ? "हिंदी संदेश · वैकल्पिक"
+      : "हिंदी संदेश · हिंदी संस्करण उपलब्ध नहीं";
   renderDailyGuidance();
 }
 
