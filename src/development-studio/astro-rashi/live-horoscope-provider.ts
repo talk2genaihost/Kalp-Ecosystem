@@ -78,8 +78,9 @@ export function createLiveHoroscopeProvider(): HoroscopeContentProvider & {
 export async function fetchLiveHoroscopes(
   locale: Locale
 ): Promise<{ values: Map<string, string>; attribution?: string }> {
-  const language = locale === "hi-IN" ? "en" : "en";
-  const response = await fetch(`${DAILY_ENDPOINT}?lang=${language}&full=1`);
+  // Sigastra supports 15 languages, but not Hindi. Request English explicitly and label it honestly in the UI.
+  void locale;
+  const response = await fetch(`${DAILY_ENDPOINT}?lang=en`);
   if (!response.ok) throw new Error(`Live horoscope provider failed (${response.status}).`);
 
   const payload = await response.json() as ProviderObject;
