@@ -15,7 +15,6 @@ const locale: Locale = "hi-IN";
 void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
 let accessToken: string | null = null;
-let liveStatus = "हिंदी दैनिक संदेश लोड हो रहा है…";
 function isHindiText(value: string): boolean {
   const devanagari = (value.match(/[\u0900-\u097F]/g) ?? []).length;
   const latin = (value.match(/[A-Za-z]/g) ?? []).length;
@@ -88,7 +87,7 @@ function renderDailyGuidance(): void {
 function renderDaily(): void {
   const summary = getDailySummary(selectedRashi.id);
   $("selectedRashiLabel").textContent = `${selectedRashi.names[locale]} — चयनित राशि`;
-  $("selectedRashiHint").textContent = "हिंदी में दैनिक संदेश";
+  $("selectedRashiHint").textContent = isHindiText(summary) ? "हिंदी में दैनिक संदेश" : "प्रदाता का मूल संदेश";
   $("dailyHeroTitle").textContent = `आज का संदेश — ${selectedRashi.names[locale]}`;
   $("dailyHeroText").textContent = summary;
   const currentSummary = runtime.weekly(selectedRashi.id, locale).summary?.trim() ?? "";
@@ -108,10 +107,8 @@ async function loadLive(): Promise<void> {
       const value = result.values.get(SIGN_MAP[rashi.id]);
       if (value?.trim()) liveProvider.setSummary(rashi.id, value.trim());
     }
-    liveStatus = "लाइव दैनिक संदेश · Sigastra";
     renderDaily();
   } catch (error) {
-    liveStatus = "लाइव संदेश अभी उपलब्ध नहीं है; हिंदी संदेश दिखाया जा रहा है।";
     renderDaily();
     console.error(error);
   }
