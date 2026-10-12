@@ -99,23 +99,7 @@ function renderDaily(): void {
       ? "● लाइव संदेश · मूल भाषा"
       : "दैनिक संदेश · स्रोत से उपलब्ध नहीं";
   renderDailyGuidance();
-  const summaryNode = $("dailyHeroText");
-  const host = summaryNode.parentElement;
-  if (host) {
-    let credit = document.getElementById("dailyProviderCredit") as HTMLAnchorElement | null;
-    if (!credit) {
-      credit = document.createElement("a");
-      credit.id = "dailyProviderCredit";
-      credit.target = "_blank";
-      credit.rel = "noopener noreferrer";
-      credit.textContent = "Horoscope content powered by Sigastra";
-      credit.style.display = "inline-block";
-      credit.style.marginTop = "0.5rem";
-      credit.style.fontSize = "0.85rem";
-      host.appendChild(credit);
-    }
-    credit.href = liveAttributions.get(SIGN_MAP[selectedRashi.id]) ?? "https://sigastra.com/partners/api";
-  }
+
 }
 
 async function loadLive(): Promise<void> {
@@ -129,7 +113,7 @@ async function loadLive(): Promise<void> {
     renderDaily();
   } catch (error) {
     renderDaily();
-    console.error(error);
+    console.error("Gemini daily horoscope unavailable:", error);
   }
 }
 
