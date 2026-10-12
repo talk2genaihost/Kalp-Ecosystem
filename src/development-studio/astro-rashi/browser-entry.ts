@@ -14,7 +14,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | und
 const locale: Locale = "hi-IN";
 void deriveCanonicalEvidence;
 let selectedRashi: Rashi = rashis[0];
-let liveAttributionUrl = "https://sigastra.com/partners/api";
+const liveAttributions = new Map<string, string>();
 let accessToken: string | null = null;
 function isHindiText(value: string): boolean {
   const devanagari = (value.match(/[\u0900-\u097F]/g) ?? []).length;
@@ -114,14 +114,14 @@ function renderDaily(): void {
       credit.style.fontSize = "0.85rem";
       host.appendChild(credit);
     }
-    credit.href = liveAttributionUrl;
+    credit.href = liveAttributions.get(SIGN_MAP[selectedRashi.id]) ?? "https://sigastra.com/partners/api";
   }
 }
 
 async function loadLive(): Promise<void> {
   try {
     const result = await fetchLiveHoroscopes(locale);
-    liveAttributionUrl = result.attribution ?? "https://sigastra.com/partners/api";
+    result.attributions.forEach((url, sign) => liveAttributions.set(sign, url));
     for (const rashi of rashis) {
       const value = result.values.get(SIGN_MAP[rashi.id]);
       if (value?.trim()) liveProvider.setSummary(rashi.id, value.trim());

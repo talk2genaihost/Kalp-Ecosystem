@@ -77,27 +77,53 @@ export function createLiveHoroscopeProvider(): HoroscopeContentProvider & {
 
 export async function fetchLiveHoroscopes(
   locale: Locale
-): Promise<{ values: Map<string, string>; attribution?: string }> {
-  // Sigastra supports 15 languages, but not Hindi. Request English explicitly and label it honestly in the UI.
+): Promise<{ values: Map<string, string>; attributions: Map<string, string> }> {
+  // Sigastra does not list Hindi as a supported language, so request English and label the source language honestly.
   void locale;
-  const response = await fetch(`${DAILY_ENDPOINT}?lang=en`);
-  if (!response.ok) throw new Error(`Live horoscope provider failed (${response.status}).`);
 
-  const payload = await response.json() as ProviderObject;
+  // The API returns a sign-specific item when the sign query parameter is supplied.
+  // Fetch each sign explicitly instead of assuming the endpoint returns all 12 signs.
+  const signs = [...new Set(Object.values(SIGN_MAP))];
+  const responses = await Promise.allSettled(
+    signs.map(async (sign) => {
+      const url = new URL(DAILY_ENDPOINT);
+      url.searchParams.set("lang", "en");
+      url.searchParams.set("sign", sign);
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`Live horoscope provider failed for ${sign} (${response.status}).`);
+      const payload = await response.json() as ProviderObject;
+      const items = normalize(payload);
+      const item = items.find((candidate) => {
+        const reportedSign = extractSign(candidate);
+        return !reportedSign || reportedSign === sign;
+      }) ?? items[0];
+      const value = item ? extractText(item) : null;
+      const attribution = payload.attribution && typeof payload.attribution === "object"
+        ? (payload.attribution as ProviderObject).localizedHref
+        : undefined;
+      return {
+        sign,
+        value,
+        attribution: typeof attribution === "string" ? attribution : `https://sigastra.com/daily-horoscope/${sign}`
+      };
+    })
+  );
+
   const values = new Map<string, string>();
-
-  for (const item of normalize(payload)) {
-    const sign = extractSign(item);
-    const value = extractText(item);
-    if (sign && value) values.set(sign, value);
+  const attributions = new Map<string, string>();
+  const failures: string[] = [];
+  for (const result of responses) {
+    if (result.status === "fulfilled") {
+      if (result.value.value) values.set(result.value.sign, result.value.value);
+      attributions.set(result.value.sign, result.value.attribution);
+    } else {
+      failures.push(result.reason instanceof Error ? result.reason.message : String(result.reason));
+    }
   }
 
-  const attributionObject = payload.attribution;
-  const attribution = attributionObject && typeof attributionObject === "object"
-    ? typeof (attributionObject as ProviderObject).localizedHref === "string"
-      ? (attributionObject as ProviderObject).localizedHref as string
-      : "https://sigastra.com/partners/api"
-    : "https://sigastra.com/partners/api";
+  if (values.size === 0) {
+    throw new Error(failures[0] ?? "Live horoscope provider returned no usable daily summaries.");
+  }
 
-  return { values, attribution };
+  return { values, attributions };
 }
