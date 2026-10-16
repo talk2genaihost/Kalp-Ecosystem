@@ -1,5 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { initialFreeProviderMesh, type NormalizedProviderResult, type ProviderRequest } from "./provider-adapters-v01.js";
+import { KalpExecutionFabricV01, type MarketQuoteRequestV1 } from "../execution-fabric/kalp-execution-fabric-v01.js";
 
 export interface RuntimeGatewayConfig {
   port: number;
@@ -65,15 +66,22 @@ async function readBody(req: IncomingMessage, maxBytes: number): Promise<string>
 }
 
 export function createRuntimeGateway(config: RuntimeGatewayConfig, sink: ManthanFusionSink) {
+  const executionFabric = new KalpExecutionFabricV01();
   return createServer(async (req, res) => {
     try {
       if (req.method === "GET" && req.url === "/health") {
-        return json(res, 200, { status: "ok", service: "KALP-MTR-RUNTIME-GATEWAY", version: "v0.1" });
+        return json(res, 200, { status: "ok", service: "KALP-MTR-RUNTIME-GATEWAY", version: "v0.1", execution_fabric: "RE-06-7" });
       }
-      if (req.method !== "POST" || req.url !== "/v1/evidence/ingest") return json(res, 404, { error: "NOT_FOUND" });
+      if (req.method !== "POST" || (req.url !== "/v1/evidence/ingest" && req.url !== "/v1/market/quote")) return json(res, 404, { error: "NOT_FOUND" });
       if (!authorized(req, config.gateway_token)) return json(res, 401, { error: "UNAUTHORIZED" });
 
       const body = await readBody(req, config.max_body_bytes);
+      if (req.url === "/v1/market/quote") {
+        const request = JSON.parse(body || "{}") as MarketQuoteRequestV1;
+        const result = await executionFabric.executeMarketQuote(request);
+        return json(res, result.status === "REJECTED" ? 400 : result.status === "FAILED" ? 502 : 200, result);
+      }
+
       const request = (body ? JSON.parse(body) : {}) as ProviderRequest;
       const providers = await Promise.all(initialFreeProviderMesh.map(provider => provider.fetch(request)));
       const evidence = providers.filter(provider => provider.status === "ok" && provider.provider_id !== "MM-PAF-FIXTURE");
