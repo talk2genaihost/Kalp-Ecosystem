@@ -1,0 +1,182 @@
+{
+  "schema_version": "KALP-UNIVERSAL-CHARACTER-INTELLIGENCE-1.0",
+  "module_id": "KALP_UCI_001",
+  "purpose": "Research, version, validate, approve and reuse subject identity/persona/world profiles inside the existing KALP Cinematic Studio.",
+  "ui_policy": {
+    "new_dashboard": false,
+    "host_view": "characters",
+    "reuse_existing_views": [
+      "characters",
+      "library",
+      "scenes",
+      "storyboard",
+      "production"
+    ]
+  },
+  "approval_policy": {
+    "first_profile_version": "HUMAN_APPROVAL_REQUIRED",
+    "major_identity_or_persona_change": "NEW_VERSION_AND_HUMAN_APPROVAL_REQUIRED",
+    "routine_topic_change": "REUSE_APPROVED_PROFILE",
+    "minor_source_refresh": "VALIDATE_AND_PROPOSE_VERSION_IF_PROFILE_FIELDS_CHANGE"
+  },
+  "gates": [
+    {
+      "id": "INTENT",
+      "order": 1,
+      "required": true,
+      "pass_condition": "Subject and creative intent are resolved."
+    },
+    {
+      "id": "RESEARCH",
+      "order": 2,
+      "required": true,
+      "pass_condition": "Research records contain source URLs, retrieved-at timestamps, evidence summaries and uncertainty labels."
+    },
+    {
+      "id": "DNA_BUILD",
+      "order": 3,
+      "required": true,
+      "pass_condition": "Required identity, persona, communication, knowledge, world and production fields are populated."
+    },
+    {
+      "id": "VALIDATE",
+      "order": 4,
+      "required": true,
+      "pass_condition": "Schema, source coverage, identity consistency and safety checks pass."
+    },
+    {
+      "id": "HUMAN_APPROVAL",
+      "order": 5,
+      "required": true,
+      "pass_condition": "First profile version or major change is explicitly approved."
+    },
+    {
+      "id": "PERSIST_READBACK",
+      "order": 6,
+      "required": true,
+      "pass_condition": "Versioned profile is saved to canonical storage and read back successfully; Excel export is a human-readable mirror."
+    },
+    {
+      "id": "CONTENT_INTENT",
+      "order": 7,
+      "required": true,
+      "pass_condition": "Topic, audience, language, reel count and frame count are resolved."
+    },
+    {
+      "id": "STORYBOARD",
+      "order": 8,
+      "required": true,
+      "pass_condition": "Requested frame count is exact; for the default three-reel format this is 3 reels × 8 frames = 24 frames."
+    },
+    {
+      "id": "CONTINUITY_QA",
+      "order": 9,
+      "required": true,
+      "pass_condition": "Character/world/story continuity and renderer schema validate before production handoff."
+    }
+  ],
+  "profile": {
+    "required_fields": [
+      "profile_id",
+      "canonical_name",
+      "category",
+      "version",
+      "status",
+      "identity_dna",
+      "persona_dna",
+      "communication_dna",
+      "knowledge_dna",
+      "world_dna",
+      "production_dna",
+      "sources",
+      "validation",
+      "approval"
+    ],
+    "categories": [
+      "cartoon_comedy",
+      "mythology_epic",
+      "game_action",
+      "spiritual_discourse",
+      "professional_realistic",
+      "other"
+    ],
+    "statuses": [
+      "RESEARCHING",
+      "VALIDATING",
+      "PENDING_APPROVAL",
+      "APPROVED",
+      "SUPERSEDED",
+      "REJECTED"
+    ],
+    "dna_sections": {
+      "identity_dna": [
+        "canonical_identity",
+        "appearance_or_representation",
+        "visual_reference_ids",
+        "identity_constraints"
+      ],
+      "persona_dna": [
+        "documented_traits",
+        "worldview_or_role",
+        "emotional_range",
+        "confidence_notes"
+      ],
+      "communication_dna": [
+        "language",
+        "vocabulary",
+        "sentence_rhythm",
+        "rhetorical_patterns",
+        "delivery_cues",
+        "imitation_boundaries"
+      ],
+      "knowledge_dna": [
+        "source_texts",
+        "verified_claims",
+        "interpretations",
+        "uncertainties",
+        "quotation_policy"
+      ],
+      "world_dna": [
+        "era_or_context",
+        "setting",
+        "environment_rules",
+        "props",
+        "world_constraints"
+      ],
+      "production_dna": [
+        "aspect_ratio",
+        "visual_style",
+        "camera_language",
+        "lighting",
+        "audio_cues",
+        "continuity_rules"
+      ]
+    },
+    "source_record_fields": [
+      "url",
+      "title",
+      "publisher",
+      "retrieved_at",
+      "evidence_summary",
+      "supports_fields",
+      "reliability_note"
+    ]
+  },
+  "persistence": {
+    "canonical_store": "Existing application persistence layer, after capability audit; do not treat browser localStorage or GitHub source files as cross-user durable memory.",
+    "excel_role": "Exportable human-readable mirror with Profile, DNA, Sources, Validation and Version History sheets.",
+    "versioning": "Immutable approved versions; proposed changes never overwrite the active approved version."
+  },
+  "adapters": {
+    "character_registry": "Extend existing apps/cinematic-studio/data/character-registry.json contracts without replacing the registry.",
+    "retro64": "Reuse apps/cinematic-studio/retro64-ui-v2.js and its Excel/reference-driven DNA logic as the first domain adapter.",
+    "scene_runtime": "Reuse apps/cinematic-studio/api/cinematic.js scene/frame contracts where compatible.",
+    "renderer": "Reuse existing storyboard and production handoff; no parallel storyboard engine."
+  },
+  "known_gaps": [
+    "The existing cinematic runtime currently generates an 8-frame scene from a registered character selection; it is not yet a universal 24-frame discourse engine.",
+    "The visible MCP/Gemini/Governor selector in index.html is UI state and is not, by itself, proof of a connected automatic research provider.",
+    "The current cinematic API reads JSON contracts and generates scene data; it does not provide durable profile CRUD or human-approval persistence.",
+    "Retro 64 has its own workbook-driven reference ingestion and 3-reel progression logic, but its selected-game workflow is domain-specific."
+  ]
+}
