@@ -10,6 +10,7 @@
     "build": "tsc",
     "build:astro-rashi": "vite build",
     "test": "tsx --test tests/**/*.test.ts",
+    "test:cloudflare": "node --test apps/cinematic-studio/cloudflare/tests/*.test.js",
     "dev:kalpgyan": "vite modules/kalpgyan-manthan/dashboard",
     "dev:kalpgyan-runtime": "tsx src/kalpgyan-manthan/server.ts"
   },

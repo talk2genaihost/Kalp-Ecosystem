@@ -1,0 +1,25 @@
+name: Cinematic Studio Cloudflare API Tests
+
+on:
+  pull_request:
+    paths:
+      - "apps/cinematic-studio/cloudflare/**"
+      - "package.json"
+      - ".github/workflows/cinematic-cloudflare-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cloudflare-worker-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Run Worker API tests
+        run: npm run test:cloudflare
