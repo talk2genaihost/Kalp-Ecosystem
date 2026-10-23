@@ -2,6 +2,8 @@ import { extractBookText } from "./book.js";
 import { generateDiscourse } from "./providers/gemini.js";
 import { synthesizeSpeech } from "./providers/google-tts.js";
 import { persistMp3 } from "./audio.js";
+import { AI_AWAAZ_PROVIDER_ID, createAiAwaazAdapter } from "./providers/ai-awaaz.js";
+export { AI_AWAAZ_PROVIDER_ID, createAiAwaazAdapter } from "./providers/ai-awaaz.js";
 
 export const SPEAKER_STYLES: SpeakerStyle[] = [
   { id: "neutral-philosopher", label: "Neutral Philosopher", writingDNA: ["clear","reflective"], performanceDNA: ["measured","warm"] },
@@ -45,9 +47,10 @@ function qaScript(script: string, durationMinutes: 15 | 20): string[] {
 export async function createProduction(req: ProductionRequest, voice: VoiceProfile): Promise<ProductionResult> {
   const reasons = validateVoiceForProduction(voice);
   if (reasons.length) return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons } };
-  if (!req.book.sourceRef) return { productionId: crypto.randomUUID(), status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["book.sourceRef is required for real production."] } };
-
   const productionId = crypto.randomUUID();
+  if (voice.provider === AI_AWAAZ_PROVIDER_ID) return { productionId, status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["AI Awaaz provider execution is gated until AWAAZ-02 API contract validation and AWAAZ-03 controlled connectivity pass."] } };
+  if (!req.book.sourceRef) return { productionId, status: "blocked", script: "", chapters: [], qa: { passed: false, reasons: ["book.sourceRef is required for real production."] } };
+
   try {
     const sourceText = await extractBookText(req.book.sourceRef);
     if (sourceText.length < 200) throw new Error("Book intake returned too little source text for governed discourse generation.");
